@@ -1,470 +1,1035 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" data-theme="royal">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="theme-color" content="#26030b" />
-  <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <meta name="format-detection" content="telephone=no" />
-  <title>Dice Duel</title>
-  <link rel="icon" type="image/png" href="favicon.png" />
-  <link rel="apple-touch-icon" href="favicon.png" />
-  <link rel="stylesheet" href="variant-themes.css" />
-  <style>
-    :root { --ink:#1d2340; --cream:#fffaf0; --orange:#ec633f; --orange-dark:#a83b25; --teal:#216d67; --green:#19754e; --red:#a6273d; --gold:#f5c850; }
-    * { box-sizing:border-box } body { margin:0; min-width:320px; font-family:Arial,Helvetica,sans-serif; color:var(--ink); background:radial-gradient(#1d234013 .8px,transparent .8px),linear-gradient(135deg,#fff8e9,#f6edd7); background-size:13px 13px,auto }
-    button,input { font:inherit } button { cursor:pointer } .shell { max-width:1050px; margin:auto; padding:26px 18px 50px } header { display:flex; justify-content:space-between; align-items:center; gap:16px; margin-bottom:28px } .brand { display:flex; align-items:center; gap:11px; font-weight:800; font-size:21px }.logo { display:grid; place-items:center; width:42px; height:42px; border-radius:12px; background:var(--orange); color:white; box-shadow:0 4px 0 var(--orange-dark) }.bank { background:#fffdf8c9; border:1px solid #dcd1bc; border-radius:999px; padding:10px 14px; font-weight:700 }
-    main { display:grid; grid-template-columns:minmax(0,1fr) 285px; gap:20px }.card { background:#fffdf8dd; border:1px solid #dfd2bd; border-radius:27px; box-shadow:0 4px 0 #1d234016,0 18px 35px #1d234010 }.game { padding:28px; text-align:center; position:relative; overflow:hidden }.eyebrow { font:700 11px monospace; letter-spacing:.16em; text-transform:uppercase; color:#697083 }.round-title { margin:8px 0 4px; font-size:28px }.copy { color:#687084; margin:0 auto; max-width:470px; line-height:1.5 }.shooter { margin:28px 0 20px }.shooter-name { margin:0; font-size:31px; letter-spacing:-.04em }.shooter-number { margin:6px 0 0; color:var(--teal); font:700 11px monospace; text-transform:uppercase; letter-spacing:.13em }
-    .dice-row { min-height:150px; display:flex; align-items:center; justify-content:center; gap:18px }.die { width:92px; height:92px; border-radius:19px; background:white; border:2px solid #1d234022; box-shadow:inset 0 -5px #1d234018,0 7px #1d23402b,0 14px 22px #1d234020; display:grid; grid-template:repeat(3,1fr)/repeat(3,1fr); padding:13px }.pip { width:13px; height:13px; background:var(--ink); border-radius:50%; place-self:center }.sum { color:#7b8291; font:22px monospace }.total { display:none; width:110px; margin:5px auto 20px; padding:10px; border:2px solid var(--gold); background:#f5c85055; border-radius:18px; font:700 12px monospace; text-transform:uppercase }.total strong { display:block; font-size:35px; color:var(--ink); letter-spacing:-.1em }.roll { border:0; width:min(100%,390px); min-height:58px; border-radius:16px; background:var(--orange); color:white; font-weight:800; font-size:16px; box-shadow:0 5px var(--orange-dark),0 13px 25px #ec633f42 }.roll:active { transform:translateY(3px); box-shadow:0 2px var(--orange-dark) }.turn { color:#697083; font:11px monospace; text-transform:uppercase; letter-spacing:.12em; margin:19px 0 0 }
-    aside { display:grid; gap:16px; align-content:start }.side { padding:20px }.side h3 { margin:0 0 14px; font:700 11px monospace; color:#697083; letter-spacing:.16em; text-transform:uppercase }.pool { font:500 37px monospace; letter-spacing:-.12em; margin:0; padding:17px; background:#f2eadb; border-radius:17px }.wager-preview { display:inline-block; margin-left:8px; color:#D29C5E; font-size:13px; letter-spacing:-.04em; opacity:.55; vertical-align:middle; white-space:nowrap }.hint { font:11px monospace; color:#687084; text-align:center; line-height:1.5 }.sidebet-controls { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin:12px 0 0 }.sidebet-controls button { min-height:52px; border:1px solid #D29C5E; border-radius:12px; background:#87502C; color:#F4D895; font:800 18px monospace; box-shadow:0 3px #30060D }.sidebet-controls button:disabled { opacity:.4; cursor:not-allowed }.sidebet-controls.dimmed { opacity:.35; filter:grayscale(.85) }.sidebet-draft { margin:8px 0 0; text-align:center; color:#D29C5E; font:10px monospace; min-height:14px }.sidebet { margin-top:13px; padding:13px; border:1px solid #216d6744; border-radius:15px; background:#216d670c; text-align:center }.sidebet p { margin:0; font-size:12px; font-weight:800 }.sidebet small { display:block; margin:7px 0 10px; color:#687084; font:10px monospace }.timer-track { overflow:hidden; height:7px; border-radius:999px; background:#1d23401a }.timer-fill { display:block; height:100%; width:100%; background:linear-gradient(90deg,var(--orange),var(--gold)); transition:width .1s linear }.sidebet-actions { display:grid; grid-template-columns:1fr; gap:8px }.sidebet-actions button { min-height:39px; border:0; border-radius:10px; font-weight:800 }.accept { background:var(--green); color:white }.stats { display:grid; grid-template-columns:1fr 1fr; gap:9px }.stat { padding:13px; background:#f2eadb; border-radius:14px; font-size:12px; color:#687084 }.stat strong { display:block; margin-top:8px; color:var(--ink); font:500 24px }
-    .overlay { position:fixed; inset:0; display:flex; align-items:center; justify-content:center; padding:16px; z-index:9; background:#1d2340a8; backdrop-filter:blur(4px) }.modal { width:min(100%,460px); position:relative; text-align:center; border-radius:29px; padding:29px; color:white; box-shadow:0 25px 75px #10132680; overflow:hidden }.win { background:linear-gradient(145deg,#2e9e69,#12543e); border:2px solid var(--gold) }.loss { background:linear-gradient(145deg,#c13c55,#67182b); border:2px solid #ff94a6 }.modal h2 { font-size:38px; margin:15px 0 8px }.modal p { margin:0; line-height:1.5 }.modal button,.setup button { width:100%; margin-top:23px; min-height:52px; border:0; border-radius:15px; background:white; color:var(--ink); font-weight:800 }.money { position:absolute; inset:0; pointer-events:none; overflow:hidden }.money span { position:absolute; top:-45px; font-size:28px; animation:rain 4s linear infinite; animation-delay:var(--d); left:var(--x) } @keyframes rain { to { transform:translate(24px,115vh) rotate(210deg) } }.win-icon { font-size:70px; position:relative }.wallet { position:relative; margin:0 auto 12px; width:115px; height:100px; display:grid; place-items:center; font-size:62px; animation:open 1.15s ease-in-out infinite alternate }.wallet b { position:absolute; font-size:34px; top:29px; left:43px }.wallet i { position:absolute; font-style:normal; font-size:21px; bottom:-3px; right:3px; animation:spider 2s ease-in-out infinite } @keyframes open { to { transform:scale(1.12) rotate(-6deg) } } @keyframes spider { 50% { transform:translate(-25px,-10px) } }
-    .setup { background:#fffdf8; color:var(--ink); text-align:left }.setup h2 { margin:5px 0 7px; font-size:30px }.setup input { width:100%; margin-top:11px; padding:14px; border-radius:13px; border:1px solid #d8ccb9; background:#fff; outline-color:var(--orange) }.setup button { background:var(--orange); color:white }.opening-options { display:grid; grid-template-columns:repeat(3,1fr); gap:9px; margin-top:20px }.opening-options button { margin:0; min-height:65px; font:500 25px monospace }.rolloff-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:20px }.rolloff-player { border:1px solid #dccfbb; border-radius:16px; padding:14px; text-align:center; background:#fff }.rolloff-player strong { display:block; overflow:hidden; text-overflow:ellipsis; white-space:nowrap }.rolloff-number { min-height:57px; padding-top:10px; font:500 30px monospace; color:var(--orange) }.rolling-die { display:inline-grid; width:43px; height:43px; place-items:center; border-radius:10px; background:white; border:1px solid #1d234022; box-shadow:0 3px #1d234021; animation:tumble .18s linear infinite }.rolloff-player button { margin-top:5px; min-height:41px; font-size:13px }.ledger { display:grid; gap:9px }.ledger-row { display:grid; grid-template-columns:minmax(0,1fr) 72px; gap:7px; align-items:center; padding:11px; background:#f2eadb; border-radius:13px; font-size:11px; color:#687084 }.ledger-row b { display:block; overflow:hidden; color:var(--ink); text-overflow:ellipsis; white-space:nowrap; font-size:12px }.ledger-money { text-align:right; font:500 16px monospace }.positive { color:var(--green)!important }.negative { color:var(--red)!important }.winner-info { position:relative; margin:17px auto 4px; max-width:280px; padding:13px; border-radius:14px; background:#ffffff2b; font:700 16px monospace }.winner-info small { display:block; margin-bottom:5px; font:700 10px; letter-spacing:.12em; text-transform:uppercase; opacity:.76 }.hidden { display:none!important } @keyframes tumble { 50% { transform:rotate(180deg) translateY(-5px) scale(.92) } 100% { transform:rotate(360deg) } }
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="theme-color" content="#1c0509" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="format-detection" content="telephone=no" />
+<meta name="description" content="Dice Duel — a private two-player dice table with wagers, side bets and a running ledger." />
+<title>Dice Duel — Private Table</title>
+<link rel="icon" type="image/png" href="favicon.png" />
+<link rel="apple-touch-icon" href="favicon.png" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+<style>
+/* ============================================================
+   DICE DUEL — design system
+   One token set drives every table theme via [data-theme="…"].
+   ============================================================ */
 
-    /* Dice Duel logo palette: black cherry, burgundy, mahogany, and antique gold. */
-    :root { --ink:#F4E8D0; --cream:#120103; --orange:#662F1D; --orange-dark:#30060D; --teal:#D29C5E; --green:#22C55E; --red:#DC2626; --gold:#F4D895; }
-    body { background:radial-gradient(#F4D89513 .8px,transparent .8px),radial-gradient(circle at 18% 0,#44180F 0,transparent 37%),linear-gradient(135deg,#120103,#2A0509 58%,#30060D); background-size:13px 13px,auto,auto; color:var(--ink) }
-    .logo { background:linear-gradient(145deg,#AC7542,#662F1D); color:#120103; box-shadow:0 4px 0 #30060D }.brand { color:var(--gold) }.card { background:#2A0509e8; border-color:#AC7542; box-shadow:0 4px 0 #120103,0 18px 35px #12010380 }.eyebrow,.turn,.hint { color:#D29C5E }.round-title,.shooter-name,.ledger-row b { color:#F4E8D0 }.copy { color:#C9B08A }.shooter-number { color:#F4D895 }.die { background:#F4E8D0; border-color:#D29C5E; box-shadow:inset 0 -5px #1201032e,0 7px #1201038a,0 14px 22px #12010370 }.pip { background:#120103 }.sum { color:#D29C5E }.total { background:#AC754244; border-color:#F4D895 }.total strong { color:#F4E8D0 }.roll { background:linear-gradient(145deg,#87502C,#662F1D); box-shadow:0 5px #30060D,0 13px 25px #12010370; color:#F4D895 }.roll:active { box-shadow:0 2px #30060D }.pool,.ledger-row,.stat { background:#44180F; color:#C9B08A }.pool { color:#F4D895; border:1px solid #87502C }.side-buttons button { background:#30060D; border-color:#AC7542; box-shadow:0 3px #120103; color:#F4D895 }.side-buttons button:hover { border-color:#F4D895; background:#44180F }.side-buttons:first-child button { color:#F4D895 }.side-buttons:last-child button { color:#F4D895 }.sidebet { background:#44180F; border-color:#AC7542 }.sidebet p,.sidebet small { color:#F4E8D0 }.timer-track { background:#120103 }.timer-fill { background:linear-gradient(90deg,#AC7542,#F4D895) }.deny { background:#30060D; color:#F4D895; border:1px solid #87502C!important }.accept { background:#87502C; color:#F4D895; border:1px solid #D29C5E!important }.overlay { background:#120103cc }.setup { background:#2A0509; color:#F4E8D0; border:2px solid #AC7542 }.setup input { background:#120103; border-color:#87502C; color:#F4E8D0 }.setup button,.rolloff-player button { background:#87502C; color:#F4D895 }.rolloff-player { background:#30060D; border-color:#87502C }.rolloff-number { color:#F4D895 }.rolling-die { background:#F4E8D0; color:#120103; border-color:#D29C5E; box-shadow:0 3px #120103 }.outcome-win { background:linear-gradient(145deg,#2A5A31,#12341F); border-color:#F4D895 }.outcome-loss { background:linear-gradient(145deg,#7A0F22,#30060D); border-color:#D29C5E }
+* { box-sizing: border-box; }
+html { color-scheme: dark; -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0;
+  min-height: 100dvh;
+  min-width: 320px;
+  overflow-x: hidden;
+  font-family: "Inter", -apple-system, "Segoe UI", sans-serif;
+  color: var(--ink);
+  background:
+    radial-gradient(ellipse 900px 520px at 50% -8%, var(--bg-1) 0%, transparent 60%),
+    radial-gradient(ellipse 700px 700px at 105% 15%, color-mix(in srgb, var(--bg-1) 55%, transparent) 0%, transparent 55%),
+    linear-gradient(160deg, var(--bg-2) 0%, var(--bg-3) 62%, var(--bg-2) 100%);
+  background-attachment: fixed;
+  padding-bottom: env(safe-area-inset-bottom);
+}
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  opacity: var(--felt-opacity, .05);
+  background-image: repeating-linear-gradient(45deg, transparent 0 10px, var(--ink) 10px 11px, transparent 11px 20px);
+  mix-blend-mode: overlay;
+}
 
-    /* Luxury casino finish inspired by the Dice Duel crest. */
-    body {
-      min-height:100vh;
-      font-family:Georgia,"Times New Roman",serif;
-      background:
-        radial-gradient(ellipse at 50% -12%,#8b1839 0,#4d0a1b 25%,transparent 56%),
-        radial-gradient(circle at 16% 28%,#7b132a55 0,transparent 28%),
-        radial-gradient(circle at 84% 66%,#68102355 0,transparent 31%),
-        repeating-radial-gradient(ellipse at 30% 30%,#ffffff08 0 1px,transparent 1px 5px),
-        linear-gradient(135deg,#160105,#380611 48%,#170104);
-      background-attachment:fixed;
-    }
-    body::before {
-      content:""; position:fixed; inset:0; pointer-events:none; z-index:-1; opacity:.42;
-      background:
-        repeating-linear-gradient(45deg,transparent 0 8px,#f4d8950b 8px 9px,transparent 9px 17px),
-        repeating-linear-gradient(-45deg,transparent 0 8px,#12010366 8px 9px,transparent 9px 17px);
-      mix-blend-mode:soft-light;
-    }
-    .shell { max-width:1100px; padding-top:22px }
-    header { justify-content:center; margin-bottom:24px }
-    .brand {
-      position:relative; padding:12px 34px; font-size:24px; text-transform:uppercase;
-      letter-spacing:.18em; color:#ffe8a8; text-shadow:0 2px 0 #5e2b08,0 0 18px #ffc85766;
-    }
-    .brand::before,.brand::after { content:"◆"; color:#d29c5e; font-size:11px; margin:0 15px; vertical-align:middle }
-    .logo {
-      width:48px; height:48px; border-radius:50%; font-size:19px; letter-spacing:-.18em;
-      border:2px solid #f4d895; background:radial-gradient(circle at 35% 25%,#b73958,#620a20 56%,#260108);
-      color:#ffe8a8; box-shadow:inset 0 0 0 3px #6f3713,inset 0 -8px 14px #160105,0 3px 0 #4d240c,0 0 20px #d29c5e44;
-    }
-    .card {
-      position:relative; overflow:hidden; border:1px solid #d29c5e;
-      background:
-        linear-gradient(145deg,#5b1022e8,#2a0509f2 52%,#170104f5),
-        repeating-linear-gradient(45deg,transparent 0 12px,#f4d8950a 12px 13px);
-      box-shadow:inset 0 0 0 3px #3c140c,inset 0 0 0 4px #87502c,0 7px 0 #120103,0 22px 45px #08000199,0 0 28px #ac75421f;
-    }
-    .card::before {
-      content:""; position:absolute; inset:8px; border:1px solid #ac754255; border-radius:20px; pointer-events:none;
-    }
-    .game { padding:34px 32px }
-    .eyebrow,.side h3,.turn { font-family:Arial,Helvetica,sans-serif; color:#d9ad6a; font-weight:800 }
-    .round-title,.shooter-name,.setup h2,.modal h2 { color:#fff0bf; text-shadow:0 2px 0 #4b1d09,0 0 14px #ffc85730 }
-    .round-title { letter-spacing:.025em }
-    .copy { color:#d9c29a }
-    .die {
-      border:2px solid #f4d895; border-radius:17px;
-      background:linear-gradient(145deg,#fff3c8,#d8a84f 58%,#9c611e);
-      box-shadow:inset 0 2px 5px #fff9df,inset 0 -8px 12px #5e2b1680,0 6px 0 #4b230b,0 14px 24px #090001aa;
-    }
-    .pip { background:radial-gradient(circle at 35% 30%,#c6294f,#4b0615 62%,#160105); box-shadow:inset 0 1px 2px #ff8697,0 1px 1px #fff1b899 }
-    .roll {
-      border:1px solid #f4d895; font-family:Georgia,"Times New Roman",serif; text-transform:uppercase; letter-spacing:.12em;
-      background:linear-gradient(#9a2946,#681127 48%,#3f0714 52%,#6f1229);
-      box-shadow:inset 0 0 0 2px #8b4c2b,inset 0 2px 0 #d29c5e,0 5px 0 #240105,0 12px 25px #090001aa;
-    }
-    .roll:hover { filter:brightness(1.13) saturate(1.08) }
-    .pool,.ledger-row,.stat {
-      background:linear-gradient(145deg,#210207,#4a0b18); border:1px solid #87502c;
-      box-shadow:inset 0 0 12px #08000188;
-    }
-    .pool { color:#ffe49a; text-shadow:0 0 12px #ffc85755 }
-    .sidebet-controls button,.setup button,.rolloff-player button {
-      border:1px solid #f4d895; background:linear-gradient(#9a6235,#633218); color:#ffe6a5;
-      box-shadow:inset 0 1px #ffe5a066,0 3px #240105;
-    }
-    .setup { background:linear-gradient(145deg,#5b1022,#260207 65%); box-shadow:inset 0 0 0 4px #572511,0 24px 70px #080001 }
-    .setup input,.rolloff-player { background:#170104; border-color:#9f6335 }
-    .modal.win { background:linear-gradient(145deg,#275f38,#102a1a); border-color:#f4d895 }
-    .modal.loss { background:linear-gradient(145deg,#7a1530,#30040f); border-color:#d29c5e }
+/* ---------- theme tokens ---------- */
+:root,
+[data-theme="royal"] {
+  --bg-1:#5a1027; --bg-2:#230711; --bg-3:#0c0204;
+  --surface:#2a0a15f0; --surface-strong:#380f1cfa; --surface-soft:#210813d9;
+  --border:#8a5a32; --border-soft:#54331c; --border-strong:#d9b06a;
+  --accent:#d9b06a; --accent-strong:#f3d896; --accent-ink:#26060d;
+  --ink:#f6ecd9; --ink-soft:#cbab84; --ink-faint:#9c7f66;
+  --die-1:#fff8e6; --die-2:#e3bd73; --die-3:#8f5f28; --pip:#3c0c17;
+  --danger:#e0596b; --success:#57bd85;
+  --radius-card:26px; --radius-control:14px;
+}
+[data-theme="emerald"] {
+  --bg-1:#1f6350; --bg-2:#0c2820; --bg-3:#040f0b;
+  --surface:#0f2a22f0; --surface-strong:#153a2ffa; --surface-soft:#0c2019d9;
+  --border:#a4823f; --border-soft:#5c4a24; --border-strong:#e8c778;
+  --accent:#d3ae5c; --accent-strong:#f3d488; --accent-ink:#0a1f18;
+  --ink:#eef3e6; --ink-soft:#a9c6b4; --ink-faint:#7fa08d;
+  --die-1:#fff9e2; --die-2:#dfb965; --die-3:#83621f; --pip:#0d3b2c;
+  --danger:#e0596b; --success:#5fd39a;
+  --radius-card:26px; --radius-control:14px;
+}
+[data-theme="noir"] {
+  --bg-1:#3a3a3f; --bg-2:#18181b; --bg-3:#08080a;
+  --surface:#1c1c1ff2; --surface-strong:#26262afa; --surface-soft:#141416d9;
+  --border:#6d6d6d; --border-soft:#3a3a3c; --border-strong:#eae5d6;
+  --accent:#e7e2d2; --accent-strong:#ffffff; --accent-ink:#151517;
+  --ink:#f1efe9; --ink-soft:#adada9; --ink-faint:#77767a;
+  --die-1:#fdfbf4; --die-2:#cfcabb; --die-3:#726d61; --pip:#151517;
+  --danger:#e35a6d; --success:#63b088;
+  --radius-card:18px; --radius-control:10px; --felt-opacity:.035;
+}
+[data-theme="neon"] {
+  --bg-1:#33227a; --bg-2:#130f33; --bg-3:#07061a;
+  --surface:#151a3af2; --surface-strong:#1c234efa; --surface-soft:#101430d9;
+  --border:#4a5aa0; --border-soft:#282f5e; --border-strong:#7fe9ef;
+  --accent:#5fe1e8; --accent-strong:#9df3f8; --accent-ink:#07101c;
+  --ink:#eaf6ff; --ink-soft:#a3b8dc; --ink-faint:#6c7cab;
+  --die-1:#eafdff; --die-2:#87d9e6; --die-3:#2c6a93; --pip:#1c2550;
+  --danger:#ff6e8f; --success:#5be9ac;
+  --radius-card:22px; --radius-control:12px;
+}
+[data-theme="artdeco"] {
+  --bg-1:#1c3f6d; --bg-2:#0a1830; --bg-3:#050b18;
+  --surface:#0f2036f2; --surface-strong:#132a46fa; --surface-soft:#0a1728d9;
+  --border:#c9a24f; --border-soft:#5c4a22; --border-strong:#f3d891;
+  --accent:#e2bd6d; --accent-strong:#f6dd9a; --accent-ink:#0d1f3a;
+  --ink:#f2ecd8; --ink-soft:#b9c3d6; --ink-faint:#7c88a3;
+  --die-1:#fff4d6; --die-2:#dbb768; --die-3:#8c6c2c; --pip:#0d1f3a;
+  --danger:#e0596b; --success:#57bd85;
+  --radius-card:10px; --radius-control:6px;
+}
+[data-theme="crimson"] {
+  --bg-1:#7a1f2c; --bg-2:#320a10; --bg-3:#0d0304;
+  --surface:#38101af0; --surface-strong:#46141ffa; --surface-soft:#280b12d9;
+  --border:#b06a3c; --border-soft:#5f3a20; --border-strong:#eab077;
+  --accent:#e2985c; --accent-strong:#f3bd8c; --accent-ink:#2a0a0d;
+  --ink:#f7e6d6; --ink-soft:#d3a685; --ink-faint:#9c7862;
+  --die-1:#fff1d6; --die-2:#d9a866; --die-3:#8a5626; --pip:#4a0f18;
+  --danger:#e0596b; --success:#57bd85;
+  --radius-card:24px; --radius-control:14px;
+}
+[data-theme="lounge"] {
+  --bg-1:#5c3c1c; --bg-2:#2a1a0c; --bg-3:#0d0703;
+  --surface:#2b1a0df0; --surface-strong:#3a230ffa; --surface-soft:#20140ad9;
+  --border:#a9793f; --border-soft:#5a3f20; --border-strong:#e6bb78;
+  --accent:#d8a256; --accent-strong:#f0c987; --accent-ink:#2b1808;
+  --ink:#f2e5cf; --ink-soft:#cba985; --ink-faint:#977c5f;
+  --die-1:#fff2d8; --die-2:#dcae62; --die-3:#8f5f27; --pip:#2b1a0d;
+  --danger:#e0596b; --success:#57bd85;
+  --radius-card:22px; --radius-control:13px;
+}
 
-    /* Darker royal table and compact paired result controls. */
-    body {
-      background:
-        radial-gradient(ellipse at 50% -14%,#68112b 0,#350715 27%,transparent 55%),
-        radial-gradient(circle at 16% 28%,#4b0a1b55 0,transparent 28%),
-        radial-gradient(circle at 84% 66%,#42071555 0,transparent 31%),
-        repeating-radial-gradient(ellipse at 30% 30%,#ffffff05 0 1px,transparent 1px 5px),
-        linear-gradient(135deg,#0c0002,#26030b 48%,#0c0002);
-    }
-    .card {
-      background:linear-gradient(145deg,#3b0917f2,#1b0206f7 52%,#0e0003fa);
-      border-color:#9d6a38;
-      box-shadow:inset 0 0 0 3px #250906,inset 0 0 0 4px #653719,0 7px 0 #080001,0 22px 45px #050001bb;
-    }
-    .game > .eyebrow { margin-top:8px }
-    .game > .eyebrow::before { content:"♛"; display:block; margin:0 auto 9px; color:#c79249; font:30px Georgia,serif; text-shadow:0 2px #301405,0 0 16px #ffc85744 }
-    .game > .round-title { margin-top:7px }
-    .game > .copy { padding-bottom:14px }
-    .shooter {
-      position:relative; width:min(100%,430px); margin:8px auto 24px; padding:19px 24px 17px;
-      border-top:1px solid #a7733e; border-bottom:1px solid #a7733e;
-      background:radial-gradient(ellipse at center,#5a102455 0,transparent 72%);
-    }
-    .shooter::before,.shooter::after { content:"◆"; position:absolute; top:50%; transform:translateY(-50%); color:#b77b3f; font-size:10px }
-    .shooter::before { left:8px }.shooter::after { right:8px }
-    .shooter-name { margin:0; font-size:34px; letter-spacing:.03em }
-    .shooter-number { margin-top:7px }
-    .dice-row { min-height:132px }
-    .total,.roll {
-      width:148px; height:76px; min-height:76px; margin:8px 5px 20px; vertical-align:top; border-radius:14px;
-    }
-    .total { padding:7px; line-height:1.05; box-shadow:inset 0 0 14px #100002,0 4px 0 #160104 }
-    .total[style*="block"] { display:inline-grid!important; place-items:center }
-    .total strong { font-size:29px; margin:1px 0 }
-    .roll { display:inline-grid; place-items:center; padding:8px; font-size:13px; line-height:1.25 }
-    .pool,.ledger-row,.stat { background:linear-gradient(145deg,#100002,#310610) }
-    .setup { background:linear-gradient(145deg,#3e0a18,#150104 65%) }
+/* ---------- base elements ---------- */
+button, input { font: inherit; color: inherit; }
+button { cursor: pointer; -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
+button:disabled { cursor: not-allowed; }
+h1, h2, h3 { font-family: "Fraunces", Georgia, serif; margin: 0; }
+.hidden { display: none !important; }
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 
-    /* Ledger-first layout with wager and side bets inside the game table. */
-    main { grid-template-columns:1fr }
-    main > aside { display:contents }
-    main > .game { grid-row:2; grid-column:1 }
-    main > aside > .side:last-child { grid-row:1; grid-column:1; padding:16px 22px }
-    main > aside > .side:last-child .ledger { grid-template-columns:1fr 1fr }
-    main > aside > .side:last-child .ledger-row { grid-template-columns:minmax(0,1fr) 100px; padding:13px 16px }
-    .game > .copy { display:none }
-    .game > .copy.has-point { display:block; padding-bottom:10px }
-    .shooter-name { display:none }
-    .shooter-number { margin:0; font:700 38px Georgia,"Times New Roman",serif; letter-spacing:.025em; text-transform:none; color:#fff0bf; text-shadow:0 2px 0 #4b1d09,0 0 14px #ffc85730 }
-    .main-wager { width:min(100%,520px); margin:7px auto 12px }
-    .main-wager h3 { margin:0 0 8px; font:800 10px Arial,Helvetica,sans-serif; color:#c79249; letter-spacing:.16em; text-transform:uppercase }
-    .main-wager .pool { width:100%; padding:12px 17px; font-size:30px; letter-spacing:-.06em }
-    .game > .side-bets-panel { width:min(100%,520px); margin:0 auto 7px; padding:18px; text-align:left; border-radius:20px }
-    .game > .side-bets-panel::before { border-radius:14px }
-    .game > .side-bets-panel h3 { position:relative; margin-bottom:11px }
-    .game > .side-bets-panel .hint { position:relative }
-    .game > .side-bets-panel .sidebet-controls { position:relative }
-    .game > .side-bets-panel .sidebet { position:relative }
-    .game > .side-bets-panel .sidebet-draft { position:relative }
-    .side-bets-panel:has(#sidebet:not(.hidden)) .sidebet-controls,
-    .side-bets-panel:has(#sidebet:not(.hidden)) #wager-hint,
-    .side-bets-panel:has(#sidebet:not(.hidden)) .sidebet-draft { display:none!important }
-    .side-bets-panel:has(#sidebet:not(.hidden)) #sidebet {
-      margin:0; min-height:126px; display:grid; align-content:center; gap:7px;
-      background:linear-gradient(145deg,#4a0b1b,#1a0207); border-color:#d29c5e;
-      box-shadow:inset 0 0 18px #080001,0 4px 0 #100002;
-    }
-    .side-bets-panel:has(#sidebet:not(.hidden)) #sidebet-accept {
-      min-height:52px; font-family:Georgia,"Times New Roman",serif; font-size:16px;
-      text-transform:uppercase; letter-spacing:.12em;
-    }
-    .turn { display:none!important }
+.shell { width: min(100%, 1180px); margin: 0 auto; padding: 28px 20px 56px; }
 
-    @media(max-width:760px) { main { grid-template-columns:1fr }.shell { padding:17px 12px 36px }.game { padding:27px 18px }.round-title { font-size:24px } .shooter-name { font-size:28px } main > aside > .side:last-child .ledger { grid-template-columns:1fr 1fr } .brand { padding:10px 0;font-size:20px;letter-spacing:.1em }.brand::before,.brand::after { margin:0 8px } } @media(max-width:520px) { main > aside > .side:last-child .ledger { grid-template-columns:1fr } } @media(max-width:440px) { .die { width:78px;height:78px }.pip { width:11px;height:11px } .brand::before,.brand::after { display:none } .total,.roll { width:132px } }
-  </style>
+/* ---------- header ---------- */
+.topbar { display: flex; flex-direction: column; align-items: center; gap: 4px; margin-bottom: 30px; text-align: center; }
+.crest { width: 56px; height: 56px; border-radius: 50%; object-fit: cover; object-position: 50% 18%; border: 1px solid var(--border-strong); box-shadow: 0 4px 16px #00000066; }
+.wordmark { display: flex; align-items: center; gap: 14px; }
+.wordmark h1 {
+  font-size: 26px; font-weight: 600; letter-spacing: .16em; text-transform: uppercase;
+  color: var(--accent-strong); text-shadow: 0 2px 10px color-mix(in srgb, var(--accent) 45%, transparent);
+}
+.tagline { margin: 2px 0 0; font-size: 11px; letter-spacing: .32em; text-transform: uppercase; color: var(--ink-faint); font-weight: 600; }
+.topbar-actions { position: absolute; right: 20px; top: 22px; display: flex; gap: 8px; }
+
+/* ---------- layout ---------- */
+main.table-layout { display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: 20px; align-items: start; }
+
+.card {
+  position: relative;
+  border-radius: var(--radius-card);
+  border: 1px solid var(--border);
+  background:
+    linear-gradient(160deg, var(--surface-strong), var(--surface) 60%, var(--surface-soft)),
+    repeating-linear-gradient(45deg, transparent 0 12px, color-mix(in srgb, var(--accent) 6%, transparent) 12px 13px);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--accent) 18%, transparent), 0 18px 40px #00000055;
+}
+.card::before {
+  content: ""; position: absolute; inset: 7px; border: 1px solid color-mix(in srgb, var(--border-strong) 35%, transparent);
+  border-radius: calc(var(--radius-card) - 8px); pointer-events: none;
+}
+
+/* ---------- table (game) panel ---------- */
+.table-panel { padding: 34px 36px 30px; text-align: center; overflow: hidden; }
+
+.status-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 22px; }
+.eyebrow {
+  font: 700 11px "Inter", sans-serif; letter-spacing: .18em; text-transform: uppercase; color: var(--accent);
+  padding: 6px 14px; border: 1px solid color-mix(in srgb, var(--accent) 45%, transparent); border-radius: 999px;
+  background: color-mix(in srgb, var(--accent) 10%, transparent);
+}
+.turn-indicator { font: 600 11px "Inter", sans-serif; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-faint); }
+.turn-indicator b { color: var(--ink-soft); font-weight: 700; }
+
+.shooter-block { margin: 6px auto 22px; max-width: 460px; }
+.shooter-name { font-size: 14px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-faint); }
+.point-display { margin: 6px 0 0; font: 600 56px/1 "Fraunces", Georgia, serif; color: var(--ink); }
+.point-display .slash { color: var(--ink-faint); font-weight: 500; margin: 0 6px; }
+.table-call { margin: 10px 0 0; font: italic 500 14px "Fraunces", Georgia, serif; color: var(--ink-soft); min-height: 20px; }
+.rule-copy { margin: 4px 0 0; font-size: 13px; color: var(--ink-faint); min-height: 18px; }
+
+.dice-row { min-height: 148px; display: flex; align-items: center; justify-content: center; gap: 20px; }
+.die {
+  width: 96px; height: 96px; border-radius: 20px; padding: 14px;
+  display: grid; grid-template: repeat(3, 1fr) / repeat(3, 1fr);
+  border: 2px solid var(--border-strong);
+  background: linear-gradient(155deg, var(--die-1), var(--die-2) 55%, var(--die-3));
+  box-shadow: inset 0 2px 4px #ffffff55, inset 0 -8px 14px #00000030, 0 10px 20px #00000055;
+}
+.die.rolling { animation: dieRoll .5s ease-out; }
+@keyframes dieRoll { 0% { transform: rotate(0) scale(1); } 45% { transform: rotate(150deg) scale(.94); } 100% { transform: rotate(360deg) scale(1); } }
+.pip { width: 13px; height: 13px; border-radius: 50%; place-self: center; background: var(--pip); box-shadow: inset 0 1px 1px #00000055; }
+.dice-plus { font: 600 22px "Fraunces", serif; color: var(--ink-faint); }
+
+.total-chip {
+  display: none; width: 132px; margin: 18px auto 6px; padding: 10px 8px; border-radius: 16px;
+  border: 1px solid var(--border-strong); background: color-mix(in srgb, var(--accent) 16%, var(--surface));
+  font: 700 11px "Inter", sans-serif; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-soft);
+}
+.total-chip.visible { display: block; }
+.total-chip strong { display: block; margin-top: 2px; font: 600 30px "Fraunces", serif; color: var(--ink); letter-spacing: -.02em; }
+
+.btn {
+  border: 0; border-radius: var(--radius-control); font-weight: 700; letter-spacing: .02em;
+  min-height: 48px; padding: 0 22px; transition: filter .15s ease, transform .05s ease;
+}
+.btn:active { transform: translateY(1px); }
+.btn-primary {
+  border: 1px solid var(--border-strong);
+  background: linear-gradient(160deg, var(--accent-strong), var(--accent) 65%);
+  color: var(--accent-ink); box-shadow: 0 6px 0 color-mix(in srgb, var(--border) 70%, black), 0 14px 28px color-mix(in srgb, var(--accent) 30%, transparent);
+}
+.btn-primary:hover:not(:disabled) { filter: brightness(1.06); }
+.btn-primary:disabled { opacity: .5; box-shadow: none; }
+.btn-ghost {
+  border: 1px solid var(--border); background: color-mix(in srgb, var(--surface) 90%, transparent); color: var(--ink-soft);
+}
+.btn-ghost:hover { border-color: var(--border-strong); color: var(--ink); }
+
+#roll { width: min(100%, 320px); font: 700 15px "Inter", sans-serif; text-transform: uppercase; letter-spacing: .1em; margin: 4px auto 26px; display: block; }
+
+.wager-plate { width: min(100%, 420px); margin: 0 auto 18px; }
+.wager-plate h3, .side-panel h3 {
+  margin: 0 0 10px; font: 700 11px "Inter", sans-serif; letter-spacing: .18em; text-transform: uppercase; color: var(--ink-faint);
+}
+.pool-amount {
+  padding: 14px; border-radius: 16px; border: 1px solid var(--border);
+  background: linear-gradient(160deg, var(--surface-strong), var(--surface-soft));
+  box-shadow: inset 0 0 16px #00000040;
+  font: 600 32px "Fraunces", serif; color: var(--accent-strong); letter-spacing: -.02em;
+}
+.wager-preview { display: block; margin-top: 6px; font: 500 12px "Inter", sans-serif; color: var(--ink-faint); min-height: 16px; }
+
+.side-bets-panel { width: min(100%, 420px); margin: 0 auto; padding: 18px 20px; text-align: left; border-radius: 18px; border: 1px solid var(--border-soft); background: color-mix(in srgb, var(--surface-soft) 92%, transparent); }
+.chip-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+.chip-btn {
+  min-height: 54px; border-radius: 999px; border: 1px solid var(--border-strong);
+  background: radial-gradient(circle at 35% 30%, var(--die-1), var(--accent) 55%, var(--border) 100%);
+  color: var(--accent-ink); font: 800 15px "Inter", sans-serif; box-shadow: 0 4px 0 color-mix(in srgb, var(--border) 70%, black), inset 0 0 0 3px color-mix(in srgb, var(--accent-ink) 12%, transparent);
+}
+.chip-btn:disabled { opacity: .4; filter: grayscale(.5); box-shadow: none; }
+.chip-row.dimmed { opacity: .4; filter: grayscale(.6); }
+.side-hint { margin: 10px 0 0; font-size: 12px; color: var(--ink-faint); text-align: center; line-height: 1.5; }
+
+.sidebet-offer { margin-top: 14px; padding: 16px; border-radius: 16px; border: 1px solid var(--border-strong); background: color-mix(in srgb, var(--accent) 10%, var(--surface)); text-align: center; }
+.sidebet-offer p { margin: 0; font-size: 13px; font-weight: 600; color: var(--ink); }
+.sidebet-offer small { display: block; margin: 8px 0 10px; font-size: 11px; letter-spacing: .06em; text-transform: uppercase; color: var(--ink-faint); }
+.timer-track { height: 5px; border-radius: 999px; overflow: hidden; background: #00000040; }
+.timer-fill { display: block; height: 100%; background: linear-gradient(90deg, var(--accent), var(--accent-strong)); transition: width .1s linear; }
+.sidebet-offer .btn { width: 100%; margin-top: 12px; }
+
+/* ---------- aside / ledger ---------- */
+aside.rail { display: grid; gap: 18px; align-content: start; }
+.side-panel { padding: 22px; }
+.ledger { display: grid; gap: 10px; }
+.ledger-row { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 8px; padding: 13px 15px; border-radius: 13px; background: color-mix(in srgb, var(--surface-soft) 90%, transparent); border: 1px solid var(--border-soft); }
+.ledger-row b { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 13px; color: var(--ink); }
+.ledger-money { font: 700 16px "Fraunces", serif; font-variant-numeric: tabular-nums; }
+.positive { color: var(--success); }
+.negative { color: var(--danger); }
+.rules-list { margin: 0; padding: 0; list-style: none; display: grid; gap: 10px; }
+.rules-list li { font-size: 12.5px; line-height: 1.55; color: var(--ink-soft); padding-left: 16px; position: relative; }
+.rules-list li::before { content: "◆"; position: absolute; left: 0; top: 1px; font-size: 8px; color: var(--accent); }
+.rules-list b { color: var(--ink); }
+
+/* ---------- overlay / modals ---------- */
+.overlay { position: fixed; inset: 0; z-index: 30; display: flex; align-items: center; justify-content: center; padding: 18px; background: color-mix(in srgb, var(--bg-3) 78%, transparent); backdrop-filter: blur(6px); }
+.modal {
+  width: min(100%, 460px); max-height: calc(100dvh - 30px); overflow: auto; position: relative;
+  border-radius: 24px; padding: 30px; text-align: center; border: 1px solid var(--border-strong);
+  background: linear-gradient(160deg, var(--surface-strong), var(--surface-soft));
+  box-shadow: 0 30px 70px #00000090, inset 0 0 0 1px color-mix(in srgb, var(--accent) 20%, transparent);
+}
+.modal .eyebrow { display: inline-block; margin-bottom: 10px; }
+.modal h2 { font-size: 30px; margin: 4px 0 10px; color: var(--ink); }
+.modal p.lead { margin: 0 auto; max-width: 340px; color: var(--ink-soft); line-height: 1.55; font-size: 14px; }
+.modal .btn { width: 100%; margin-top: 22px; }
+
+.setup-modal { text-align: left; width: min(100%, 560px); }
+.setup-modal h2 { text-align: center; }
+.setup-modal > p.lead { text-align: center; }
+.table-picker, .mode-picker { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-top: 16px; }
+.pick-card {
+  min-height: 62px; text-align: left; padding: 12px 14px; border-radius: 14px; border: 1px solid var(--border-soft);
+  background: color-mix(in srgb, var(--surface-soft) 85%, transparent); color: var(--ink-soft);
+}
+.pick-card .swatch { display: inline-block; width: 14px; height: 14px; border-radius: 4px; margin-right: 8px; vertical-align: -2px; border: 1px solid #00000040; }
+.pick-card strong { display: block; font-size: 14px; color: var(--ink); }
+.pick-card small { display: block; margin-top: 3px; font-size: 10.5px; color: var(--ink-faint); }
+.pick-card.selected { border-color: var(--border-strong); background: color-mix(in srgb, var(--accent) 16%, var(--surface-soft)); box-shadow: inset 0 0 0 1px var(--accent); }
+
+.field { margin-top: 14px; }
+.field label { display: block; margin-bottom: 6px; font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-faint); font-weight: 700; }
+.field input { width: 100%; padding: 13px 14px; border-radius: 12px; border: 1px solid var(--border-soft); background: color-mix(in srgb, var(--bg-3) 55%, transparent); color: var(--ink); outline: none; }
+.field input:focus { border-color: var(--border-strong); }
+
+.opening-options { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 18px; }
+.opening-options .chip-btn { min-height: 66px; font-size: 20px; }
+
+.rolloff-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 18px; }
+.rolloff-seat { border: 1px solid var(--border-soft); border-radius: 16px; padding: 16px; text-align: center; background: color-mix(in srgb, var(--surface-soft) 85%, transparent); }
+.rolloff-seat strong { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 13px; color: var(--ink); }
+.rolloff-face { min-height: 54px; padding-top: 8px; font: 600 30px "Fraunces", serif; color: var(--accent); }
+.rolloff-face.spin { animation: dieRoll .16s linear infinite; }
+.rolloff-seat .btn { width: 100%; margin-top: 8px; min-height: 42px; font-size: 12.5px; }
+
+.outcome-modal.win { border-color: var(--success); }
+.outcome-modal.loss { border-color: var(--border); }
+.outcome-icon { width: 64px; height: 64px; margin: 0 auto 10px; border-radius: 50%; display: grid; place-items: center; font-size: 26px; border: 1px solid var(--border-strong); }
+.outcome-modal.win .outcome-icon { background: color-mix(in srgb, var(--success) 22%, var(--surface)); color: var(--success); }
+.outcome-modal.loss .outcome-icon { background: color-mix(in srgb, var(--danger) 18%, var(--surface)); color: var(--danger); }
+.outcome-amount { margin: 16px auto 4px; max-width: 300px; padding: 14px; border-radius: 14px; background: color-mix(in srgb, var(--accent) 10%, var(--surface-soft)); border: 1px solid var(--border-soft); }
+.outcome-amount small { display: block; font: 700 10px "Inter", sans-serif; letter-spacing: .12em; text-transform: uppercase; color: var(--ink-faint); margin-bottom: 4px; }
+.outcome-amount strong { font: 600 26px "Fraunces", serif; color: var(--ink); }
+
+.confetti { position: absolute; inset: 0; overflow: hidden; pointer-events: none; border-radius: inherit; }
+.confetti i { position: absolute; top: -14px; width: 7px; height: 7px; background: var(--accent-strong); transform: rotate(45deg); animation: fall 2.6s linear infinite; opacity: .85; }
+@keyframes fall { to { transform: translateY(120%) rotate(220deg); opacity: 0; } }
+
+/* ---------- floating table tools ---------- */
+.tools-toggle {
+  position: fixed; z-index: 20; right: max(16px, env(safe-area-inset-right)); bottom: max(16px, env(safe-area-inset-bottom));
+  min-height: 46px; padding: 0 16px; border-radius: 999px; border: 1px solid var(--border-strong);
+  background: linear-gradient(160deg, var(--surface-strong), var(--surface));
+  color: var(--ink-soft); font: 700 12px "Inter", sans-serif; letter-spacing: .04em;
+  box-shadow: 0 10px 24px #00000066;
+}
+.tools-panel {
+  position: fixed; z-index: 25; right: max(16px, env(safe-area-inset-right)); bottom: 72px;
+  width: min(340px, calc(100vw - 32px)); max-height: calc(100dvh - 100px); overflow: auto;
+  padding: 18px; border-radius: 20px; border: 1px solid var(--border);
+  background: linear-gradient(160deg, var(--surface-strong), var(--surface-soft));
+  box-shadow: 0 24px 60px #000000aa;
+}
+.tools-panel h3 { font-size: 17px; color: var(--ink); margin-bottom: 4px; }
+.tools-panel h4 { margin: 14px 0 7px; font: 700 10px "Inter", sans-serif; letter-spacing: .12em; text-transform: uppercase; color: var(--ink-faint); }
+.tools-close { float: right; min-height: 30px; padding: 0 10px; border-radius: 8px; border: 1px solid var(--border-soft); background: transparent; color: var(--ink-soft); }
+.mini-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 6px; }
+.mini-grid.money { grid-template-columns: repeat(4, 1fr); }
+.mini-btn { min-height: 36px; padding: 0 4px; border-radius: 8px; border: 1px solid var(--border-soft); background: color-mix(in srgb, var(--surface-soft) 80%, transparent); color: var(--ink-soft); font-weight: 700; font-size: 12.5px; }
+.mini-btn:hover { border-color: var(--border-strong); color: var(--ink); }
+.mini-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 12px; }
+.mini-stat { padding: 10px; border-radius: 10px; border: 1px solid var(--border-soft); background: color-mix(in srgb, var(--surface-soft) 80%, transparent); font-size: 11px; color: var(--ink-faint); }
+.mini-stat b { display: block; margin-top: 4px; font: 700 19px "Fraunces", serif; color: var(--ink); }
+.coin-face { display: grid; place-items: center; min-height: 92px; margin: 6px 0 14px; border-radius: 50%; border: 1px solid var(--border-strong); background: radial-gradient(circle at 33% 25%, var(--die-1), var(--die-2) 55%, var(--die-3)); color: var(--pip); font: 700 22px "Fraunces", serif; }
+.coin-mode .table-panel > *:not(.coin-play) { display: none !important; }
+.coin-play { width: min(100%, 380px); margin: 10px auto; }
+
+@media (max-width: 900px) {
+  main.table-layout { grid-template-columns: 1fr; }
+}
+@media (max-width: 760px) {
+  .shell { padding: 20px 14px 44px; }
+  .table-panel { padding: 26px 18px; }
+  .point-display { font-size: 44px; }
+  .die { width: clamp(72px, 24vw, 92px); height: clamp(72px, 24vw, 92px); }
+  .topbar-actions { position: static; justify-content: center; margin-top: 10px; }
+  .topbar { position: relative; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; }
+}
+</style>
 </head>
 <body>
-  <div class="shell"><header><div class="brand"><span class="logo">DD</span> Dice Duel</div></header>
-  <main><section class="card game"><p class="eyebrow" id="phase">Opening roll</p><h1 class="round-title" id="title">Place your wager.</h1><p class="copy" id="copy">7 or 11 wins. Snake eyes loses.</p><div class="shooter"><h2 class="shooter-name" id="shooter">Player 1</h2><p class="shooter-number" id="number">Player 1's number is …</p></div><div class="dice-row"><div class="die" id="die1"></div><span class="sum">+</span><div class="die" id="die2"></div></div><div class="total" id="total">You hit <strong id="sum">7</strong> total</div><button class="roll" id="roll">Place a wager to roll</button><p class="turn" id="turn">Wager not placed · Player 1's turn</p></section>
-  <aside><section class="card side"><h3>Side bets</h3><div class="sidebet-controls dimmed" id="sidebet-controls"><button data-sidebet="1" disabled>+$1</button><button data-sidebet="2" disabled>+$2</button><button data-sidebet="5" disabled>+$5</button></div><p class="hint" id="wager-hint">Side bets unlock after the first roll sets a point.</p><h3 style="margin-top:20px">Current wager</h3><p class="pool">$<span id="wager">1</span><span class="wager-preview hidden" id="wager-preview"></span></p><p class="sidebet-draft" id="sidebet-draft"></p><div class="sidebet hidden" id="sidebet"><p>Side bet: each player adds $<span id="sidebet-amount">1</span> — pool adds $<span id="sidebet-pool-add">2</span>. Accept it?</p><small><span id="sidebet-seconds">5.0</span> seconds to accept</small><div class="timer-track"><i class="timer-fill" id="sidebet-timer"></i></div><div class="sidebet-actions"><button class="accept" id="sidebet-accept">Accept</button></div></div></section><section class="card side"><h3>Player ledger</h3><div class="ledger" id="ledger"></div></section></aside></main></div>
-  <div class="overlay" id="setup"><div class="modal setup"><p class="eyebrow">Dice Duel</p><h2>Name the shooters</h2><p>Enter both names, then begin a local game.</p><input id="p1" value="Player 1" maxlength="18" /><input id="p2" value="Player 2" maxlength="18" /><button id="start">Start game</button></div></div>
-  <div class="overlay hidden" id="outcome"></div>
-  <script>
-    const spots={1:[4],2:[0,8],3:[0,4,8],4:[0,2,6,8],5:[0,2,4,6,8],6:[0,2,3,5,6,8]}; let players=['Player 1','Player 2'],active=0,wager=1,point=null,ledger=[{won:0,lost:0},{won:0,lost:0}],rolling=false,roundEnding=false,openingWagerPlaced=false,pendingSideBet=null,sideBetInterval=null,sideBetDraft=0,sideBetDelay=null;
-    const $=id=>document.getElementById(id); const calls={2:'Snake eyes — no surprise!',3:'Little Joe, ready to go!',4:'Little Phoebe, roll it easy!',5:'Nickel alive, stay alive!',6:'Easy six — stack those bricks!',7:'Seven’s heaven!',8:'Eight’s the gate — don’t be late!',9:'Nina! I neva seena!',10:'Big ten — do it again!',11:'Yo-leven!',12:'Boxcars on the tracks!'}; function die(id,n){const el=$(id);el.innerHTML='';spots[n].forEach(i=>{let p=document.createElement('i');p.className='pip';p.style.gridArea=`${Math.floor(i/3)+1}/${i%3+1}`;el.append(p)})} function view(){ $('shooter').textContent=players[active];$('number').textContent=point?calls[point]:'Street dice — roll nice!';$('wager').textContent=wager;const playerAmount=pendingSideBet??sideBetDraft, poolAmount=playerAmount*2;$('wager-preview').textContent=playerAmount?`+$${playerAmount} each → +$${poolAmount} pool = $${wager+poolAmount}`:'';$('wager-preview').classList.toggle('hidden',!playerAmount);$('ledger').innerHTML=players.map((name,i)=>{const net=ledger[i].won-ledger[i].lost;return `<div class="ledger-row"><b>${name}</b><span class="ledger-money ${net>=0?'positive':'negative'}">${net<0?'−':''}$${Math.abs(net)}</span></div>`}).join('');$('turn').textContent=`Wager $${wager} · ${players[active]}'s turn`;$('roll').textContent=rolling?'Rolling…':`Roll the dice`;$('phase').textContent=point?'Point round':'Opening roll';$('title').textContent=point?`${players[active]}'s number is ${point}.`:`${players[active]}'s number is…`;$('copy').textContent=point?`Roll ${point} before a 7. Snake eyes still loses.`:'7 or 11 wins. Snake eyes loses.';const sideBetsUnlocked=point!==null;$('sidebet-controls').classList.toggle('dimmed',!sideBetsUnlocked);document.querySelectorAll('[data-sidebet]').forEach(button=>button.disabled=!sideBetsUnlocked||pendingSideBet!==null);$('wager-hint').textContent=sideBetsUnlocked?'Add a side bet, then let the other player accept within 5 seconds.':'Side bets unlock after the first roll sets a point.'}
-    function finish(shooterWon){roundEnding=true;const winner=shooterWon?active:(active?0:1),loser=winner?0:1;ledger[winner].won+=wager;ledger[loser].lost+=wager;view();setTimeout(()=>{let decor=shooterWon?Array.from({length:32},(_,i)=>`<span style="--x:${(i*29)%98}%;--d:${(i%9)*.16}s">${i%3?'💵':'🪙'}</span>`).join(''):'';const resultLine=shooterWon?`The wager bank lookin’ kinda thin… ’cuz ${players[active]}'s wallet just got $${wager} fatter.`:`Damn ${players[active]}, you lost… Run ${players[winner]} his paper! $${wager} owed.`;const boxLine=shooterWon?`${players[active]} won $${wager} from the game…`:`${players[active]} lost $${wager} to the game…`;$('outcome').innerHTML=`<div class="modal ${shooterWon?'win':'loss'}">${shooterWon?`<div class="money">${decor}</div><div class="win-icon">🏆💰</div>`:`<div class="wallet">👛<b>🕸️</b><i>🕷️</i></div>`}<p class="eyebrow">Round result</p><h2>${shooterWon?'Winner!':'Damn…'}</h2><div class="winner-info">${boxLine}</div><p>${resultLine}</p><button id="next">Place next wager</button></div>`;$('outcome').classList.remove('hidden');$('next').onclick=()=>{$('outcome').classList.add('hidden');active=active?0:1;point=null;roundEnding=false;openingWagerPlaced=false;showOpeningWager()}},700)}
-    $('roll').onclick=()=>{if(rolling||roundEnding||pendingSideBet!==null)return;rolling=true;view();let t=0,spin=setInterval(()=>{die('die1',1+Math.random()*6|0);die('die2',1+Math.random()*6|0);if(++t===12){clearInterval(spin);let a=1+Math.random()*6|0,b=1+Math.random()*6|0,total=a+b;die('die1',a);die('die2',b);$('sum').textContent=total;$('total').style.display='block';rolling=false;if(!point){if(total===7||total===11)finish(true);else if(a===1&&b===1)finish(false);else{point=total;view()}}else if(total===point)finish(true);else if(total===7||(a===1&&b===1))finish(false);else view()}},105)};
-    function closeSideBet(){if(sideBetInterval)clearInterval(sideBetInterval);sideBetInterval=null;pendingSideBet=null;$('sidebet').classList.add('hidden');view()}function proposeSideBet(amount){if(!point||pendingSideBet!==null)return;pendingSideBet=amount;$('sidebet-amount').textContent=amount;$('sidebet-pool-add').textContent=amount*2;$('sidebet').classList.remove('hidden');let remaining=5000;const tick=()=>{$('sidebet-seconds').textContent=(remaining/1000).toFixed(1);$('sidebet-timer').style.width=`${remaining/50}%`;if(remaining<=0)closeSideBet();remaining-=100};tick();sideBetInterval=setInterval(tick,100);view()}function queueSideBet(amount){if(!point||pendingSideBet!==null)return;sideBetDraft=0;$('sidebet-draft').textContent='';proposeSideBet(amount)}document.querySelectorAll('[data-change]').forEach(b=>b.onclick=()=>{if(point)return;wager=Math.max(1,Math.min(100,wager+Number(b.dataset.change)));view()});document.querySelectorAll('[data-sidebet]').forEach(b=>b.onclick=()=>queueSideBet(Number(b.dataset.sidebet)));$('sidebet-accept').onclick=()=>{if(pendingSideBet!==null){wager+=pendingSideBet*2;closeSideBet()}};function showOpeningWager(){$('setup').innerHTML=`<div class="modal setup"><p class="eyebrow">Place next wager</p><h2>${players[active]}'s wager</h2><p>Choose your own stake. The other player matches it, so the wager pool doubles.</p><div class="opening-options">${[1,2,5].map(amount=>`<button data-opening-wager="${amount}">$${amount}</button>`).join('')}</div></div>`;$('setup').classList.remove('hidden');document.querySelectorAll('[data-opening-wager]').forEach(button=>button.onclick=()=>{wager=Number(button.dataset.openingWager)*2;openingWagerPlaced=true;point=null;$('setup').classList.add('hidden');view()})}function beginRollOff(){let values=[null,null],rollingOff=[false,false];$('setup').innerHTML=`<div class="modal setup"><p class="eyebrow">First shot</p><h2>Roll for first</h2><p>Each player rolls one die. The highest number shoots first.</p><div class="rolloff-grid">${players.map((name,i)=>`<div class="rolloff-player"><strong>${name}</strong><div class="rolloff-number" id="rolloff-${i}">?</div><button id="rolloff-button-${i}">Roll one die</button></div>`).join('')}</div></div>`;function checkWinner(){if(!values.every(v=>v!==null))return;if(values[0]===values[1]){setTimeout(beginRollOff,850);return}active=values[0]>values[1]?0:1;setTimeout(showOpeningWager,700)}players.forEach((_,i)=>{$(`rolloff-button-${i}`).onclick=()=>{if(values[i]!==null||rollingOff[i])return;rollingOff[i]=true;const face=$(`rolloff-${i}`);face.classList.add('rolling-die');const spin=setInterval(()=>face.textContent=1+Math.floor(Math.random()*6),85);$(`rolloff-button-${i}`).disabled=true;$(`rolloff-button-${i}`).textContent='Rolling…';setTimeout(()=>{clearInterval(spin);values[i]=1+Math.floor(Math.random()*6);face.textContent=values[i];face.classList.remove('rolling-die');$(`rolloff-button-${i}`).textContent='Rolled';checkWinner()},950)}})}$('start').onclick=()=>{players=[$('p1').value.trim()||'Player 1',$('p2').value.trim()||'Player 2'];ledger=[{won:0,lost:0},{won:0,lost:0}];openingWagerPlaced=false;beginRollOff()};die('die1',5);die('die2',2);view();
-  </script>
-  <script>
-    // Keep the player name and point instructions together below the dice-table heading.
-    (() => {
-      const shooter = document.getElementById('shooter').parentElement;
-      ['phase', 'title', 'copy'].forEach((id) => shooter.append(document.getElementById(id)));
-    })();
-  </script>
-  <style>
-    .brand { gap: 12px; font-family: Georgia, 'Times New Roman', serif; font-size: 25px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: #F4D895; text-shadow: 0 2px 0 #120103, 0 0 18px #AC754266; }
-    .brand .logo-art { width: 54px; height: 54px; object-fit: cover; object-position: 50% 14%; border: 1px solid #D29C5E; border-radius: 50%; box-shadow: 0 3px 10px #120103; }
-    .shooter-number { display: inline-block; min-width: 180px; padding: 8px 13px; border: 1px solid #AC7542; border-radius: 12px; background: #12010399; color: #F4D895; font-size: 12px; letter-spacing: .08em; }
-    .gentle-spin { animation: gentle-spin .34s ease-in-out; }
-    @keyframes gentle-spin { 0% { transform: rotate(0deg) scale(1); } 55% { transform: rotate(135deg) scale(.96); } 100% { transform: rotate(360deg) scale(1); } }
-  </style>
-  <script>
-    (() => {
-      const brand = document.querySelector('.brand');
-      brand.innerHTML = '<img class="logo-art" src="47794DE1-D40E-48A4-8423-D802E1821F85.PNG" alt="Dice Duel crest"><span>Dice Duel</span>';
 
-      const rollWindow = document.getElementById('number');
-      const playerNameSource = document.getElementById('shooter');
-      const showPlayerName = () => { rollWindow.textContent = playerNameSource.textContent; };
-      new MutationObserver(showPlayerName).observe(playerNameSource, { childList: true, characterData: true, subtree: true });
-      showPlayerName();
+<div class="shell">
+  <header class="topbar">
+    <div class="wordmark">
+      <img class="crest" src="47794DE1-D40E-48A4-8423-D802E1821F85.PNG" alt="Dice Duel crest" />
+      <div>
+        <h1>Dice Duel</h1>
+        <p class="tagline">Private Table</p>
+      </div>
+    </div>
+    <div class="topbar-actions">
+      <button class="btn btn-ghost" id="open-rules" type="button">Table rules</button>
+    </div>
+  </header>
 
-      ['die1', 'die2'].forEach((id) => {
-        const die = document.getElementById(id);
-        new MutationObserver(() => {
-          die.classList.remove('gentle-spin');
-          void die.offsetWidth;
-          die.classList.add('gentle-spin');
-        }).observe(die, { childList: true });
-      });
+  <main class="table-layout">
+    <section class="card table-panel">
+      <div class="status-row">
+        <span class="eyebrow" id="phase">Opening roll</span>
+        <span class="turn-indicator" id="turn"></span>
+      </div>
 
-      showOpeningWager = () => {
-        document.getElementById('setup').innerHTML = `<div class="modal setup"><p class="eyebrow">The Dice Duel Bank</p><h2>The bank needs more money.</h2><p>Choose how much each player puts in. The wager pool doubles it.</p><div class="opening-options">${[1, 2, 5].map((amount) => `<button data-opening-wager="${amount}">$${amount}</button>`).join('')}</div></div>`;
-        document.getElementById('setup').classList.remove('hidden');
-        document.querySelectorAll('[data-opening-wager]').forEach((button) => {
-          button.onclick = () => {
-            wager = Number(button.dataset.openingWager) * 2;
-            openingWagerPlaced = true;
-            point = null;
-            document.getElementById('setup').classList.add('hidden');
-            view();
-          };
-        });
-      };
-    })();
-  </script>
-  <style>.round-title { display: none; }</style>
-  <script>
-    /* Present the point rule with a visual snake-eyes warning. */
-    const pointRuleCopy = document.getElementById('copy');
-    const formatPointRule = () => {
-      const match = pointRuleCopy.textContent.match(/^Roll (\d+) before a 7\./);
-      if (match && !pointRuleCopy.textContent.includes('Watch out')) {
-        pointRuleCopy.textContent = `Roll ${match[1]} before a 7. Watch out for \u2680 \u2680`;
+      <div class="shooter-block">
+        <p class="shooter-name" id="shooter">Player 1</p>
+        <p class="point-display" id="point-display">—</p>
+        <p class="table-call" id="table-call"></p>
+        <p class="rule-copy" id="rule-copy">7 or 11 wins the roll. Snake eyes loses.</p>
+      </div>
+
+      <div class="dice-row">
+        <div class="die" id="die1"></div>
+        <span class="dice-plus">+</span>
+        <div class="die" id="die2"></div>
+      </div>
+      <div class="total-chip" id="total-chip">Total<strong id="sum">7</strong></div>
+
+      <button class="btn btn-primary" id="roll">Place a wager to roll</button>
+
+      <div class="wager-plate">
+        <h3>Current wager</h3>
+        <p class="pool-amount">$<span id="wager">1</span></p>
+        <span class="wager-preview" id="wager-preview"></span>
+      </div>
+
+      <div class="side-bets-panel" id="side-bets-panel">
+        <h3>Side bets</h3>
+        <div class="chip-row dimmed" id="chip-row">
+          <button class="chip-btn" data-sidebet="1" disabled>+$1</button>
+          <button class="chip-btn" data-sidebet="2" disabled>+$2</button>
+          <button class="chip-btn" data-sidebet="5" disabled>+$5</button>
+        </div>
+        <p class="side-hint" id="side-hint">Side bets unlock once a point is set.</p>
+        <div class="sidebet-offer hidden" id="sidebet-offer">
+          <p>Side bet: each player adds $<span id="sidebet-amount">1</span> — the pool grows by $<span id="sidebet-pool-add">2</span>.</p>
+          <small><span id="sidebet-seconds">5.0</span>s to accept</small>
+          <div class="timer-track"><i class="timer-fill" id="sidebet-timer"></i></div>
+          <button class="btn btn-primary" id="sidebet-accept">Accept side bet</button>
+        </div>
+      </div>
+
+      <div class="coin-play hidden" id="coin-play">
+        <div class="coin-face" id="coin-face">READY</div>
+        <div class="chip-row" style="grid-template-columns:1fr 1fr 1fr">
+          <button class="btn btn-ghost" id="coin-heads">Heads</button>
+          <button class="btn btn-primary" id="coin-flip">Flip</button>
+          <button class="btn btn-ghost" id="coin-tails">Tails</button>
+        </div>
+      </div>
+    </section>
+
+    <aside class="rail">
+      <section class="card side-panel" id="ledger-panel">
+        <h3>Ledger</h3>
+        <div class="ledger" id="ledger"></div>
+      </section>
+      <section class="card side-panel">
+        <h3 id="rules-panel-title">House rules</h3>
+        <ul class="rules-list" id="rules-panel-list">
+          <li><b>Opening roll —</b> 7 or 11 wins instantly. Snake eyes (2) loses instantly. Any other total sets the point.</li>
+          <li><b>Point round —</b> the shooter must roll the point again before a 7 appears.</li>
+          <li><b>Side bets —</b> once a point is live, either player may propose a side bet. The other player has 5 seconds to accept.</li>
+          <li><b>Settlement —</b> the winner's ledger rises by the full wager; the loser's falls by the same amount.</li>
+        </ul>
+      </section>
+    </aside>
+  </main>
+</div>
+
+<div class="overlay hidden" id="rules-overlay" role="dialog" aria-modal="true" aria-label="Table rules">
+  <div class="modal">
+    <span class="eyebrow">Dice Duel</span>
+    <h2 id="rules-overlay-title">Table Rules</h2>
+    <ul class="rules-list" style="text-align:left;margin-top:16px" id="rules-overlay-list">
+      <li><b>Opening roll —</b> 7 or 11 wins instantly. Snake eyes (2) loses instantly. Any other total becomes the point.</li>
+      <li><b>Point round —</b> the shooter keeps rolling; hitting the point wins, a 7 first loses.</li>
+      <li><b>Side bets —</b> proposed after the point is set. Whichever player proposes stakes it; the other has 5 seconds to accept, or it's withdrawn.</li>
+      <li><b>Ledger —</b> tracks each player's running total across the whole session, not just one round.</li>
+      <li><b>Shooter rotation —</b> the loser's opponent shoots next round and opens the new wager.</li>
+    </ul>
+    <button class="btn btn-primary" id="close-rules">Close</button>
+  </div>
+</div>
+
+<div class="overlay" id="setup" role="dialog" aria-modal="true" aria-label="Table setup"></div>
+<div class="overlay hidden" id="outcome" role="dialog" aria-modal="true" aria-label="Round result"></div>
+
+<button class="tools-toggle hidden" id="tools-toggle" type="button">Table tools</button>
+<aside class="tools-panel hidden" id="tools-panel"></aside>
+
+<script>
+(() => {
+  "use strict";
+
+  /* ---------------------------------------------------------
+   * Constants
+   * ------------------------------------------------------- */
+  const THEMES = [
+    { id: "royal",   name: "Royal Crest",    desc: "Black cherry · antique gold", swatch: "#8a5a32" },
+    { id: "emerald", name: "Emerald Salon",  desc: "Green felt · brass glow",      swatch: "#1f6350" },
+    { id: "noir",    name: "Noir Table",     desc: "Monochrome · sharp contrast",  swatch: "#6d6d6d" },
+    { id: "neon",    name: "Neon Afterdark", desc: "Indigo · cyan accents",        swatch: "#5fe1e8" },
+    { id: "artdeco", name: "Art Deco",       desc: "Navy geometry · gold lines",   swatch: "#c9a24f" },
+    { id: "crimson", name: "Crimson Room",   desc: "Velvet red · copper",          swatch: "#b06a3c" },
+    { id: "lounge",  name: "Whiskey Lounge", desc: "Walnut · warm leather",        swatch: "#a9793f" },
+  ];
+  const DIE_SPOTS = { 1: [4], 2: [0, 8], 3: [0, 4, 8], 4: [0, 2, 6, 8], 5: [0, 2, 4, 6, 8], 6: [0, 2, 3, 5, 6, 8] };
+  const TABLE_CALLS = {
+    2: "Snake eyes.", 3: "Little Joe.", 4: "Little Phoebe.", 5: "Fever five.",
+    6: "Easy six.", 7: "Seven, a winner.", 8: "Eighter from Decatur.", 9: "Nine, the point.",
+    10: "Big ten.", 11: "Yo-leven.", 12: "Boxcars.",
+  };
+  const OPENING_STAKES = [1, 2, 5];
+  const SIDEBET_MS = 5000;
+
+  /* ---------------------------------------------------------
+   * State
+   * ------------------------------------------------------- */
+  const state = {
+    theme: "royal",
+    mode: "dice",           // 'dice' | 'coin'
+    players: ["Player 1", "Player 2"],
+    active: 0,
+    wager: 1,
+    point: null,
+    ledger: [{ won: 0, lost: 0 }, { won: 0, lost: 0 }],
+    rolling: false,
+    roundEnding: false,
+    pendingSideBet: null,
+    sideBetDeadline: 0,
+    sideBetTimer: null,
+    coin: { heads: 0, tails: 0 },
+    tracker: { die1: Array(6).fill(0), die2: Array(6).fill(0), money: 0, bank: 0, coinMoney: 0, coinBank: 0 },
+    lobby: { theme: "royal", mode: "dice" },
+  };
+
+  const params = new URLSearchParams(location.search);
+  if (params.get("theme") && THEMES.some(t => t.id === params.get("theme"))) {
+    state.lobby.theme = params.get("theme");
+  }
+
+  /* ---------------------------------------------------------
+   * DOM refs
+   * ------------------------------------------------------- */
+  const $ = (id) => document.getElementById(id);
+  const els = {
+    phase: $("phase"), turn: $("turn"), shooter: $("shooter"),
+    pointDisplay: $("point-display"), tableCall: $("table-call"), ruleCopy: $("rule-copy"),
+    die1: $("die1"), die2: $("die2"), totalChip: $("total-chip"), sum: $("sum"),
+    roll: $("roll"), wager: $("wager"), wagerPreview: $("wager-preview"),
+    chipRow: $("chip-row"), sideHint: $("side-hint"), sidebetOffer: $("sidebet-offer"),
+    sidebetAmount: $("sidebet-amount"), sidebetPoolAdd: $("sidebet-pool-add"),
+    sidebetSeconds: $("sidebet-seconds"), sidebetTimer: $("sidebet-timer"), sidebetAccept: $("sidebet-accept"),
+    ledger: $("ledger"), setup: $("setup"), outcome: $("outcome"),
+    rulesOverlay: $("rules-overlay"), openRules: $("open-rules"), closeRules: $("close-rules"),
+    toolsToggle: $("tools-toggle"), toolsPanel: $("tools-panel"),
+    coinPlay: $("coin-play"), coinFace: $("coin-face"),
+    tablePanel: document.querySelector(".table-panel"),
+    ledgerPanel: $("ledger-panel"), rulesPanelTitle: $("rules-panel-title"), rulesPanelList: $("rules-panel-list"),
+    rulesOverlayTitle: $("rules-overlay-title"), rulesOverlayList: $("rules-overlay-list"),
+  };
+
+  const DICE_RULES_HTML = `
+    <li><b>Opening roll —</b> 7 or 11 wins instantly. Snake eyes (2) loses instantly. Any other total sets the point.</li>
+    <li><b>Point round —</b> the shooter must roll the point again before a 7 appears.</li>
+    <li><b>Side bets —</b> once a point is live, either player may propose a side bet. The other player has 5 seconds to accept.</li>
+    <li><b>Settlement —</b> the winner's ledger rises by the full wager; the loser's falls by the same amount.</li>`;
+  const DICE_RULES_HTML_LONG = `
+    <li><b>Opening roll —</b> 7 or 11 wins instantly. Snake eyes (2) loses instantly. Any other total becomes the point.</li>
+    <li><b>Point round —</b> the shooter keeps rolling; hitting the point wins, a 7 first loses.</li>
+    <li><b>Side bets —</b> proposed after the point is set. Whichever player proposes stakes it; the other has 5 seconds to accept, or it's withdrawn.</li>
+    <li><b>Ledger —</b> tracks each player's running total across the whole session, not just one round.</li>
+    <li><b>Shooter rotation —</b> the loser's opponent shoots next round and opens the new wager.</li>`;
+  const COIN_RULES_HTML = `
+    <li><b>Call it —</b> agree on heads or tails before the flip.</li>
+    <li><b>Flip —</b> tap Flip for a random result, or record a manual call with Heads / Tails.</li>
+    <li><b>Keeping score —</b> Coin Flip has no automatic wager — use Table Tools (bottom right) to track money and bank by hand.</li>`;
+
+  /* ---------------------------------------------------------
+   * Sound (restrained, synthesized — no external assets)
+   * ------------------------------------------------------- */
+  const sound = (() => {
+    let ctx = null;
+    const unlock = () => {
+      if (!ctx) ctx = new (window.AudioContext || window.webkitAudioContext)();
+      if (ctx.state === "suspended") ctx.resume();
+    };
+    const tone = (freq, start, dur, type = "sine", peak = .18) => {
+      const osc = ctx.createOscillator(), gain = ctx.createGain();
+      osc.type = type; osc.frequency.setValueAtTime(freq, start);
+      gain.gain.setValueAtTime(0, start);
+      gain.gain.linearRampToValueAtTime(peak, start + .015);
+      gain.gain.exponentialRampToValueAtTime(.0001, start + dur);
+      osc.connect(gain).connect(ctx.destination);
+      osc.start(start); osc.stop(start + dur + .02);
+    };
+    return {
+      unlock,
+      click() { if (!ctx) return; const t = ctx.currentTime; tone(720, t, .07, "triangle", .1); },
+      win() {
+        if (!ctx) return; const t = ctx.currentTime;
+        [523.25, 659.25, 783.99, 1046.5].forEach((f, i) => tone(f, t + i * .09, .5, "sine", .14));
+      },
+      loss() {
+        if (!ctx) return; const t = ctx.currentTime;
+        tone(220, t, .5, "sine", .16); tone(164.81, t + .12, .55, "sine", .12);
+      },
+    };
+  })();
+
+  /* ---------------------------------------------------------
+   * Helpers
+   * ------------------------------------------------------- */
+  const money = (n) => `$${Math.abs(n)}`;
+  const applyTheme = (id) => { document.documentElement.setAttribute("data-theme", id); state.theme = id; };
+  const clearSideBetTimer = () => { if (state.sideBetTimer) clearInterval(state.sideBetTimer); state.sideBetTimer = null; };
+
+  function paintDie(el, n) {
+    el.innerHTML = "";
+    DIE_SPOTS[n].forEach((i) => {
+      const p = document.createElement("i");
+      p.className = "pip";
+      p.style.gridArea = `${Math.floor(i / 3) + 1} / ${(i % 3) + 1}`;
+      el.append(p);
+    });
+    el.classList.remove("die-repaint");
+    void el.offsetWidth;
+    el.classList.add("rolling");
+    setTimeout(() => el.classList.remove("rolling"), 500);
+  }
+
+  /* ---------------------------------------------------------
+   * Render
+   * ------------------------------------------------------- */
+  function render() {
+    const { players, active, point, wager, pendingSideBet, rolling } = state;
+    els.shooter.textContent = players[active];
+    els.pointDisplay.textContent = point ? point : "—";
+    els.tableCall.textContent = point ? `“${TABLE_CALLS[point] || ""}”` : "Awaiting the come-out roll.";
+    els.ruleCopy.textContent = point
+      ? `Roll ${point} again before a 7 shows.`
+      : "7 or 11 wins the roll. Snake eyes loses.";
+    els.phase.textContent = point ? "Point round" : "Opening roll";
+    els.turn.innerHTML = `Wager ${money(wager)} · <b>${players[active]}</b>'s turn`;
+    els.wager.textContent = wager;
+
+    const draftAmount = pendingSideBet;
+    if (draftAmount) {
+      const poolAdd = draftAmount * 2;
+      els.wagerPreview.textContent = `+${money(draftAmount)} each → pool becomes ${money(wager + poolAdd)}`;
+    } else {
+      els.wagerPreview.textContent = "";
+    }
+
+    els.ledger.innerHTML = players.map((name, i) => {
+      const net = state.ledger[i].won - state.ledger[i].lost;
+      return `<div class="ledger-row"><b>${escapeHtml(name)}</b><span class="ledger-money ${net >= 0 ? "positive" : "negative"}">${net < 0 ? "−" : "+"}${money(net)}</span></div>`;
+    }).join("");
+
+    els.roll.textContent = rolling ? "Rolling…" : (point ? `Roll for ${point}` : "Roll the dice");
+    els.roll.disabled = rolling || state.roundEnding || pendingSideBet !== null;
+
+    const sideBetsUnlocked = point !== null;
+    els.chipRow.classList.toggle("dimmed", !sideBetsUnlocked);
+    document.querySelectorAll("[data-sidebet]").forEach((btn) => {
+      btn.disabled = !sideBetsUnlocked || pendingSideBet !== null;
+    });
+    els.sideHint.textContent = sideBetsUnlocked
+      ? "Propose a side bet — the other player has 5 seconds to accept."
+      : "Side bets unlock once a point is set.";
+    els.sideHint.classList.toggle("hidden", pendingSideBet !== null);
+    els.chipRow.classList.toggle("hidden", pendingSideBet !== null);
+  }
+
+  function escapeHtml(str) {
+    return str.replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+  }
+
+  /* ---------------------------------------------------------
+   * Rolling logic
+   * ------------------------------------------------------- */
+  function rollDice() {
+    if (state.rolling || state.roundEnding || state.pendingSideBet !== null) return;
+    sound.unlock();
+    state.rolling = true;
+    render();
+    let ticks = 0;
+    const spin = setInterval(() => {
+      paintDie(els.die1, 1 + (Math.random() * 6 | 0));
+      paintDie(els.die2, 1 + (Math.random() * 6 | 0));
+      ticks++;
+      if (ticks === 10) {
+        clearInterval(spin);
+        const a = 1 + (Math.random() * 6 | 0), b = 1 + (Math.random() * 6 | 0), total = a + b;
+        paintDie(els.die1, a); paintDie(els.die2, b);
+        els.sum.textContent = total;
+        els.totalChip.classList.add("visible");
+        state.rolling = false;
+
+        if (!state.point) {
+          if (total === 7 || total === 11) return finishRound(true);
+          if (a === 1 && b === 1) return finishRound(false);
+          state.point = total;
+          return render();
+        }
+        if (total === state.point) return finishRound(true);
+        if (total === 7 || (a === 1 && b === 1)) return finishRound(false);
+        render();
       }
+    }, 90);
+  }
+
+  function finishRound(shooterWon) {
+    state.roundEnding = true;
+    const winner = shooterWon ? state.active : (state.active ? 0 : 1);
+    const loser = winner ? 0 : 1;
+    state.ledger[winner].won += state.wager;
+    state.ledger[loser].lost += state.wager;
+    render();
+    setTimeout(() => showOutcome(shooterWon, winner, loser), 650);
+  }
+
+  function showOutcome(shooterWon, winner, loser) {
+    const kind = shooterWon ? "win" : "loss";
+    shooterWon ? sound.win() : sound.loss();
+    const confetti = shooterWon
+      ? `<div class="confetti">${Array.from({ length: 22 }, (_, i) =>
+          `<i style="left:${(i * 31) % 96}%;animation-delay:${(i % 7) * .18}s;background:${i % 2 ? "var(--accent-strong)" : "var(--accent)"}"></i>`).join("")}</div>`
+      : "";
+    els.outcome.innerHTML = `
+      <div class="modal outcome-modal ${kind}">
+        ${confetti}
+        <div class="outcome-icon">${shooterWon ? "♦" : "♠"}</div>
+        <span class="eyebrow">Round complete</span>
+        <h2>${escapeHtml(state.players[winner])} wins the round</h2>
+        <p class="lead">${escapeHtml(state.players[loser])}'s stake moves to ${escapeHtml(state.players[winner])}'s side of the ledger.</p>
+        <div class="outcome-amount"><small>Settled</small><strong>${money(state.wager)}</strong></div>
+        <button class="btn btn-primary" id="next-round">Next round</button>
+      </div>`;
+    els.outcome.classList.remove("hidden");
+    $("next-round").onclick = () => {
+      els.outcome.classList.add("hidden");
+      state.active = state.active ? 0 : 1;
+      state.point = null;
+      state.roundEnding = false;
+      els.totalChip.classList.remove("visible");
+      showOpeningWager();
     };
-    new MutationObserver(formatPointRule).observe(pointRuleCopy, { childList:true, characterData:true, subtree:true });
-    formatPointRule();
-  </script>
-  <script>
-    /* Recompose the table without duplicating live game data. */
-    const gameTable = document.querySelector('.game');
-    const wagerPoolBox = document.querySelector('.pool');
-    const wagerHeading = wagerPoolBox.previousElementSibling;
-    const turnStatus = document.getElementById('turn');
-    const sideBetsPanel = document.querySelector('main > aside > .side:first-child');
-    const wagerPanel = document.createElement('div');
-    wagerPanel.className = 'main-wager';
-    gameTable.insertBefore(wagerPanel, turnStatus);
-    wagerPanel.append(wagerHeading, wagerPoolBox);
-    sideBetsPanel.classList.add('side-bets-panel');
-    gameTable.insertBefore(sideBetsPanel, turnStatus);
-    /* Keep this hidden node because the original game engine updates it each roll. */
-    turnStatus.textContent = '';
+  }
 
-    const targetTitle = document.getElementById('title');
-    const targetNumber = document.getElementById('number');
-    const rollControl = document.getElementById('roll');
-    const ruleCopy = document.getElementById('copy');
-    let displayedTarget = null;
-    const syncTargetDisplay = () => {
-      const targetMatch = targetTitle.textContent.match(/number is (\d+)\./);
-      if (targetMatch) displayedTarget = targetMatch[1];
-      else if (targetTitle.textContent !== '') displayedTarget = null;
-      const target = displayedTarget;
-      if (targetTitle.textContent !== '') targetTitle.textContent = '';
-      targetNumber.textContent = document.getElementById('shooter').textContent;
-      ruleCopy.classList.toggle('has-point', Boolean(target));
-      ruleCopy.classList.remove('opening-call');
-      if (!target && ruleCopy.textContent !== '') ruleCopy.textContent = '';
-      if (target && rollControl.textContent === 'Roll the dice') rollControl.textContent = `Roll ${target}`;
+  /* ---------------------------------------------------------
+   * Side bets
+   * ------------------------------------------------------- */
+  function closeSideBet() {
+    clearSideBetTimer();
+    state.pendingSideBet = null;
+    els.sidebetOffer.classList.add("hidden");
+    render();
+  }
+
+  function proposeSideBet(amount) {
+    if (!state.point || state.pendingSideBet !== null) return;
+    sound.click();
+    state.pendingSideBet = amount;
+    els.sidebetAmount.textContent = amount;
+    els.sidebetPoolAdd.textContent = amount * 2;
+    els.sidebetOffer.classList.remove("hidden");
+    state.sideBetDeadline = Date.now() + SIDEBET_MS;
+    const tick = () => {
+      const remaining = Math.max(0, state.sideBetDeadline - Date.now());
+      els.sidebetSeconds.textContent = (remaining / 1000).toFixed(1);
+      els.sidebetTimer.style.width = `${(remaining / SIDEBET_MS) * 100}%`;
+      if (remaining <= 0) closeSideBet();
     };
-    new MutationObserver(syncTargetDisplay).observe(targetTitle, { childList:true, characterData:true, subtree:true });
-    new MutationObserver(syncTargetDisplay).observe(rollControl, { childList:true, characterData:true, subtree:true });
-    syncTargetDisplay();
-  </script>
-  <script>
-    /* Replace the themed result stories with a neutral payment statement. */
-    const outcomeScreen = document.getElementById('outcome');
-    new MutationObserver(() => {
-      const originalModal = outcomeScreen.querySelector('.modal:not(.generic-outcome)');
-      if (!originalModal) return;
-      const shooterWonRound = originalModal.classList.contains('win');
-      const resultPlayer = players[active];
-      const genericModal = document.createElement('div');
-      genericModal.className = `modal generic-outcome ${shooterWonRound ? 'win' : 'loss'}`;
-      const resultText = document.createElement('h2');
-      resultText.textContent = `${resultPlayer} ${shooterWonRound ? 'gets' : 'gives'} $${wager}`;
-      const nextRoundButton = document.createElement('button');
-      nextRoundButton.id = 'next';
-      nextRoundButton.textContent = 'Next round';
-      nextRoundButton.onclick = () => {
-        outcomeScreen.classList.add('hidden');
-        active = active ? 0 : 1;
-        point = null;
-        roundEnding = false;
-        openingWagerPlaced = false;
-        showOpeningWager();
+    tick();
+    state.sideBetTimer = setInterval(tick, 100);
+    render();
+  }
+
+  function acceptSideBet() {
+    if (state.pendingSideBet === null) return;
+    state.wager += state.pendingSideBet * 2;
+    closeSideBet();
+  }
+
+  /* ---------------------------------------------------------
+   * Screens: lobby → roll-off → opening wager → table
+   * ------------------------------------------------------- */
+  function showOverlay(el) { el.classList.remove("hidden"); }
+  function hideOverlay(el) { el.classList.add("hidden"); }
+
+  function renderLobby() {
+    showOverlay(els.setup);
+    els.setup.innerHTML = `
+      <div class="modal setup-modal">
+        <span class="eyebrow">Dice Duel</span>
+        <h2>Choose your table</h2>
+        <p class="lead">Pick the table finish and the game, then seat both players.</p>
+        <div class="table-picker">
+          ${THEMES.map((t) => `
+            <button class="pick-card ${t.id === state.lobby.theme ? "selected" : ""}" data-theme-pick="${t.id}" type="button">
+              <strong><span class="swatch" style="background:${t.swatch}"></span>${t.name}</strong>
+              <small>${t.desc}</small>
+            </button>`).join("")}
+        </div>
+        <div class="field"><label>Game mode</label></div>
+        <div class="mode-picker">
+          <button class="pick-card ${state.lobby.mode === "dice" ? "selected" : ""}" data-mode-pick="dice" type="button">
+            <strong>Dice Duel</strong><small>Craps-style point round</small>
+          </button>
+          <button class="pick-card ${state.lobby.mode === "coin" ? "selected" : ""}" data-mode-pick="coin" type="button">
+            <strong>Coin Flip</strong><small>Straight heads or tails</small>
+          </button>
+        </div>
+        <div class="field"><label for="p1-input">Player 1</label><input id="p1-input" maxlength="18" value="Player 1" /></div>
+        <div class="field"><label for="p2-input">Player 2</label><input id="p2-input" maxlength="18" value="Player 2" /></div>
+        <button class="btn btn-primary" id="enter-match" type="button">Enter the table</button>
+      </div>`;
+    applyTheme(state.lobby.theme);
+
+    document.querySelectorAll("[data-theme-pick]").forEach((btn) => {
+      btn.onclick = () => { state.lobby.theme = btn.dataset.themePick; renderLobby(); };
+    });
+    document.querySelectorAll("[data-mode-pick]").forEach((btn) => {
+      btn.onclick = () => { state.lobby.mode = btn.dataset.modePick; renderLobby(); };
+    });
+    $("enter-match").onclick = enterMatch;
+    [$("p1-input"), $("p2-input")].forEach((input) => {
+      input.addEventListener("keydown", (e) => { if (e.key === "Enter") enterMatch(); });
+    });
+  }
+
+  function enterMatch() {
+    sound.unlock();
+    state.players = [
+      $("p1-input").value.trim() || "Player 1",
+      $("p2-input").value.trim() || "Player 2",
+    ];
+    state.ledger = [{ won: 0, lost: 0 }, { won: 0, lost: 0 }];
+    state.active = 0;
+    state.mode = state.lobby.mode;
+    applyTheme(state.lobby.theme);
+    hideOverlay(els.setup);
+    buildToolsPanel();
+    els.toolsToggle.classList.remove("hidden");
+
+    if (state.mode === "coin") {
+      document.body.classList.add("coin-mode");
+      els.coinPlay.classList.remove("hidden");
+      els.ledgerPanel.classList.add("hidden");
+      els.rulesPanelTitle.textContent = "Coin flip rules";
+      els.rulesPanelList.innerHTML = COIN_RULES_HTML;
+      els.rulesOverlayTitle.textContent = "Coin Flip Rules";
+      els.rulesOverlayList.innerHTML = COIN_RULES_HTML;
+      state.coin = { heads: 0, tails: 0 };
+      renderCoin();
+    } else {
+      document.body.classList.remove("coin-mode");
+      els.coinPlay.classList.add("hidden");
+      els.ledgerPanel.classList.remove("hidden");
+      els.rulesPanelTitle.textContent = "House rules";
+      els.rulesPanelList.innerHTML = DICE_RULES_HTML;
+      els.rulesOverlayTitle.textContent = "Table Rules";
+      els.rulesOverlayList.innerHTML = DICE_RULES_HTML_LONG;
+      beginRollOff();
+    }
+  }
+
+  function beginRollOff() {
+    const values = [null, null];
+    showOverlay(els.setup);
+    const draw = () => `
+      <div class="modal setup-modal" style="text-align:center">
+        <span class="eyebrow">First shot</span>
+        <h2>Roll for first</h2>
+        <p class="lead">Each player rolls one die. The higher number shoots first.</p>
+        <div class="rolloff-grid">
+          ${state.players.map((name, i) => `
+            <div class="rolloff-seat">
+              <strong>${escapeHtml(name)}</strong>
+              <div class="rolloff-face" id="rolloff-${i}">?</div>
+              <button class="btn btn-ghost" id="rolloff-btn-${i}" type="button">Roll one die</button>
+            </div>`).join("")}
+        </div>
+      </div>`;
+    els.setup.innerHTML = draw();
+
+    const checkWinner = () => {
+      if (values.some((v) => v === null)) return;
+      if (values[0] === values[1]) { setTimeout(beginRollOff, 800); return; }
+      state.active = values[0] > values[1] ? 0 : 1;
+      setTimeout(showOpeningWager, 650);
+    };
+
+    state.players.forEach((_, i) => {
+      const btn = $(`rolloff-btn-${i}`), face = $(`rolloff-${i}`);
+      btn.onclick = () => {
+        if (values[i] !== null || btn.disabled) return;
+        sound.unlock();
+        btn.disabled = true; btn.textContent = "Rolling…";
+        face.classList.add("spin");
+        const spin = setInterval(() => { face.textContent = 1 + Math.floor(Math.random() * 6); }, 80);
+        setTimeout(() => {
+          clearInterval(spin);
+          values[i] = 1 + Math.floor(Math.random() * 6);
+          face.textContent = values[i];
+          face.classList.remove("spin");
+          btn.textContent = "Rolled";
+          checkWinner();
+        }, 900);
       };
-      genericModal.append(resultText, nextRoundButton);
-      outcomeScreen.replaceChildren(genericModal);
-    }).observe(outcomeScreen, { childList:true, subtree:true });
-  </script>
-  <script>
-    /* Sound feedback: a revolver shot on loss and a short automatic burst on win. */
-    (() => {
-      let audioContext=null, noiseBuffer=null, lastOutcome=null;
-      const unlockAudio=()=>{
-        if(!audioContext){ audioContext=new (window.AudioContext||window.webkitAudioContext)(); noiseBuffer=audioContext.createBuffer(1,audioContext.sampleRate*.35,audioContext.sampleRate); const data=noiseBuffer.getChannelData(0); for(let i=0;i<data.length;i++) data[i]=Math.random()*2-1; }
-        if(audioContext.state==='suspended') audioContext.resume();
+    });
+  }
+
+  function showOpeningWager() {
+    showOverlay(els.setup);
+    els.setup.innerHTML = `
+      <div class="modal setup-modal" style="text-align:center">
+        <span class="eyebrow">Place next wager</span>
+        <h2>${escapeHtml(state.players[state.active])}'s wager</h2>
+        <p class="lead">Choose the stake. The other player matches it, so the pool doubles.</p>
+        <div class="opening-options">
+          ${OPENING_STAKES.map((amount) => `<button class="chip-btn" data-opening-wager="${amount}" type="button">$${amount}</button>`).join("")}
+        </div>
+      </div>`;
+    document.querySelectorAll("[data-opening-wager]").forEach((btn) => {
+      btn.onclick = () => {
+        sound.click();
+        state.wager = Number(btn.dataset.openingWager) * 2;
+        state.point = null;
+        hideOverlay(els.setup);
+        render();
       };
-      const shot=()=>{
-        unlockAudio(); const now=audioContext.currentTime;
-        const noise=audioContext.createBufferSource(), filter=audioContext.createBiquadFilter(), noiseGain=audioContext.createGain();
-        noise.buffer=noiseBuffer; filter.type='bandpass'; filter.frequency.value=1450; filter.Q.value=.7; noiseGain.gain.setValueAtTime(.75,now); noiseGain.gain.exponentialRampToValueAtTime(.001,now+.24); noise.connect(filter).connect(noiseGain).connect(audioContext.destination); noise.start(now); noise.stop(now+.26);
-        const crack=audioContext.createOscillator(), crackGain=audioContext.createGain(); crack.type='sawtooth'; crack.frequency.setValueAtTime(1250,now); crack.frequency.exponentialRampToValueAtTime(170,now+.12); crackGain.gain.setValueAtTime(.22,now); crackGain.gain.exponentialRampToValueAtTime(.001,now+.13); crack.connect(crackGain).connect(audioContext.destination); crack.start(now); crack.stop(now+.14);
-        const thump=audioContext.createOscillator(), thumpGain=audioContext.createGain(); thump.type='sine'; thump.frequency.setValueAtTime(105,now); thump.frequency.exponentialRampToValueAtTime(42,now+.28); thumpGain.gain.setValueAtTime(.7,now); thumpGain.gain.exponentialRampToValueAtTime(.001,now+.3); thump.connect(thumpGain).connect(audioContext.destination); thump.start(now); thump.stop(now+.31);
-      };
-      const burst=()=>{ for(let i=0;i<5;i++) setTimeout(shot,i*105); };
-      document.getElementById('roll').addEventListener('pointerdown',unlockAudio,{passive:true});
-      new MutationObserver(()=>{ const win=outcomeScreen.querySelector('.modal.win'), loss=outcomeScreen.querySelector('.modal.loss'), current=win||loss; if(!current||current===lastOutcome)return; lastOutcome=current; if(loss)shot(); else burst(); }).observe(outcomeScreen,{childList:true,subtree:true});
-    })();
-  </script>
-  <style>
-    /* Final responsive pass for iPhone, iPad, Mac and desktop browsers. */
-    :root { color-scheme:dark; }
-    .pool,.total strong,.sidebet-controls button,.sidebet-draft,.sidebet p,.sidebet small,.rolloff-number,.ledger-money,.wager-preview,.opening-options button,[id$="amount"],[id$="add"],[id$="seconds"],[id$="timer"] { font-family:"Harrington","Harrington Std",Georgia,"Times New Roman",serif; }
-    html { min-width:320px; background:#0c0002; -webkit-text-size-adjust:100%; }
-    body { min-width:0; min-height:100dvh; overflow-x:hidden; overscroll-behavior-x:none; padding-bottom:env(safe-area-inset-bottom); }
-    button, input { -webkit-tap-highlight-color:transparent; }
-    button { min-height:44px; touch-action:manipulation; }
-    input { font-size:16px; }
-    .shell { width:min(100%,1240px); padding-left:max(18px,env(safe-area-inset-left)); padding-right:max(18px,env(safe-area-inset-right)); }
-    .brand { max-width:100%; white-space:nowrap; }
-    .game { isolation:isolate; }
+    });
+  }
 
-    @media (min-width:1024px) {
-      .shell { padding-top:34px; padding-bottom:72px; }
-      header { margin-bottom:30px; }
-      .brand { font-size:27px; }
-      main { grid-template-columns:minmax(0,1fr) 330px; gap:26px; align-items:start; }
-      main > .game { grid-column:1; grid-row:1; min-height:650px; padding:42px 42px 34px; }
-      main > aside { display:grid; grid-column:2; grid-row:1; gap:20px; align-content:start; }
-      main > aside > .side:last-child { grid-column:auto; grid-row:auto; padding:22px; }
-      .game > .side-bets-panel { width:min(100%,560px); margin-top:10px; }
-      .dice-row { min-height:190px; gap:28px; }
-      .die { width:138px; height:138px; }
-      .sum { font-size:27px; }
-      .shooter-number { font-size:42px; }
-      .main-wager { max-width:560px; }
-      .roll { width:180px; height:82px; }
-      .total { width:160px; height:82px; }
-    }
+  /* ---------------------------------------------------------
+   * Coin mode
+   * ------------------------------------------------------- */
+  function renderCoin() {
+    els.coinFace.textContent = "READY";
+  }
+  function flipCoin(forced) {
+    sound.unlock();
+    const face = forced || (Math.random() < .5 ? "heads" : "tails");
+    let ticks = 0;
+    const spin = setInterval(() => {
+      els.coinFace.textContent = Math.random() < .5 ? "HEADS" : "TAILS";
+      ticks++;
+      if (ticks === 8) {
+        clearInterval(spin);
+        els.coinFace.textContent = face.toUpperCase();
+        state.coin[face]++;
+        renderToolsPanel();
+      }
+    }, 70);
+  }
 
-    @media (min-width:761px) and (max-width:1023px) {
-      .shell { max-width:820px; padding-top:24px; }
-      main > aside > .side:last-child { padding:18px 22px; }
-      .game { padding:30px 24px 26px; }
-      .game > .side-bets-panel { width:min(100%,620px); }
-    }
+  /* ---------------------------------------------------------
+   * Table tools (manual tracker, corner panel)
+   * ------------------------------------------------------- */
+  const MONEY_STEPS = [-10, -5, -1, 1, 5, 10];
 
-    @media (max-width:760px) {
-      .shell { padding-top:max(12px,env(safe-area-inset-top)); padding-bottom:34px; }
-      header { margin-bottom:16px; }
-      .brand { gap:8px; padding:8px 0; font-size:clamp(17px,5vw,22px); letter-spacing:.1em; }
-      .brand::before,.brand::after { margin:0 5px; font-size:9px; }
-      .logo { width:40px; height:40px; font-size:16px; }
-      .card { border-radius:22px; }
-      .game { padding:23px 13px 18px; }
-      .game > .eyebrow::before { margin-bottom:5px; font-size:25px; }
-      .shooter { width:100%; margin:5px auto 14px; padding:14px 18px 13px; }
-      .shooter-number { font-size:clamp(24px,7.5vw,36px); line-height:1.12; }
-      .dice-row { min-height:126px; gap:7px; }
-      .die { width:clamp(74px,26vw,108px); height:clamp(74px,26vw,108px); }
-      .sum { font-size:19px; }
-      .main-wager { width:100%; margin-top:3px; }
-      .main-wager .pool { font-size:27px; }
-      .game > .side-bets-panel { width:100%; padding:15px 13px; margin-bottom:4px; }
-      .sidebet-controls { gap:7px; }
-      .sidebet-controls button { min-height:54px; }
-      .total,.roll { margin:7px 3px 15px; }
-      .roll { width:min(100%,360px); }
-      main > aside > .side:last-child { padding:15px 13px; }
-      main > aside > .side:last-child .ledger { gap:7px; }
-      main > aside > .side:last-child .ledger-row { min-height:48px; padding:11px 13px; }
-      .modal { max-height:calc(100dvh - 24px); overflow:auto; padding:23px 18px; border-radius:23px; }
-      .modal h2 { font-size:clamp(28px,8vw,38px); }
-      .setup input { min-height:48px; }
-      .opening-options button { min-height:58px; }
-    }
+  function buildToolsPanel() {
+    els.toolsToggle.textContent = "Table tools";
+    els.toolsToggle.onclick = () => els.toolsPanel.classList.toggle("hidden");
+    renderToolsPanel();
+  }
 
-    @media (max-width:430px) {
-      .shell { padding-left:max(10px,env(safe-area-inset-left)); padding-right:max(10px,env(safe-area-inset-right)); }
-      .brand { font-size:17px; }
-      .brand::before,.brand::after { display:none; }
-      .game { padding-left:10px; padding-right:10px; }
-      .dice-row { gap:4px; }
-      .die { width:78px; height:78px; }
-      .game > .side-bets-panel { padding-left:10px; padding-right:10px; }
-      .opening-options { gap:6px; }
-      .opening-options button { font-size:21px; }
-      .rolloff-grid { grid-template-columns:1fr; }
+  function renderToolsPanel() {
+    const t = state.tracker;
+    if (state.mode === "coin") {
+      els.toolsPanel.innerHTML = `
+        <button class="tools-close" type="button">Close</button>
+        <h3>Manual coin tracker</h3>
+        <p class="side-hint" style="text-align:left;margin:4px 0 0">Optional scratchpad for money and bank totals.</p>
+        <div class="mini-stats">
+          <div class="mini-stat">Money<b>${money(t.coinMoney)}</b></div>
+          <div class="mini-stat">Bank<b>${money(t.coinBank)}</b></div>
+        </div>
+        <h4>Money</h4>
+        <div class="mini-grid money">${MONEY_STEPS.map((n) => `<button class="mini-btn" data-coin-money="${n}">${n > 0 ? "+" : ""}${n}</button>`).join("")}</div>
+        <h4>Bank</h4>
+        <div class="mini-grid money">${MONEY_STEPS.map((n) => `<button class="mini-btn" data-coin-bank="${n}">${n > 0 ? "+" : ""}${n}</button>`).join("")}</div>`;
+    } else {
+      els.toolsPanel.innerHTML = `
+        <button class="tools-close" type="button">Close</button>
+        <h3>Manual dice tracker</h3>
+        <p class="side-hint" style="text-align:left;margin:4px 0 0">Optional scratchpad — not linked to the automatic table above.</p>
+        <div class="mini-stats">
+          <div class="mini-stat">Die 1 total<b>${t.die1.reduce((a, b) => a + b, 0)}</b></div>
+          <div class="mini-stat">Die 2 total<b>${t.die2.reduce((a, b) => a + b, 0)}</b></div>
+          <div class="mini-stat">Money<b>${money(t.money)}</b></div>
+          <div class="mini-stat">Bank<b>${money(t.bank)}</b></div>
+        </div>
+        <h4>Die 1</h4>
+        <div class="mini-grid">${[1, 2, 3, 4, 5, 6].map((n) => `<button class="mini-btn" data-track-die="1" data-face="${n}">${n}</button>`).join("")}</div>
+        <h4>Die 2</h4>
+        <div class="mini-grid">${[1, 2, 3, 4, 5, 6].map((n) => `<button class="mini-btn" data-track-die="2" data-face="${n}">${n}</button>`).join("")}</div>
+        <h4>Money</h4>
+        <div class="mini-grid money">${MONEY_STEPS.map((n) => `<button class="mini-btn" data-money="${n}">${n > 0 ? "+" : ""}${n}</button>`).join("")}</div>
+        <h4>Bank</h4>
+        <div class="mini-grid money">${MONEY_STEPS.map((n) => `<button class="mini-btn" data-bank="${n}">${n > 0 ? "+" : ""}${n}</button>`).join("")}</div>`;
     }
+    bindToolsPanel();
+  }
 
-    @media (prefers-reduced-motion:reduce) {
-      *,*::before,*::after { animation-duration:.01ms!important; animation-iteration-count:1!important; scroll-behavior:auto!important; }
-    }
-  </style>
-  <style>
-    .table-picker,.mode-picker { display:grid; grid-template-columns:repeat(2,1fr); gap:8px; margin:16px 0; }
-    .table-choice,.mode-choice { min-height:58px; margin:0!important; text-align:left; padding:10px 12px; border:1px solid #9f6335!important; border-radius:13px!important; background:#170104!important; color:#f4d895!important; }
-    .table-choice strong,.mode-choice strong { display:block; font-size:14px; }
-    .table-choice small,.mode-choice small { display:block; margin-top:4px; color:#c9b08a; font:10px Arial,sans-serif; }
-    .table-choice.selected,.mode-choice.selected { border-color:#ffe7a1!important; background:linear-gradient(145deg,#6f1d32,#2d0610)!important; box-shadow:inset 0 0 0 1px #d29c5e,0 0 14px #d29c5e44; }
-    .manual-toggle { position:fixed; z-index:8; right:max(14px,env(safe-area-inset-right)); bottom:max(14px,env(safe-area-inset-bottom)); min-height:48px; padding:0 15px; border:1px solid #f4d895; border-radius:999px; background:linear-gradient(#9a6235,#633218); color:#ffe6a5; box-shadow:0 5px 0 #240105,0 10px 24px #0008; font-weight:800; }
-    .manual-panel { position:fixed; z-index:10; right:max(14px,env(safe-area-inset-right)); bottom:76px; width:min(360px,calc(100vw - 28px)); max-height:calc(100dvh - 100px); overflow:auto; padding:18px; border:1px solid #d29c5e; border-radius:20px; color:#f4e8d0; background:linear-gradient(145deg,#3b0917f7,#100002f9); box-shadow:0 18px 50px #000b,inset 0 0 0 2px #4b170e; }
-    .manual-panel h3 { margin:0 0 12px; color:#ffe5a0; font-size:20px; }
-    .manual-panel h4 { margin:14px 0 7px; color:#d29c5e; font:800 10px Arial,sans-serif; letter-spacing:.14em; text-transform:uppercase; }
-    .manual-close { float:right; min-height:32px; padding:0 10px; margin:-4px -5px 0 8px; border:1px solid #87502c; border-radius:9px; background:#210207; color:#f4d895; }
-    .tracker-die { display:grid; grid-template-columns:repeat(6,1fr); gap:5px; }
-    .tracker-die button,.tracker-money button,.coin-actions button { min-height:38px; padding:0 7px; border:1px solid #87502c; border-radius:9px; background:#210207; color:#f4d895; font-weight:800; }
-    .tracker-die button:hover,.tracker-money button:hover,.coin-actions button:hover { border-color:#ffe5a0; background:#4a0b18; }
-    .tracker-stats { display:grid; grid-template-columns:1fr 1fr; gap:7px; margin-top:12px; }
-    .tracker-stat { padding:10px; border:1px solid #653719; border-radius:10px; background:#210207; color:#c9b08a; font:11px Arial,sans-serif; }
-    .tracker-stat b { display:block; margin-top:4px; color:#ffe49a; font:700 22px Georgia,serif; }
-    .tracker-money { display:grid; grid-template-columns:repeat(4,1fr); gap:6px; }
-    .coin-face { display:grid; place-items:center; min-height:94px; margin:8px 0 12px; border:1px solid #d29c5e; border-radius:50%; background:radial-gradient(circle at 33% 25%,#fff1bd,#c18a34 55%,#623313); color:#3b0a12; font:700 29px Georgia,serif; box-shadow:inset 0 0 0 5px #e4bc62,0 6px 0 #240105; }
-    .coin-actions { display:grid; grid-template-columns:1fr 1fr; gap:7px; }
-    .coin-actions .primary { grid-column:1/-1; background:linear-gradient(#9a2946,#681127); color:#ffe6a5; }
-    .coin-score { display:grid; grid-template-columns:1fr 1fr; gap:7px; text-align:center; }
-    .coin-score div { padding:10px; border:1px solid #653719; border-radius:10px; background:#210207; color:#c9b08a; }
-    .coin-score b { display:block; margin-top:4px; color:#ffe49a; font-size:25px; }
-    .coin-mode-active .game > *:not(.coin-panel) { display:none!important; }
-    .coin-mode-active .game { min-height:520px; display:grid; place-items:center; }
-    .coin-panel { width:min(100%,430px); text-align:center; }
-    @media(max-width:520px) { .table-picker { grid-template-columns:1fr; } .manual-panel { bottom:70px; } }
-  </style>
-  <script>
-    (() => {
-      const setup=document.getElementById('setup'), game=document.querySelector('.game');
-      const themes=[['variant-royal','Royal Crest','Black cherry · gold'],['variant-emerald','Emerald Salon','Green felt · brass'],['variant-noir','Noir Table','Monochrome · red'],['variant-neon','Neon Afterdark','Indigo · cyan'],['variant-artdeco','Art Deco','Navy · geometry'],['variant-crimson','Crimson Room','Velvet · copper'],['variant-lounge','Whiskey Lounge','Walnut · leather']];
-      let selectedTheme='variant-royal', selectedMode='dice', trackerMode='dice', manualPanel, manualToggle, coinPanel, coinState;
-      const tracker={die1:Array(6).fill(0),die2:Array(6).fill(0),money:0,bank:0};
-      const moneyButtons=[-10,-5,-1,1,5,10];
-      const renderLobby=()=>{ setup.innerHTML=`<div class="modal setup"><p class="eyebrow">Dice Duel Match</p><h2>Choose your table</h2><p>Pick the table atmosphere and game before the match begins.</p><div class="table-picker">${themes.map(([id,name,desc])=>`<button class="table-choice ${id===selectedTheme?'selected':''}" data-theme="${id}"><strong>${name}</strong><small>${desc}</small></button>`).join('')}</div><h3 style="margin:18px 0 6px">Game mode</h3><div class="mode-picker"><button class="mode-choice ${selectedMode==='dice'?'selected':''}" data-mode="dice"><strong>Dice Duel</strong><small>Automatic dice + manual tracker</small></button><button class="mode-choice ${selectedMode==='coin'?'selected':''}" data-mode="coin"><strong>Coin Flip</strong><small>Automatic or manual coin table</small></button></div><input id="p1" value="Player 1" maxlength="18" /><input id="p2" value="Player 2" maxlength="18" /><button id="enter-match">Enter match</button></div>`; document.querySelectorAll('[data-theme]').forEach(button=>button.onclick=()=>{selectedTheme=button.dataset.theme;renderLobby()});document.querySelectorAll('[data-mode]').forEach(button=>button.onclick=()=>{selectedMode=button.dataset.mode;renderLobby()});document.getElementById('enter-match').onclick=enterMatch; };
-      const setTheme=()=>{ document.body.classList.remove(...themes.map(theme=>theme[0])); document.body.classList.add(selectedTheme); };
-      const createManualControls=()=>{ if(!manualToggle){ manualToggle=document.createElement('button'); manualToggle.className='manual-toggle'; manualToggle.onclick=()=>manualPanel.classList.toggle('hidden'); document.body.append(manualToggle); manualPanel=document.createElement('aside'); manualPanel.className='manual-panel hidden'; document.body.append(manualPanel); } renderManualControls(); };
-      const renderManualControls=()=>{ if(!manualPanel)return; manualToggle.textContent=trackerMode==='coin'?'☷ Coin tracker':'☷ Dice tracker'; if(trackerMode==='coin'){ renderCoinTracker(); return; } manualPanel.innerHTML=`<button class="manual-close">Close</button><h3>Manual dice tracker</h3><p class="hint">Tap a face whenever a die is played to keep a manual count.</p><h4>Die 1 played</h4><div class="tracker-die">${[1,2,3,4,5,6].map(n=>`<button data-track-die="1" data-face="${n}">${n}</button>`).join('')}</div><h4>Die 2 played</h4><div class="tracker-die">${[1,2,3,4,5,6].map(n=>`<button data-track-die="2" data-face="${n}">${n}</button>`).join('')}</div><div class="tracker-stats"><div class="tracker-stat">Die 1 total<b>${tracker.die1.reduce((a,b)=>a+b,0)}</b></div><div class="tracker-stat">Die 2 total<b>${tracker.die2.reduce((a,b)=>a+b,0)}</b></div><div class="tracker-stat">Money<b>$${tracker.money}</b></div><div class="tracker-stat">Bank<b>$${tracker.bank}</b></div></div><h4>Money / bank</h4><div class="tracker-money">${moneyButtons.map(n=>`<button data-money="${n}">${n>0?'+':''}$${n}</button>`).join('')}</div><div class="tracker-money" style="margin-top:7px"><button data-bank="-10">Bank −$10</button><button data-bank="-1">Bank −$1</button><button data-bank="1">Bank +$1</button><button data-bank="10">Bank +$10</button></div>`; bindManualButtons(); };
-      const bindManualButtons=()=>{manualPanel.querySelector('.manual-close').onclick=()=>manualPanel.classList.add('hidden');manualPanel.querySelectorAll('[data-track-die]').forEach(button=>button.onclick=()=>{tracker[`die${button.dataset.trackDie}`][Number(button.dataset.face)-1]++;renderManualControls()});manualPanel.querySelectorAll('[data-money]').forEach(button=>button.onclick=()=>{tracker.money+=Number(button.dataset.money);renderManualControls()});manualPanel.querySelectorAll('[data-bank]').forEach(button=>button.onclick=()=>{tracker.bank+=Number(button.dataset.bank);renderManualControls()})};
-      const renderCoinTracker=()=>{manualPanel.innerHTML=`<button class="manual-close">Close</button><h3>Manual coin tracker</h3><p class="hint">Use Flip for automatic play or tap Heads / Tails manually.</p><div class="coin-score"><div>Heads<b>${coinState.heads}</b></div><div>Tails<b>${coinState.tails}</b></div></div><h4>Manual result</h4><div class="coin-actions"><button data-coin="heads">Heads</button><button data-coin="tails">Tails</button><button class="primary" data-coin="flip">Flip coin</button></div><h4>Money / bank</h4><div class="tracker-stats"><div class="tracker-stat">Money<b>$${coinState.money}</b></div><div class="tracker-stat">Bank<b>$${coinState.bank}</b></div></div><div class="tracker-money">${moneyButtons.map(n=>`<button data-coin-money="${n}">${n>0?'+':''}$${n}</button>`).join('')}</div><div class="tracker-money" style="margin-top:7px"><button data-coin-bank="-10">Bank −$10</button><button data-coin-bank="-1">Bank −$1</button><button data-coin-bank="1">Bank +$1</button><button data-coin-bank="10">Bank +$10</button></div>`;manualPanel.querySelector('.manual-close').onclick=()=>manualPanel.classList.add('hidden');manualPanel.querySelectorAll('[data-coin]').forEach(button=>button.onclick=()=>coinFlip(button.dataset.coin));manualPanel.querySelectorAll('[data-coin-money]').forEach(button=>button.onclick=()=>{coinState.money+=Number(button.dataset.coinMoney);renderManualControls()});manualPanel.querySelectorAll('[data-coin-bank]').forEach(button=>button.onclick=()=>{coinState.bank+=Number(button.dataset.coinBank);renderManualControls()});};
-      const coinFlip=result=>{ const face=result==='heads'||result==='tails'?result:(Math.random()<.5?'heads':'tails'); coinState[face]++; if(coinPanel){coinPanel.querySelector('.coin-face').textContent=face==='heads'?'HEADS':'TAILS';coinPanel.querySelector('[data-count="heads"]').textContent=coinState.heads;coinPanel.querySelector('[data-count="tails"]').textContent=coinState.tails;} renderManualControls(); };
-      const startCoinMatch=()=>{ coinState={heads:0,tails:0,money:0,bank:0}; trackerMode='coin'; game.classList.add('coin-mode-active'); coinPanel=document.createElement('div');coinPanel.className='coin-panel';coinPanel.innerHTML='<p class="eyebrow">Coin Flip Table</p><h2 class="round-title">Call it in the air.</h2><div class="coin-face">READY</div><div class="coin-actions"><button class="primary" data-auto-flip>Flip coin</button><button data-manual="heads">Heads</button><button data-manual="tails">Tails</button></div><div class="coin-score" style="margin-top:14px"><div>Heads<b data-count="heads">0</b></div><div>Tails<b data-count="tails">0</b></div></div><p class="copy">The corner coin tracker keeps manual counts, money and bank totals.</p></div>';game.append(coinPanel);coinPanel.querySelector('[data-auto-flip]').onclick=()=>coinFlip();coinPanel.querySelectorAll('[data-manual]').forEach(button=>button.onclick=()=>coinFlip(button.dataset.manual));createManualControls(); };
-      const enterMatch=()=>{ players=[document.getElementById('p1').value.trim()||'Player 1',document.getElementById('p2').value.trim()||'Player 2']; ledger=[{won:0,lost:0},{won:0,lost:0}]; active=0; openingWagerPlaced=false; setTheme(); setup.classList.add('hidden'); if(selectedMode==='coin')startCoinMatch();else{trackerMode='dice';createManualControls();beginRollOff();} };
-      document.getElementById('start').onclick=renderLobby; renderLobby();
-    })();
-  </script>
+  function bindToolsPanel() {
+    els.toolsPanel.querySelector(".tools-close").onclick = () => els.toolsPanel.classList.add("hidden");
+    els.toolsPanel.querySelectorAll("[data-track-die]").forEach((b) => {
+      b.onclick = () => { state.tracker[`die${b.dataset.trackDie}`][Number(b.dataset.face) - 1]++; renderToolsPanel(); };
+    });
+    els.toolsPanel.querySelectorAll("[data-money]").forEach((b) => {
+      b.onclick = () => { state.tracker.money += Number(b.dataset.money); renderToolsPanel(); };
+    });
+    els.toolsPanel.querySelectorAll("[data-bank]").forEach((b) => {
+      b.onclick = () => { state.tracker.bank += Number(b.dataset.bank); renderToolsPanel(); };
+    });
+    els.toolsPanel.querySelectorAll("[data-coin-money]").forEach((b) => {
+      b.onclick = () => { state.tracker.coinMoney += Number(b.dataset.coinMoney); renderToolsPanel(); };
+    });
+    els.toolsPanel.querySelectorAll("[data-coin-bank]").forEach((b) => {
+      b.onclick = () => { state.tracker.coinBank += Number(b.dataset.coinBank); renderToolsPanel(); };
+    });
+  }
+
+  /* ---------------------------------------------------------
+   * Bindings
+   * ------------------------------------------------------- */
+  els.roll.addEventListener("click", rollDice);
+  document.querySelectorAll("[data-sidebet]").forEach((b) => {
+    b.addEventListener("click", () => proposeSideBet(Number(b.dataset.sidebet)));
+  });
+  els.sidebetAccept.addEventListener("click", acceptSideBet);
+  els.openRules.addEventListener("click", () => showOverlay(els.rulesOverlay));
+  els.closeRules.addEventListener("click", () => hideOverlay(els.rulesOverlay));
+  els.rulesOverlay.addEventListener("click", (e) => { if (e.target === els.rulesOverlay) hideOverlay(els.rulesOverlay); });
+  els.coinFace.parentElement.querySelector("#coin-flip")?.addEventListener("click", () => flipCoin());
+  document.getElementById("coin-heads")?.addEventListener("click", () => flipCoin("heads"));
+  document.getElementById("coin-tails")?.addEventListener("click", () => flipCoin("tails"));
+
+  /* ---------------------------------------------------------
+   * Init
+   * ------------------------------------------------------- */
+  applyTheme(state.lobby.theme);
+  paintDie(els.die1, 5);
+  paintDie(els.die2, 2);
+  render();
+  renderLobby();
+})();
+</script>
 </body>
 </html>
