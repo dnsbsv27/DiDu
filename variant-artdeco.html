@@ -10,6 +10,7 @@
   <title>Dice Duel</title>
   <link rel="icon" type="image/png" href="favicon.png" />
   <link rel="apple-touch-icon" href="favicon.png" />
+  <link rel="stylesheet" href="variant-themes.css" />
   <style>
     :root { --ink:#1d2340; --cream:#fffaf0; --orange:#ec633f; --orange-dark:#a83b25; --teal:#216d67; --green:#19754e; --red:#a6273d; --gold:#f5c850; }
     * { box-sizing:border-box } body { margin:0; min-width:320px; font-family:Arial,Helvetica,sans-serif; color:var(--ink); background:radial-gradient(#1d234013 .8px,transparent .8px),linear-gradient(135deg,#fff8e9,#f6edd7); background-size:13px 13px,auto }
@@ -173,7 +174,7 @@
     @media(max-width:760px) { main { grid-template-columns:1fr }.shell { padding:17px 12px 36px }.game { padding:27px 18px }.round-title { font-size:24px } .shooter-name { font-size:28px } main > aside > .side:last-child .ledger { grid-template-columns:1fr 1fr } .brand { padding:10px 0;font-size:20px;letter-spacing:.1em }.brand::before,.brand::after { margin:0 8px } } @media(max-width:520px) { main > aside > .side:last-child .ledger { grid-template-columns:1fr } } @media(max-width:440px) { .die { width:78px;height:78px }.pip { width:11px;height:11px } .brand::before,.brand::after { display:none } .total,.roll { width:132px } }
   </style>
 </head>
-<body>
+<body class="variant-artdeco">
   <div class="shell"><header><div class="brand"><span class="logo">DD</span> Dice Duel</div></header>
   <main><section class="card game"><p class="eyebrow" id="phase">Opening roll</p><h1 class="round-title" id="title">Place your wager.</h1><p class="copy" id="copy">7 or 11 wins. Snake eyes loses.</p><div class="shooter"><h2 class="shooter-name" id="shooter">Player 1</h2><p class="shooter-number" id="number">Player 1's number is …</p></div><div class="dice-row"><div class="die" id="die1"></div><span class="sum">+</span><div class="die" id="die2"></div></div><div class="total" id="total">You hit <strong id="sum">7</strong> total</div><button class="roll" id="roll">Place a wager to roll</button><p class="turn" id="turn">Wager not placed · Player 1's turn</p></section>
   <aside><section class="card side"><h3>Side bets</h3><div class="sidebet-controls dimmed" id="sidebet-controls"><button data-sidebet="1" disabled>+$1</button><button data-sidebet="2" disabled>+$2</button><button data-sidebet="5" disabled>+$5</button></div><p class="hint" id="wager-hint">Side bets unlock after the first roll sets a point.</p><h3 style="margin-top:20px">Current wager</h3><p class="pool">$<span id="wager">1</span><span class="wager-preview hidden" id="wager-preview"></span></p><p class="sidebet-draft" id="sidebet-draft"></p><div class="sidebet hidden" id="sidebet"><p>Side bet: each player adds $<span id="sidebet-amount">1</span> — pool adds $<span id="sidebet-pool-add">2</span>. Accept it?</p><small><span id="sidebet-seconds">5.0</span> seconds to accept</small><div class="timer-track"><i class="timer-fill" id="sidebet-timer"></i></div><div class="sidebet-actions"><button class="accept" id="sidebet-accept">Accept</button></div></div></section><section class="card side"><h3>Player ledger</h3><div class="ledger" id="ledger"></div></section></aside></main></div>

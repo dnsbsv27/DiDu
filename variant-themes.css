@@ -1,0 +1,69 @@
+/* Dice Duel visual explorations. Each page keeps the same game engine and responsive rules. */
+body.variant-royal {
+  background:radial-gradient(ellipse at 50% -12%,#8b1839 0,#4d0a1b 25%,transparent 56%),linear-gradient(135deg,#0c0002,#26030b 48%,#0c0002);
+}
+body.variant-royal .card { border-color:#9d6a38; box-shadow:inset 0 0 0 3px #250906,inset 0 0 0 4px #653719,0 8px 0 #080001,0 24px 48px #050001bb; }
+body.variant-royal .roll { background:linear-gradient(#9a2946,#681127 48%,#3f0714 52%,#6f1229); }
+
+body.variant-emerald {
+  background:radial-gradient(ellipse at 50% -10%,#356b5d 0,#12372f 29%,transparent 58%),linear-gradient(135deg,#06110f,#09231d 52%,#020806);
+}
+body.variant-emerald .brand,.variant-emerald .round-title,.variant-emerald .shooter-number { color:#ffe9a6; }
+body.variant-emerald .card { background:linear-gradient(145deg,#0f3b32f2,#071b17f7 58%,#04100df7); border-color:#c79c55; box-shadow:inset 0 0 0 3px #06231b,inset 0 0 0 4px #8c6835,0 8px 0 #020806,0 24px 48px #020806cc; }
+body.variant-emerald .die { border-color:#e6c978; background:linear-gradient(145deg,#fff6d7,#d8b45d 58%,#8b641e); }
+body.variant-emerald .roll { background:linear-gradient(#217d68,#0c4b3e 52%,#073128); }
+body.variant-emerald .pool,body.variant-emerald .ledger-row,body.variant-emerald .stat { background:linear-gradient(145deg,#09251f,#123f34); border-color:#3e9077; }
+
+body.variant-noir {
+  background:radial-gradient(circle at 50% 0,#37383b 0,transparent 40%),linear-gradient(135deg,#08090b,#18191b 50%,#050506);
+}
+body.variant-noir .brand { color:#f2f2ed; letter-spacing:.25em; }
+body.variant-noir .logo { background:#17181b; border-color:#d9d6c9; color:#fff; box-shadow:inset 0 0 0 2px #5d5d5d,0 4px 0 #020202; }
+body.variant-noir .card { background:linear-gradient(145deg,#27282bf5,#111214f8); border-color:#858584; border-radius:12px; box-shadow:inset 0 0 0 1px #424347,0 10px 0 #030303,0 25px 50px #000b; }
+body.variant-noir .card::before { border-color:#77787355; border-radius:7px; }
+body.variant-noir .die { border-color:#dbd7c6; background:linear-gradient(145deg,#fffdf2,#c8c5b7 58%,#74736d); }
+body.variant-noir .pip { background:#18191b; box-shadow:inset 0 1px 2px #ffffffaa,0 1px 1px #000; }
+body.variant-noir .roll { background:linear-gradient(#8f182d,#4d101d 55%,#260a12); border-color:#e0d7bd; }
+
+body.variant-neon {
+  background:radial-gradient(circle at 14% 10%,#1f3e78 0,transparent 28%),radial-gradient(circle at 86% 50%,#6e154c 0,transparent 31%),linear-gradient(135deg,#050916,#0d1230 48%,#090513);
+}
+body.variant-neon .brand { color:#b7f8ff; text-shadow:0 0 16px #46eaff; }
+body.variant-neon .logo { background:linear-gradient(145deg,#142a63,#241348); border-color:#57eaff; color:#c4fbff; box-shadow:inset 0 0 0 2px #8d48df,0 0 22px #43e5ff88; }
+body.variant-neon .card { background:linear-gradient(145deg,#151d44e8,#0a1028f7); border-color:#4bdff0; box-shadow:inset 0 0 0 2px #222f68,0 0 26px #38d6ff36,0 16px 40px #02030d; }
+body.variant-neon .die { border-color:#6df1ff; background:linear-gradient(145deg,#e7ffff,#84cfe2 58%,#276493); box-shadow:inset 0 2px 5px #fff,0 7px 0 #112653,0 0 25px #5befff66; }
+body.variant-neon .pip { background:radial-gradient(circle at 35% 30%,#ff66d1,#8b164e 62%,#310629); }
+body.variant-neon .roll { background:linear-gradient(145deg,#a329a3,#5420a0 52%,#211458); border-color:#76efff; box-shadow:0 0 24px #b22cff66; }
+
+body.variant-artdeco {
+  background:repeating-linear-gradient(45deg,#07152a 0 11px,#0b1d35 11px 12px),linear-gradient(135deg,#061123,#122b4c);
+}
+body.variant-artdeco .brand { color:#f5d98c; padding:15px 40px; border:1px solid #c99c48; background:#07152acc; }
+body.variant-artdeco .card { background:linear-gradient(145deg,#102b4beF,#071326f7); border-color:#d2a652; border-radius:4px; box-shadow:inset 0 0 0 2px #254c70,0 9px 0 #020814,0 25px 45px #020814aa; }
+body.variant-artdeco .card::before { border-radius:0; border-color:#d2a65288; }
+body.variant-artdeco .die { border-radius:5px; border-color:#e4c16c; background:linear-gradient(145deg,#fff4ce,#dab364 60%,#93682a); }
+body.variant-artdeco .roll { border-radius:4px; background:linear-gradient(#b0863c,#6d4b1b); }
+body.variant-artdeco .pool,body.variant-artdeco .ledger-row,body.variant-artdeco .stat { border-radius:4px; background:#081a31; border-color:#4b7193; }
+
+body.variant-crimson {
+  background:radial-gradient(ellipse at 50% -12%,#a83247 0,#521125 27%,transparent 58%),linear-gradient(135deg,#190106,#480817 55%,#170104);
+}
+body.variant-crimson .brand { color:#ffd58d; }
+body.variant-crimson .card { background:linear-gradient(145deg,#6a1228ed,#2a050df7 58%,#160104f7); border-color:#d49450; box-shadow:inset 0 0 0 3px #4b0d1b,inset 0 0 0 4px #9d592d,0 8px 0 #100103,0 25px 46px #090001bb; }
+body.variant-crimson .die { border-color:#f2ca76; background:linear-gradient(145deg,#fff0c6,#d3a249 58%,#8b4c20); }
+body.variant-crimson .roll { background:linear-gradient(#c14b47,#7d1727 54%,#430713); }
+body.variant-crimson .pool,body.variant-crimson .ledger-row,body.variant-crimson .stat { background:linear-gradient(145deg,#3a0715,#6a1228); border-color:#a85c38; }
+
+body.variant-lounge {
+  background:radial-gradient(circle at 18% 0,#7a4b2c 0,transparent 30%),linear-gradient(135deg,#1c0f09,#3a2013 48%,#140a06);
+}
+body.variant-lounge .brand { color:#e7c58a; }
+body.variant-lounge .card { background:linear-gradient(145deg,#51301df2,#26150cf7); border-color:#b8874d; border-radius:30px; box-shadow:inset 0 0 0 3px #321b0f,0 10px 0 #0d0603,0 26px 50px #0b0402cc; }
+body.variant-lounge .die { border-color:#ddbd7a; background:linear-gradient(145deg,#fff1c7,#c99d59 58%,#75441f); }
+body.variant-lounge .roll { background:linear-gradient(#9b6740,#63351f 52%,#3e1e12); }
+body.variant-lounge .pool,body.variant-lounge .ledger-row,body.variant-lounge .stat { background:linear-gradient(145deg,#2b170d,#4b2917); border-color:#8c5c32; }
+
+@media (max-width:760px) {
+  body.variant-artdeco .brand { padding:10px 14px; }
+  body.variant-noir .card { border-radius:10px; }
+}
