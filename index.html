@@ -263,6 +263,8 @@ aside.rail { display: grid; gap: 18px; align-content: start; }
 
 /* ---------- overlay / modals ---------- */
 .overlay { position: fixed; inset: 0; z-index: 30; display: flex; align-items: center; justify-content: center; padding: 18px; background: color-mix(in srgb, var(--bg-3) 78%, transparent); backdrop-filter: blur(6px); }
+#settings-overlay, #rules-overlay { z-index: 31; }
+.lobby-settings-link { position: absolute; top: 14px; right: 14px; min-height: 34px; padding: 0 12px; font-size: 11px; }
 .modal {
   width: min(100%, 460px); max-height: calc(100dvh - 30px); overflow: auto; position: relative;
   border-radius: 24px; padding: 30px; text-align: center; border: 1px solid var(--border-strong);
@@ -315,34 +317,63 @@ aside.rail { display: grid; gap: 18px; align-content: start; }
 .confetti i { position: absolute; top: -14px; width: 7px; height: 7px; background: var(--accent-strong); transform: rotate(45deg); animation: fall 2.6s linear infinite; opacity: .85; }
 @keyframes fall { to { transform: translateY(120%) rotate(220deg); opacity: 0; } }
 
-/* ---------- floating table tools ---------- */
-.tools-toggle {
-  position: fixed; z-index: 20; right: max(16px, env(safe-area-inset-right)); bottom: max(16px, env(safe-area-inset-bottom));
-  min-height: 46px; padding: 0 16px; border-radius: 999px; border: 1px solid var(--border-strong);
-  background: linear-gradient(160deg, var(--surface-strong), var(--surface));
-  color: var(--ink-soft); font: 700 12px "Inter", sans-serif; letter-spacing: .04em;
-  box-shadow: 0 10px 24px #00000066;
+/* ---------- session stats ---------- */
+.stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 9px; margin-bottom: 4px; }
+.stat-box { padding: 12px; border-radius: 12px; border: 1px solid var(--border-soft); background: color-mix(in srgb, var(--surface-soft) 88%, transparent); }
+.stat-box small { display: block; font: 700 10px "Inter", sans-serif; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-faint); }
+.stat-box strong { display: block; margin-top: 4px; font: 600 19px "Fraunces", serif; color: var(--ink); }
+.stat-bars { display: flex; align-items: flex-end; gap: 3px; height: 46px; margin-top: 10px; }
+.stat-bars i { flex: 1; min-height: 3px; background: linear-gradient(180deg, var(--accent-strong), var(--accent)); border-radius: 3px 3px 1px 1px; position: relative; }
+.stat-bars-labels { display: flex; gap: 3px; margin-top: 4px; }
+.stat-bars-labels span { flex: 1; text-align: center; font-size: 9px; color: var(--ink-faint); }
+.stat-empty { font-size: 12px; color: var(--ink-faint); text-align: center; padding: 6px 0; }
+
+/* ---------- rolling method / physical entry ---------- */
+.method-hint { margin: 10px 0 0; padding: 10px 12px; border-radius: 12px; border: 1px dashed var(--border-soft); font-size: 12px; color: var(--ink-soft); text-align: center; }
+.die.tappable { cursor: pointer; transition: transform .1s ease, box-shadow .1s ease; }
+.die.tappable:hover { transform: translateY(-2px); }
+.die.tappable:active { transform: translateY(1px) scale(.97); }
+.die.tappable.unset { opacity: .45; }
+.die.tappable.unset::after { content: "?"; }
+.die-tap-label { margin: 8px 0 0; font-size: 11px; color: var(--ink-faint); letter-spacing: .04em; }
+
+/* ---------- coin flip stage ---------- */
+.coin-mode .shooter-block, .coin-mode .dice-row, .coin-mode .total-chip, .coin-mode #roll { display: none !important; }
+.coin-play { width: min(100%, 420px); margin: 4px auto 0; }
+.coin-calls { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 18px; }
+.coin-call-seat { padding: 12px; border-radius: 14px; border: 1px solid var(--border-soft); background: color-mix(in srgb, var(--surface-soft) 88%, transparent); text-align: center; }
+.coin-call-seat b { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 12px; color: var(--ink-faint); text-transform: uppercase; letter-spacing: .06em; }
+.coin-call-seat span { display: block; margin-top: 6px; font: 700 20px "Fraunces", serif; letter-spacing: .04em; }
+.coin-call-seat span.heads { color: var(--accent-strong); }
+.coin-call-seat span.tails { color: var(--ink-soft); }
+
+.coin-stage { perspective: 900px; display: grid; place-items: center; min-height: 190px; margin-bottom: 10px; }
+.coin3d { width: 148px; height: 148px; position: relative; transform-style: preserve-3d; }
+.coin3d.idle { animation: coinIdle 2.6s ease-in-out infinite; }
+@keyframes coinIdle { 0%, 100% { transform: rotateY(-10deg) rotateX(4deg); } 50% { transform: rotateY(10deg) rotateX(-2deg); } }
+.coin-face-flat {
+  position: absolute; inset: 0; border-radius: 50%; backface-visibility: hidden;
+  display: grid; place-items: center; border: 3px solid var(--border-strong);
+  background: radial-gradient(circle at 33% 25%, var(--die-1), var(--die-2) 55%, var(--die-3));
+  color: var(--pip); font: 700 44px "Fraunces", serif; box-shadow: inset 0 3px 8px #ffffff70, inset 0 -10px 16px #00000030, 0 12px 26px #00000060;
 }
-.tools-panel {
-  position: fixed; z-index: 25; right: max(16px, env(safe-area-inset-right)); bottom: 72px;
-  width: min(340px, calc(100vw - 32px)); max-height: calc(100dvh - 100px); overflow: auto;
-  padding: 18px; border-radius: 20px; border: 1px solid var(--border);
-  background: linear-gradient(160deg, var(--surface-strong), var(--surface-soft));
-  box-shadow: 0 24px 60px #000000aa;
+.coin-face-flat.back { transform: rotateY(180deg); }
+.coin-face-flat small { display: block; font: 700 10px "Inter", sans-serif; letter-spacing: .18em; margin-top: 2px; }
+
+.roller-disc {
+  width: 148px; height: 148px; border-radius: 50%; margin: 0 auto; display: grid; place-items: center;
+  border: 3px solid var(--border-strong);
+  background: radial-gradient(circle at 33% 25%, var(--die-1), var(--die-2) 55%, var(--die-3));
+  color: var(--pip); font: 700 26px "Fraunces", serif; box-shadow: inset 0 3px 8px #ffffff70, inset 0 -10px 16px #00000030, 0 12px 26px #00000060;
 }
-.tools-panel h3 { font-size: 17px; color: var(--ink); margin-bottom: 4px; }
-.tools-panel h4 { margin: 14px 0 7px; font: 700 10px "Inter", sans-serif; letter-spacing: .12em; text-transform: uppercase; color: var(--ink-faint); }
-.tools-close { float: right; min-height: 30px; padding: 0 10px; border-radius: 8px; border: 1px solid var(--border-soft); background: transparent; color: var(--ink-soft); }
-.mini-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 6px; }
-.mini-grid.money { grid-template-columns: repeat(4, 1fr); }
-.mini-btn { min-height: 36px; padding: 0 4px; border-radius: 8px; border: 1px solid var(--border-soft); background: color-mix(in srgb, var(--surface-soft) 80%, transparent); color: var(--ink-soft); font-weight: 700; font-size: 12.5px; }
-.mini-btn:hover { border-color: var(--border-strong); color: var(--ink); }
-.mini-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 12px; }
-.mini-stat { padding: 10px; border-radius: 10px; border: 1px solid var(--border-soft); background: color-mix(in srgb, var(--surface-soft) 80%, transparent); font-size: 11px; color: var(--ink-faint); }
-.mini-stat b { display: block; margin-top: 4px; font: 700 19px "Fraunces", serif; color: var(--ink); }
-.coin-face { display: grid; place-items: center; min-height: 92px; margin: 6px 0 14px; border-radius: 50%; border: 1px solid var(--border-strong); background: radial-gradient(circle at 33% 25%, var(--die-1), var(--die-2) 55%, var(--die-3)); color: var(--pip); font: 700 22px "Fraunces", serif; }
-.coin-mode .table-panel > *:not(.coin-play) { display: none !important; }
-.coin-play { width: min(100%, 380px); margin: 10px auto; }
+.roller-disc.spin { animation: rollerSpin .12s linear infinite; }
+@keyframes rollerSpin { to { transform: rotate(360deg) scale(.96); } }
+
+.flip-zone { margin-top: 6px; }
+.flip-ring-wrap { position: relative; width: 190px; margin: 0 auto 14px; }
+.flip-ring-wrap .timer-track { margin-top: 10px; }
+#flip-btn { width: 100%; }
+.physical-call-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 8px; }
 
 @media (max-width: 900px) {
   main.table-layout { grid-template-columns: 1fr; }
@@ -372,6 +403,7 @@ aside.rail { display: grid; gap: 18px; align-content: start; }
       </div>
     </div>
     <div class="topbar-actions">
+      <button class="btn btn-ghost" id="open-settings" type="button">Settings</button>
       <button class="btn btn-ghost" id="open-rules" type="button">Table rules</button>
     </div>
   </header>
@@ -421,20 +453,17 @@ aside.rail { display: grid; gap: 18px; align-content: start; }
         </div>
       </div>
 
-      <div class="coin-play hidden" id="coin-play">
-        <div class="coin-face" id="coin-face">READY</div>
-        <div class="chip-row" style="grid-template-columns:1fr 1fr 1fr">
-          <button class="btn btn-ghost" id="coin-heads">Heads</button>
-          <button class="btn btn-primary" id="coin-flip">Flip</button>
-          <button class="btn btn-ghost" id="coin-tails">Tails</button>
-        </div>
-      </div>
+      <div class="coin-play hidden" id="coin-play"></div>
     </section>
 
     <aside class="rail">
       <section class="card side-panel" id="ledger-panel">
         <h3>Ledger</h3>
         <div class="ledger" id="ledger"></div>
+      </section>
+      <section class="card side-panel">
+        <h3>Session</h3>
+        <div id="stats-panel"></div>
       </section>
       <section class="card side-panel">
         <h3 id="rules-panel-title">House rules</h3>
@@ -467,8 +496,23 @@ aside.rail { display: grid; gap: 18px; align-content: start; }
 <div class="overlay" id="setup" role="dialog" aria-modal="true" aria-label="Table setup"></div>
 <div class="overlay hidden" id="outcome" role="dialog" aria-modal="true" aria-label="Round result"></div>
 
-<button class="tools-toggle hidden" id="tools-toggle" type="button">Table tools</button>
-<aside class="tools-panel hidden" id="tools-panel"></aside>
+<div class="overlay hidden" id="settings-overlay" role="dialog" aria-modal="true" aria-label="Settings">
+  <div class="modal setup-modal" style="text-align:center">
+    <span class="eyebrow">Dice Duel</span>
+    <h2>Settings</h2>
+    <div class="field" style="margin-top:18px"><label>Coin flip animation</label></div>
+    <div class="mode-picker" id="coin-anim-picker">
+      <button class="pick-card" data-coin-anim="coin3d" type="button"><strong>3D Coin</strong><small>Cinematic spin &amp; landing</small></button>
+      <button class="pick-card" data-coin-anim="roller" type="button"><strong>Quick Roller</strong><small>Fast mechanical flicker</small></button>
+    </div>
+    <div class="field"><label>Sound</label></div>
+    <div class="mode-picker" id="sound-picker">
+      <button class="pick-card" data-sound="on" type="button"><strong>On</strong><small>Table chimes &amp; clicks</small></button>
+      <button class="pick-card" data-sound="off" type="button"><strong>Off</strong><small>Silent table</small></button>
+    </div>
+    <button class="btn btn-primary" id="close-settings" type="button">Done</button>
+  </div>
+</div>
 
 <script>
 (() => {
@@ -494,13 +538,32 @@ aside.rail { display: grid; gap: 18px; align-content: start; }
   };
   const OPENING_STAKES = [1, 2, 5];
   const SIDEBET_MS = 5000;
+  const FLIP_MS = 10000;
+  const SETTINGS_KEY = "diceduel-settings";
+
+  /* ---------------------------------------------------------
+   * Settings (persisted)
+   * ------------------------------------------------------- */
+  function loadSettings() {
+    try {
+      const saved = JSON.parse(localStorage.getItem(SETTINGS_KEY) || "{}");
+      return {
+        coinAnim: saved.coinAnim === "roller" ? "roller" : "coin3d",
+        sound: saved.sound !== false,
+      };
+    } catch { return { coinAnim: "coin3d", sound: true }; }
+  }
+  function saveSettings() {
+    try { localStorage.setItem(SETTINGS_KEY, JSON.stringify(state.settings)); } catch {}
+  }
 
   /* ---------------------------------------------------------
    * State
    * ------------------------------------------------------- */
   const state = {
     theme: "royal",
-    mode: "dice",           // 'dice' | 'coin'
+    mode: "dice",            // 'dice' | 'coin'
+    method: "auto",          // 'auto' | 'physical' — how results are produced
     players: ["Player 1", "Player 2"],
     active: 0,
     wager: 1,
@@ -511,9 +574,15 @@ aside.rail { display: grid; gap: 18px; align-content: start; }
     pendingSideBet: null,
     sideBetDeadline: 0,
     sideBetTimer: null,
-    coin: { heads: 0, tails: 0 },
-    tracker: { die1: Array(6).fill(0), die2: Array(6).fill(0), money: 0, bank: 0, coinMoney: 0, coinBank: 0 },
-    lobby: { theme: "royal", mode: "dice" },
+    physicalPick: [null, null],   // tapped die faces awaiting confirmation
+    coinCall: [null, null],       // each player's call for the live round
+    coinReady: false,             // wager + calls locked in, ready to flip
+    flipDeadline: 0,
+    flipTimer: null,
+    flipping: false,
+    settings: loadSettings(),
+    stats: { rounds: 0, wagered: 0, streakPlayer: null, streakCount: 0, diceTotals: {}, coinCalls: { heads: 0, tails: 0 } },
+    lobby: { theme: "royal", mode: "dice", method: "auto" },
   };
 
   const params = new URLSearchParams(location.search);
@@ -535,8 +604,9 @@ aside.rail { display: grid; gap: 18px; align-content: start; }
     sidebetSeconds: $("sidebet-seconds"), sidebetTimer: $("sidebet-timer"), sidebetAccept: $("sidebet-accept"),
     ledger: $("ledger"), setup: $("setup"), outcome: $("outcome"),
     rulesOverlay: $("rules-overlay"), openRules: $("open-rules"), closeRules: $("close-rules"),
-    toolsToggle: $("tools-toggle"), toolsPanel: $("tools-panel"),
-    coinPlay: $("coin-play"), coinFace: $("coin-face"),
+    settingsOverlay: $("settings-overlay"), openSettings: $("open-settings"), closeSettings: $("close-settings"),
+    coinAnimPicker: $("coin-anim-picker"), soundPicker: $("sound-picker"),
+    coinPlay: $("coin-play"), statsPanel: $("stats-panel"),
     tablePanel: document.querySelector(".table-panel"),
     ledgerPanel: $("ledger-panel"), rulesPanelTitle: $("rules-panel-title"), rulesPanelList: $("rules-panel-list"),
     rulesOverlayTitle: $("rules-overlay-title"), rulesOverlayList: $("rules-overlay-list"),
@@ -552,11 +622,14 @@ aside.rail { display: grid; gap: 18px; align-content: start; }
     <li><b>Point round —</b> the shooter keeps rolling; hitting the point wins, a 7 first loses.</li>
     <li><b>Side bets —</b> proposed after the point is set. Whichever player proposes stakes it; the other has 5 seconds to accept, or it's withdrawn.</li>
     <li><b>Ledger —</b> tracks each player's running total across the whole session, not just one round.</li>
-    <li><b>Shooter rotation —</b> the loser's opponent shoots next round and opens the new wager.</li>`;
+    <li><b>Shooter rotation —</b> the loser's opponent shoots next round and opens the new wager.</li>
+    <li><b>Physical dice —</b> switch to Physical in the lobby to tap in real dice results instead of the table rolling for you.</li>`;
   const COIN_RULES_HTML = `
-    <li><b>Call it —</b> agree on heads or tails before the flip.</li>
-    <li><b>Flip —</b> tap Flip for a random result, or record a manual call with Heads / Tails.</li>
-    <li><b>Keeping score —</b> Coin Flip has no automatic wager — use Table Tools (bottom right) to track money and bank by hand.</li>`;
+    <li><b>Wager —</b> the active player sets the stake each round; it doubles into the pool, same as Dice Duel.</li>
+    <li><b>Call it —</b> the active player calls heads or tails; the other player automatically takes the opposite side.</li>
+    <li><b>Flip —</b> press Flip? (or wait out the 10‑second countdown) for an automatic flip, or enter a physical coin's result by hand.</li>
+    <li><b>Side bets —</b> unlock as soon as both calls are locked in, just like a point round.</li>
+    <li><b>Settlement —</b> whoever called correctly wins the full wager onto the ledger.</li>`;
 
   /* ---------------------------------------------------------
    * Sound (restrained, synthesized — no external assets)
@@ -578,13 +651,14 @@ aside.rail { display: grid; gap: 18px; align-content: start; }
     };
     return {
       unlock,
-      click() { if (!ctx) return; const t = ctx.currentTime; tone(720, t, .07, "triangle", .1); },
+      click() { if (!ctx || !state.settings.sound) return; const t = ctx.currentTime; tone(720, t, .07, "triangle", .1); },
+      tick() { if (!ctx || !state.settings.sound) return; const t = ctx.currentTime; tone(950, t, .04, "square", .05); },
       win() {
-        if (!ctx) return; const t = ctx.currentTime;
+        if (!ctx || !state.settings.sound) return; const t = ctx.currentTime;
         [523.25, 659.25, 783.99, 1046.5].forEach((f, i) => tone(f, t + i * .09, .5, "sine", .14));
       },
       loss() {
-        if (!ctx) return; const t = ctx.currentTime;
+        if (!ctx || !state.settings.sound) return; const t = ctx.currentTime;
         tone(220, t, .5, "sine", .16); tone(164.81, t + .12, .55, "sine", .12);
       },
     };
@@ -615,14 +689,7 @@ aside.rail { display: grid; gap: 18px; align-content: start; }
    * Render
    * ------------------------------------------------------- */
   function render() {
-    const { players, active, point, wager, pendingSideBet, rolling } = state;
-    els.shooter.textContent = players[active];
-    els.pointDisplay.textContent = point ? point : "—";
-    els.tableCall.textContent = point ? `“${TABLE_CALLS[point] || ""}”` : "Awaiting the come-out roll.";
-    els.ruleCopy.textContent = point
-      ? `Roll ${point} again before a 7 shows.`
-      : "7 or 11 wins the roll. Snake eyes loses.";
-    els.phase.textContent = point ? "Point round" : "Opening roll";
+    const { players, active, point, wager, pendingSideBet, rolling, mode, method } = state;
     els.turn.innerHTML = `Wager ${money(wager)} · <b>${players[active]}</b>'s turn`;
     els.wager.textContent = wager;
 
@@ -639,19 +706,58 @@ aside.rail { display: grid; gap: 18px; align-content: start; }
       return `<div class="ledger-row"><b>${escapeHtml(name)}</b><span class="ledger-money ${net >= 0 ? "positive" : "negative"}">${net < 0 ? "−" : "+"}${money(net)}</span></div>`;
     }).join("");
 
-    els.roll.textContent = rolling ? "Rolling…" : (point ? `Roll for ${point}` : "Roll the dice");
-    els.roll.disabled = rolling || state.roundEnding || pendingSideBet !== null;
+    if (mode === "dice") {
+      els.shooter.textContent = players[active];
+      els.pointDisplay.textContent = point ? point : "—";
+      els.tableCall.textContent = point ? `“${TABLE_CALLS[point] || ""}”` : "Awaiting the come-out roll.";
+      els.ruleCopy.textContent = point
+        ? `Roll ${point} again before a 7 shows.`
+        : "7 or 11 wins the roll. Snake eyes loses.";
+      els.phase.textContent = point ? "Point round" : "Opening roll";
 
-    const sideBetsUnlocked = point !== null;
+      if (method === "physical") {
+        const [a, b] = state.physicalPick;
+        const bothSet = a !== null && b !== null;
+        els.roll.textContent = bothSet ? `Confirm ${a} + ${b} = ${a + b}` : "Tap both dice to set your roll";
+        els.roll.disabled = !bothSet || state.roundEnding || pendingSideBet !== null;
+        els.die1.classList.add("tappable"); els.die2.classList.add("tappable");
+        els.die1.classList.toggle("unset", a === null);
+        els.die2.classList.toggle("unset", b === null);
+        if (a !== null) paintDieStatic(els.die1, a); else els.die1.innerHTML = "";
+        if (b !== null) paintDieStatic(els.die2, b); else els.die2.innerHTML = "";
+      } else {
+        els.die1.classList.remove("tappable", "unset"); els.die2.classList.remove("tappable", "unset");
+        els.roll.textContent = rolling ? "Rolling…" : (point ? `Roll for ${point}` : "Roll the dice");
+        els.roll.disabled = rolling || state.roundEnding || pendingSideBet !== null;
+      }
+    } else {
+      els.phase.textContent = state.flipping ? "Flipping" : (state.coinReady ? "Ready to flip" : "Wager & call");
+    }
+
+    const inMotion = rolling || state.flipping;
+    const sideBetsUnlocked = (mode === "dice" ? point !== null : state.coinReady) && !inMotion;
     els.chipRow.classList.toggle("dimmed", !sideBetsUnlocked);
     document.querySelectorAll("[data-sidebet]").forEach((btn) => {
       btn.disabled = !sideBetsUnlocked || pendingSideBet !== null;
     });
     els.sideHint.textContent = sideBetsUnlocked
       ? "Propose a side bet — the other player has 5 seconds to accept."
-      : "Side bets unlock once a point is set.";
+      : (mode === "dice" ? "Side bets unlock once a point is set." : "Side bets unlock once both calls are locked in.");
     els.sideHint.classList.toggle("hidden", pendingSideBet !== null);
     els.chipRow.classList.toggle("hidden", pendingSideBet !== null);
+
+    if (mode === "coin") renderCoinPlay();
+    renderStats();
+  }
+
+  function paintDieStatic(el, n) {
+    el.innerHTML = "";
+    DIE_SPOTS[n].forEach((i) => {
+      const p = document.createElement("i");
+      p.className = "pip";
+      p.style.gridArea = `${Math.floor(i / 3) + 1} / ${(i % 3) + 1}`;
+      el.append(p);
+    });
   }
 
   function escapeHtml(str) {
@@ -659,9 +765,10 @@ aside.rail { display: grid; gap: 18px; align-content: start; }
   }
 
   /* ---------------------------------------------------------
-   * Rolling logic
+   * Rolling logic (dice)
    * ------------------------------------------------------- */
   function rollDice() {
+    if (state.method === "physical") return confirmPhysicalRoll();
     if (state.rolling || state.roundEnding || state.pendingSideBet !== null) return;
     sound.unlock();
     state.rolling = true;
@@ -673,46 +780,67 @@ aside.rail { display: grid; gap: 18px; align-content: start; }
       ticks++;
       if (ticks === 10) {
         clearInterval(spin);
-        const a = 1 + (Math.random() * 6 | 0), b = 1 + (Math.random() * 6 | 0), total = a + b;
+        const a = 1 + (Math.random() * 6 | 0), b = 1 + (Math.random() * 6 | 0);
         paintDie(els.die1, a); paintDie(els.die2, b);
-        els.sum.textContent = total;
-        els.totalChip.classList.add("visible");
         state.rolling = false;
-
-        if (!state.point) {
-          if (total === 7 || total === 11) return finishRound(true);
-          if (a === 1 && b === 1) return finishRound(false);
-          state.point = total;
-          return render();
-        }
-        if (total === state.point) return finishRound(true);
-        if (total === 7 || (a === 1 && b === 1)) return finishRound(false);
-        render();
+        settleDiceRoll(a, b);
       }
     }, 90);
   }
 
-  function finishRound(shooterWon) {
+  function confirmPhysicalRoll() {
+    const [a, b] = state.physicalPick;
+    if (a === null || b === null || state.roundEnding || state.pendingSideBet !== null) return;
+    sound.unlock();
+    state.physicalPick = [null, null];
+    settleDiceRoll(a, b);
+  }
+
+  function settleDiceRoll(a, b) {
+    const total = a + b;
+    els.sum.textContent = total;
+    els.totalChip.classList.add("visible");
+    state.stats.diceTotals[total] = (state.stats.diceTotals[total] || 0) + 1;
+
+    if (!state.point) {
+      if (total === 7 || total === 11) return finishRound(state.active);
+      if (a === 1 && b === 1) return finishRound(state.active ? 0 : 1);
+      state.point = total;
+      return render();
+    }
+    if (total === state.point) return finishRound(state.active);
+    if (total === 7 || (a === 1 && b === 1)) return finishRound(state.active ? 0 : 1);
+    render();
+  }
+
+  /* ---------------------------------------------------------
+   * Round settlement (shared by dice + coin)
+   * ------------------------------------------------------- */
+  function finishRound(winner) {
     state.roundEnding = true;
-    const winner = shooterWon ? state.active : (state.active ? 0 : 1);
     const loser = winner ? 0 : 1;
     state.ledger[winner].won += state.wager;
     state.ledger[loser].lost += state.wager;
+    state.stats.rounds += 1;
+    state.stats.wagered += state.wager;
+    if (state.stats.streakPlayer === winner) state.stats.streakCount += 1;
+    else { state.stats.streakPlayer = winner; state.stats.streakCount = 1; }
     render();
-    setTimeout(() => showOutcome(shooterWon, winner, loser), 650);
+    setTimeout(() => showOutcome(winner, loser), 550);
   }
 
-  function showOutcome(shooterWon, winner, loser) {
-    const kind = shooterWon ? "win" : "loss";
-    shooterWon ? sound.win() : sound.loss();
-    const confetti = shooterWon
+  function showOutcome(winner, loser) {
+    // Dice ties the modal's tone to the shooter's fate; coin has no shooter, so it's always a clean announcement.
+    const isWin = state.mode === "coin" ? true : winner === state.active;
+    isWin ? sound.win() : sound.loss();
+    const confetti = isWin
       ? `<div class="confetti">${Array.from({ length: 22 }, (_, i) =>
           `<i style="left:${(i * 31) % 96}%;animation-delay:${(i % 7) * .18}s;background:${i % 2 ? "var(--accent-strong)" : "var(--accent)"}"></i>`).join("")}</div>`
       : "";
     els.outcome.innerHTML = `
-      <div class="modal outcome-modal ${kind}">
+      <div class="modal outcome-modal ${isWin ? "win" : "loss"}">
         ${confetti}
-        <div class="outcome-icon">${shooterWon ? "♦" : "♠"}</div>
+        <div class="outcome-icon">${isWin ? "♦" : "♠"}</div>
         <span class="eyebrow">Round complete</span>
         <h2>${escapeHtml(state.players[winner])} wins the round</h2>
         <p class="lead">${escapeHtml(state.players[loser])}'s stake moves to ${escapeHtml(state.players[winner])}'s side of the ledger.</p>
@@ -723,10 +851,16 @@ aside.rail { display: grid; gap: 18px; align-content: start; }
     $("next-round").onclick = () => {
       els.outcome.classList.add("hidden");
       state.active = state.active ? 0 : 1;
-      state.point = null;
       state.roundEnding = false;
       els.totalChip.classList.remove("visible");
-      showOpeningWager();
+      if (state.mode === "dice") {
+        state.point = null;
+        showOpeningWager();
+      } else {
+        state.coinReady = false;
+        state.coinCall = [null, null];
+        showOpeningWager(() => showCoinCall());
+      }
     };
   }
 
@@ -741,7 +875,8 @@ aside.rail { display: grid; gap: 18px; align-content: start; }
   }
 
   function proposeSideBet(amount) {
-    if (!state.point || state.pendingSideBet !== null) return;
+    const unlocked = state.mode === "dice" ? state.point !== null : state.coinReady;
+    if (!unlocked || state.pendingSideBet !== null || state.rolling || state.flipping || state.roundEnding) return;
     sound.click();
     state.pendingSideBet = amount;
     els.sidebetAmount.textContent = amount;
@@ -775,6 +910,7 @@ aside.rail { display: grid; gap: 18px; align-content: start; }
     showOverlay(els.setup);
     els.setup.innerHTML = `
       <div class="modal setup-modal">
+        <button class="btn btn-ghost lobby-settings-link" id="lobby-settings" type="button">Settings</button>
         <span class="eyebrow">Dice Duel</span>
         <h2>Choose your table</h2>
         <p class="lead">Pick the table finish and the game, then seat both players.</p>
@@ -791,7 +927,16 @@ aside.rail { display: grid; gap: 18px; align-content: start; }
             <strong>Dice Duel</strong><small>Craps-style point round</small>
           </button>
           <button class="pick-card ${state.lobby.mode === "coin" ? "selected" : ""}" data-mode-pick="coin" type="button">
-            <strong>Coin Flip</strong><small>Straight heads or tails</small>
+            <strong>Coin Flip</strong><small>Wager, call it, flip</small>
+          </button>
+        </div>
+        <div class="field"><label>Rolling method</label></div>
+        <div class="mode-picker">
+          <button class="pick-card ${state.lobby.method === "auto" ? "selected" : ""}" data-method-pick="auto" type="button">
+            <strong>Automatic</strong><small>The table rolls / flips for you</small>
+          </button>
+          <button class="pick-card ${state.lobby.method === "physical" ? "selected" : ""}" data-method-pick="physical" type="button">
+            <strong>Physical</strong><small>I have real dice or a coin</small>
           </button>
         </div>
         <div class="field"><label for="p1-input">Player 1</label><input id="p1-input" maxlength="18" value="Player 1" /></div>
@@ -806,7 +951,11 @@ aside.rail { display: grid; gap: 18px; align-content: start; }
     document.querySelectorAll("[data-mode-pick]").forEach((btn) => {
       btn.onclick = () => { state.lobby.mode = btn.dataset.modePick; renderLobby(); };
     });
+    document.querySelectorAll("[data-method-pick]").forEach((btn) => {
+      btn.onclick = () => { state.lobby.method = btn.dataset.methodPick; renderLobby(); };
+    });
     $("enter-match").onclick = enterMatch;
+    $("lobby-settings").onclick = () => { renderSettingsPickers(); showOverlay(els.settingsOverlay); };
     [$("p1-input"), $("p2-input")].forEach((input) => {
       input.addEventListener("keydown", (e) => { if (e.key === "Enter") enterMatch(); });
     });
@@ -821,25 +970,25 @@ aside.rail { display: grid; gap: 18px; align-content: start; }
     state.ledger = [{ won: 0, lost: 0 }, { won: 0, lost: 0 }];
     state.active = 0;
     state.mode = state.lobby.mode;
+    state.method = state.lobby.method;
+    state.physicalPick = [null, null];
+    state.coinCall = [null, null];
+    state.coinReady = false;
+    state.stats = { rounds: 0, wagered: 0, streakPlayer: null, streakCount: 0, diceTotals: {}, coinCalls: { heads: 0, tails: 0 } };
     applyTheme(state.lobby.theme);
     hideOverlay(els.setup);
-    buildToolsPanel();
-    els.toolsToggle.classList.remove("hidden");
 
     if (state.mode === "coin") {
       document.body.classList.add("coin-mode");
       els.coinPlay.classList.remove("hidden");
-      els.ledgerPanel.classList.add("hidden");
       els.rulesPanelTitle.textContent = "Coin flip rules";
       els.rulesPanelList.innerHTML = COIN_RULES_HTML;
       els.rulesOverlayTitle.textContent = "Coin Flip Rules";
       els.rulesOverlayList.innerHTML = COIN_RULES_HTML;
-      state.coin = { heads: 0, tails: 0 };
-      renderCoin();
+      showOpeningWager(() => showCoinCall());
     } else {
       document.body.classList.remove("coin-mode");
       els.coinPlay.classList.add("hidden");
-      els.ledgerPanel.classList.remove("hidden");
       els.rulesPanelTitle.textContent = "House rules";
       els.rulesPanelList.innerHTML = DICE_RULES_HTML;
       els.rulesOverlayTitle.textContent = "Table Rules";
@@ -850,22 +999,26 @@ aside.rail { display: grid; gap: 18px; align-content: start; }
 
   function beginRollOff() {
     const values = [null, null];
+    const physical = state.method === "physical";
     showOverlay(els.setup);
-    const draw = () => `
+    const seatHtml = (name, i) => physical
+      ? `<div class="rolloff-seat">
+          <strong>${escapeHtml(name)}</strong>
+          <div class="rolloff-face" id="rolloff-${i}" style="cursor:pointer">?</div>
+          <button class="btn btn-ghost" id="rolloff-btn-${i}" type="button" disabled>Confirm</button>
+        </div>`
+      : `<div class="rolloff-seat">
+          <strong>${escapeHtml(name)}</strong>
+          <div class="rolloff-face" id="rolloff-${i}">?</div>
+          <button class="btn btn-ghost" id="rolloff-btn-${i}" type="button">Roll one die</button>
+        </div>`;
+    els.setup.innerHTML = `
       <div class="modal setup-modal" style="text-align:center">
         <span class="eyebrow">First shot</span>
         <h2>Roll for first</h2>
-        <p class="lead">Each player rolls one die. The higher number shoots first.</p>
-        <div class="rolloff-grid">
-          ${state.players.map((name, i) => `
-            <div class="rolloff-seat">
-              <strong>${escapeHtml(name)}</strong>
-              <div class="rolloff-face" id="rolloff-${i}">?</div>
-              <button class="btn btn-ghost" id="rolloff-btn-${i}" type="button">Roll one die</button>
-            </div>`).join("")}
-        </div>
+        <p class="lead">${physical ? "Tap each face to match your physical die, then confirm. The higher number shoots first." : "Each player rolls one die. The higher number shoots first."}</p>
+        <div class="rolloff-grid">${state.players.map(seatHtml).join("")}</div>
       </div>`;
-    els.setup.innerHTML = draw();
 
     const checkWinner = () => {
       if (values.some((v) => v === null)) return;
@@ -874,27 +1027,48 @@ aside.rail { display: grid; gap: 18px; align-content: start; }
       setTimeout(showOpeningWager, 650);
     };
 
-    state.players.forEach((_, i) => {
-      const btn = $(`rolloff-btn-${i}`), face = $(`rolloff-${i}`);
-      btn.onclick = () => {
-        if (values[i] !== null || btn.disabled) return;
-        sound.unlock();
-        btn.disabled = true; btn.textContent = "Rolling…";
-        face.classList.add("spin");
-        const spin = setInterval(() => { face.textContent = 1 + Math.floor(Math.random() * 6); }, 80);
-        setTimeout(() => {
-          clearInterval(spin);
-          values[i] = 1 + Math.floor(Math.random() * 6);
-          face.textContent = values[i];
-          face.classList.remove("spin");
-          btn.textContent = "Rolled";
+    if (physical) {
+      const taps = [null, null];
+      state.players.forEach((_, i) => {
+        const face = $(`rolloff-${i}`), btn = $(`rolloff-btn-${i}`);
+        face.onclick = () => {
+          if (values[i] !== null) return;
+          taps[i] = taps[i] === null ? 1 : (taps[i] % 6) + 1;
+          face.textContent = taps[i];
+          btn.disabled = false;
+        };
+        btn.onclick = () => {
+          if (values[i] !== null || taps[i] === null) return;
+          sound.click();
+          values[i] = taps[i];
+          face.style.cursor = "default"; face.onclick = null;
+          btn.disabled = true; btn.textContent = "Confirmed";
           checkWinner();
-        }, 900);
-      };
-    });
+        };
+      });
+    } else {
+      state.players.forEach((_, i) => {
+        const btn = $(`rolloff-btn-${i}`), face = $(`rolloff-${i}`);
+        btn.onclick = () => {
+          if (values[i] !== null || btn.disabled) return;
+          sound.unlock();
+          btn.disabled = true; btn.textContent = "Rolling…";
+          face.classList.add("spin");
+          const spin = setInterval(() => { face.textContent = 1 + Math.floor(Math.random() * 6); }, 80);
+          setTimeout(() => {
+            clearInterval(spin);
+            values[i] = 1 + Math.floor(Math.random() * 6);
+            face.textContent = values[i];
+            face.classList.remove("spin");
+            btn.textContent = "Rolled";
+            checkWinner();
+          }, 900);
+        };
+      });
+    }
   }
 
-  function showOpeningWager() {
+  function showOpeningWager(onDone) {
     showOverlay(els.setup);
     els.setup.innerHTML = `
       <div class="modal setup-modal" style="text-align:center">
@@ -909,6 +1083,7 @@ aside.rail { display: grid; gap: 18px; align-content: start; }
       btn.onclick = () => {
         sound.click();
         state.wager = Number(btn.dataset.openingWager) * 2;
+        if (onDone) { onDone(); return; }
         state.point = null;
         hideOverlay(els.setup);
         render();
@@ -917,93 +1092,201 @@ aside.rail { display: grid; gap: 18px; align-content: start; }
   }
 
   /* ---------------------------------------------------------
-   * Coin mode
+   * Coin mode — wager (shared above) → call → flip
    * ------------------------------------------------------- */
-  function renderCoin() {
-    els.coinFace.textContent = "READY";
+  function showCoinCall() {
+    showOverlay(els.setup);
+    const active = state.active, other = active ? 0 : 1;
+    els.setup.innerHTML = `
+      <div class="modal setup-modal" style="text-align:center">
+        <span class="eyebrow">Call it</span>
+        <h2>${escapeHtml(state.players[active])} calls the coin</h2>
+        <p class="lead">${escapeHtml(state.players[other])} automatically takes whichever side is left.</p>
+        <div class="opening-options" style="grid-template-columns:1fr 1fr">
+          <button class="chip-btn" data-call="heads" type="button">Heads</button>
+          <button class="chip-btn" data-call="tails" type="button">Tails</button>
+        </div>
+      </div>`;
+    document.querySelectorAll("[data-call]").forEach((btn) => {
+      btn.onclick = () => {
+        sound.click();
+        const call = btn.dataset.call;
+        state.coinCall[active] = call;
+        state.coinCall[other] = call === "heads" ? "tails" : "heads";
+        state.coinReady = true;
+        hideOverlay(els.setup);
+        render();
+      };
+    });
   }
-  function flipCoin(forced) {
+
+  function renderCoinPlay() {
+    const [c0, c1] = state.coinCall;
+    const callsHtml = `
+      <div class="coin-calls">
+        <div class="coin-call-seat"><b>${escapeHtml(state.players[0])}</b><span class="${c0 || ""}">${c0 ? c0.toUpperCase() : "—"}</span></div>
+        <div class="coin-call-seat"><b>${escapeHtml(state.players[1])}</b><span class="${c1 || ""}">${c1 ? c1.toUpperCase() : "—"}</span></div>
+      </div>`;
+
+    if (!state.coinReady) {
+      els.coinPlay.innerHTML = callsHtml + `<p class="method-hint">Waiting on the wager and call for this round…</p>`;
+      return;
+    }
+
+    const stageHtml = state.settings.coinAnim === "roller"
+      ? `<div class="coin-stage"><div class="roller-disc" id="coin-roller">${state.flipping ? "" : "READY"}</div></div>`
+      : `<div class="coin-stage"><div class="coin3d ${state.flipping ? "" : "idle"}" id="coin3d"><div class="coin3d-inner" id="coin3d-inner">
+           <div class="coin-face-flat front">H<small>HEADS</small></div>
+           <div class="coin-face-flat back">T<small>TAILS</small></div>
+         </div></div></div>`;
+
+    const sideBetPending = state.pendingSideBet !== null;
+    let controlsHtml;
+    if (state.flipping) {
+      controlsHtml = `<p class="method-hint">Flipping…</p>`;
+    } else if (sideBetPending) {
+      clearFlipTimer();
+      controlsHtml = `<p class="method-hint">Settle the side bet above before flipping.</p>`;
+    } else if (state.method === "physical") {
+      controlsHtml = `
+        <p class="method-hint">Flip your physical coin, then tell the table what landed.</p>
+        <div class="physical-call-row">
+          <button class="btn btn-ghost" id="physical-heads" type="button">It landed Heads</button>
+          <button class="btn btn-ghost" id="physical-tails" type="button">It landed Tails</button>
+        </div>`;
+    } else {
+      const remaining = Math.max(0, state.flipDeadline - Date.now());
+      const pct = state.flipDeadline ? (remaining / FLIP_MS) * 100 : 100;
+      controlsHtml = `
+        <div class="flip-ring-wrap">
+          <button class="btn btn-primary" id="flip-btn" type="button">Flip?</button>
+          <div class="timer-track"><i class="timer-fill" id="flip-timer-fill" style="width:${pct}%"></i></div>
+        </div>
+        <p class="method-hint" id="flip-countdown-text">Auto-flips in ${(remaining / 1000).toFixed(1)}s — or press Flip? now.</p>`;
+    }
+
+    els.coinPlay.innerHTML = callsHtml + stageHtml + `<div class="flip-zone">${controlsHtml}</div>`;
+
+    if (!state.flipping && !sideBetPending && state.method !== "physical") {
+      $("flip-btn").onclick = () => { clearFlipTimer(); doFlip(); };
+      if (!state.flipTimer) armFlip();
+    } else if (!state.flipping && !sideBetPending && state.method === "physical") {
+      $("physical-heads").onclick = () => resolveCoinFlip("heads");
+      $("physical-tails").onclick = () => resolveCoinFlip("tails");
+    }
+  }
+
+  function clearFlipTimer() { if (state.flipTimer) clearInterval(state.flipTimer); state.flipTimer = null; }
+
+  function armFlip() {
+    state.flipDeadline = Date.now() + FLIP_MS;
+    state.flipTimer = setInterval(() => {
+      if (state.pendingSideBet !== null) { clearFlipTimer(); return; }
+      const remaining = Math.max(0, state.flipDeadline - Date.now());
+      const fill = $("flip-timer-fill"), txt = $("flip-countdown-text");
+      if (fill) fill.style.width = `${(remaining / FLIP_MS) * 100}%`;
+      if (txt) txt.textContent = `Auto-flips in ${(remaining / 1000).toFixed(1)}s — or press Flip? now.`;
+      if (remaining <= 0) { clearFlipTimer(); doFlip(); }
+    }, 100);
+  }
+
+  function doFlip() {
+    if (state.flipping || state.pendingSideBet !== null) return;
     sound.unlock();
-    const face = forced || (Math.random() < .5 ? "heads" : "tails");
-    let ticks = 0;
-    const spin = setInterval(() => {
-      els.coinFace.textContent = Math.random() < .5 ? "HEADS" : "TAILS";
-      ticks++;
-      if (ticks === 8) {
-        clearInterval(spin);
-        els.coinFace.textContent = face.toUpperCase();
-        state.coin[face]++;
-        renderToolsPanel();
+    state.flipping = true;
+    const face = Math.random() < .5 ? "heads" : "tails";
+    render();
+    const anim = state.settings.coinAnim === "roller" ? playRoller : playCoin3D;
+    anim(face, () => { state.flipping = false; resolveCoinFlip(face); });
+  }
+
+  function playCoin3D(face, done) {
+    const inner = $("coin3d-inner");
+    if (!inner || !inner.animate) { setTimeout(done, 1200); return; }
+    const spins = 5;
+    const endDeg = spins * 360 + (face === "heads" ? 0 : 180);
+    const anim = inner.animate([
+      { transform: "translateY(0) rotateY(0deg) scale(1)" },
+      { transform: `translateY(-64px) rotateY(${endDeg * 0.55}deg) scale(1.1)`, offset: .5 },
+      { transform: `translateY(0) rotateY(${endDeg}deg) scale(1)` },
+    ], { duration: 1300, easing: "cubic-bezier(.22,.61,.25,1)" });
+    let lastTick = 0;
+    const tickTimer = setInterval(() => {
+      const t = performance.now();
+      if (t - lastTick > 110) { sound.tick(); lastTick = t; }
+    }, 60);
+    anim.onfinish = () => { clearInterval(tickTimer); done(); };
+  }
+
+  function playRoller(face, done) {
+    const disc = $("coin-roller");
+    if (!disc) { setTimeout(done, 900); return; }
+    disc.classList.add("spin");
+    let delay = 55, elapsed = 0;
+    const step = () => {
+      disc.textContent = Math.random() < .5 ? "H" : "T";
+      sound.tick();
+      elapsed += delay;
+      delay = Math.min(delay * 1.22, 220);
+      if (elapsed < 950) setTimeout(step, delay);
+      else {
+        disc.classList.remove("spin");
+        disc.textContent = face === "heads" ? "HEADS" : "TAILS";
+        setTimeout(done, 250);
       }
-    }, 70);
+    };
+    step();
+  }
+
+  function resolveCoinFlip(face) {
+    state.flipping = false;
+    clearFlipTimer();
+    state.stats.coinCalls[face] += 1;
+    const winner = state.coinCall[0] === face ? 0 : 1;
+    finishRound(winner);
   }
 
   /* ---------------------------------------------------------
-   * Table tools (manual tracker, corner panel)
+   * Session stats (aside card)
    * ------------------------------------------------------- */
-  const MONEY_STEPS = [-10, -5, -1, 1, 5, 10];
+  function renderStats() {
+    if (!els.statsPanel) return;
+    const s = state.stats;
+    const streakText = s.streakCount > 1
+      ? `${escapeHtml(state.players[s.streakPlayer])} · ${s.streakCount} in a row`
+      : "No streak yet";
 
-  function buildToolsPanel() {
-    els.toolsToggle.textContent = "Table tools";
-    els.toolsToggle.onclick = () => els.toolsPanel.classList.toggle("hidden");
-    renderToolsPanel();
-  }
-
-  function renderToolsPanel() {
-    const t = state.tracker;
-    if (state.mode === "coin") {
-      els.toolsPanel.innerHTML = `
-        <button class="tools-close" type="button">Close</button>
-        <h3>Manual coin tracker</h3>
-        <p class="side-hint" style="text-align:left;margin:4px 0 0">Optional scratchpad for money and bank totals.</p>
-        <div class="mini-stats">
-          <div class="mini-stat">Money<b>${money(t.coinMoney)}</b></div>
-          <div class="mini-stat">Bank<b>${money(t.coinBank)}</b></div>
-        </div>
-        <h4>Money</h4>
-        <div class="mini-grid money">${MONEY_STEPS.map((n) => `<button class="mini-btn" data-coin-money="${n}">${n > 0 ? "+" : ""}${n}</button>`).join("")}</div>
-        <h4>Bank</h4>
-        <div class="mini-grid money">${MONEY_STEPS.map((n) => `<button class="mini-btn" data-coin-bank="${n}">${n > 0 ? "+" : ""}${n}</button>`).join("")}</div>`;
+    let distHtml = "";
+    if (state.mode === "dice") {
+      const totals = Array.from({ length: 11 }, (_, i) => i + 2);
+      const max = Math.max(1, ...totals.map((t) => s.diceTotals[t] || 0));
+      if (s.rounds === 0 && Object.keys(s.diceTotals).length === 0) {
+        distHtml = `<p class="stat-empty">Roll history will appear here.</p>`;
+      } else {
+        distHtml = `
+          <div class="stat-bars">${totals.map((t) => `<i style="height:${((s.diceTotals[t] || 0) / max) * 100 || 3}%" title="${t}: ${s.diceTotals[t] || 0}"></i>`).join("")}</div>
+          <div class="stat-bars-labels">${totals.map((t) => `<span>${t}</span>`).join("")}</div>`;
+      }
     } else {
-      els.toolsPanel.innerHTML = `
-        <button class="tools-close" type="button">Close</button>
-        <h3>Manual dice tracker</h3>
-        <p class="side-hint" style="text-align:left;margin:4px 0 0">Optional scratchpad — not linked to the automatic table above.</p>
-        <div class="mini-stats">
-          <div class="mini-stat">Die 1 total<b>${t.die1.reduce((a, b) => a + b, 0)}</b></div>
-          <div class="mini-stat">Die 2 total<b>${t.die2.reduce((a, b) => a + b, 0)}</b></div>
-          <div class="mini-stat">Money<b>${money(t.money)}</b></div>
-          <div class="mini-stat">Bank<b>${money(t.bank)}</b></div>
-        </div>
-        <h4>Die 1</h4>
-        <div class="mini-grid">${[1, 2, 3, 4, 5, 6].map((n) => `<button class="mini-btn" data-track-die="1" data-face="${n}">${n}</button>`).join("")}</div>
-        <h4>Die 2</h4>
-        <div class="mini-grid">${[1, 2, 3, 4, 5, 6].map((n) => `<button class="mini-btn" data-track-die="2" data-face="${n}">${n}</button>`).join("")}</div>
-        <h4>Money</h4>
-        <div class="mini-grid money">${MONEY_STEPS.map((n) => `<button class="mini-btn" data-money="${n}">${n > 0 ? "+" : ""}${n}</button>`).join("")}</div>
-        <h4>Bank</h4>
-        <div class="mini-grid money">${MONEY_STEPS.map((n) => `<button class="mini-btn" data-bank="${n}">${n > 0 ? "+" : ""}${n}</button>`).join("")}</div>`;
+      const { heads, tails } = s.coinCalls;
+      const max = Math.max(1, heads, tails);
+      distHtml = (heads + tails === 0)
+        ? `<p class="stat-empty">Flip history will appear here.</p>`
+        : `
+          <div class="stat-bars">
+            <i style="height:${(heads / max) * 100 || 3}%" title="Heads: ${heads}"></i>
+            <i style="height:${(tails / max) * 100 || 3}%" title="Tails: ${tails}"></i>
+          </div>
+          <div class="stat-bars-labels"><span>Heads (${heads})</span><span>Tails (${tails})</span></div>`;
     }
-    bindToolsPanel();
-  }
 
-  function bindToolsPanel() {
-    els.toolsPanel.querySelector(".tools-close").onclick = () => els.toolsPanel.classList.add("hidden");
-    els.toolsPanel.querySelectorAll("[data-track-die]").forEach((b) => {
-      b.onclick = () => { state.tracker[`die${b.dataset.trackDie}`][Number(b.dataset.face) - 1]++; renderToolsPanel(); };
-    });
-    els.toolsPanel.querySelectorAll("[data-money]").forEach((b) => {
-      b.onclick = () => { state.tracker.money += Number(b.dataset.money); renderToolsPanel(); };
-    });
-    els.toolsPanel.querySelectorAll("[data-bank]").forEach((b) => {
-      b.onclick = () => { state.tracker.bank += Number(b.dataset.bank); renderToolsPanel(); };
-    });
-    els.toolsPanel.querySelectorAll("[data-coin-money]").forEach((b) => {
-      b.onclick = () => { state.tracker.coinMoney += Number(b.dataset.coinMoney); renderToolsPanel(); };
-    });
-    els.toolsPanel.querySelectorAll("[data-coin-bank]").forEach((b) => {
-      b.onclick = () => { state.tracker.coinBank += Number(b.dataset.coinBank); renderToolsPanel(); };
-    });
+    els.statsPanel.innerHTML = `
+      <div class="stat-grid">
+        <div class="stat-box"><small>Rounds</small><strong>${s.rounds}</strong></div>
+        <div class="stat-box"><small>Wagered</small><strong>${money(s.wagered)}</strong></div>
+      </div>
+      <div class="stat-box" style="margin-bottom:10px"><small>Streak</small><strong style="font-size:14px">${streakText}</strong></div>
+      ${distHtml}`;
   }
 
   /* ---------------------------------------------------------
@@ -1017,9 +1300,30 @@ aside.rail { display: grid; gap: 18px; align-content: start; }
   els.openRules.addEventListener("click", () => showOverlay(els.rulesOverlay));
   els.closeRules.addEventListener("click", () => hideOverlay(els.rulesOverlay));
   els.rulesOverlay.addEventListener("click", (e) => { if (e.target === els.rulesOverlay) hideOverlay(els.rulesOverlay); });
-  els.coinFace.parentElement.querySelector("#coin-flip")?.addEventListener("click", () => flipCoin());
-  document.getElementById("coin-heads")?.addEventListener("click", () => flipCoin("heads"));
-  document.getElementById("coin-tails")?.addEventListener("click", () => flipCoin("tails"));
+
+  function tapDie(index) {
+    if (state.mode !== "dice" || state.method !== "physical" || state.rolling || state.roundEnding || state.pendingSideBet !== null) return;
+    const current = state.physicalPick[index];
+    state.physicalPick[index] = current === null ? 1 : (current % 6) + 1;
+    render();
+  }
+  els.die1.addEventListener("click", () => tapDie(0));
+  els.die2.addEventListener("click", () => tapDie(1));
+
+  els.openSettings.addEventListener("click", () => { renderSettingsPickers(); showOverlay(els.settingsOverlay); });
+  els.closeSettings.addEventListener("click", () => hideOverlay(els.settingsOverlay));
+  els.settingsOverlay.addEventListener("click", (e) => { if (e.target === els.settingsOverlay) hideOverlay(els.settingsOverlay); });
+  function renderSettingsPickers() {
+    els.coinAnimPicker.querySelectorAll("[data-coin-anim]").forEach((btn) => {
+      btn.classList.toggle("selected", btn.dataset.coinAnim === state.settings.coinAnim);
+      btn.onclick = () => { state.settings.coinAnim = btn.dataset.coinAnim; saveSettings(); renderSettingsPickers(); };
+    });
+    els.soundPicker.querySelectorAll("[data-sound]").forEach((btn) => {
+      const on = btn.dataset.sound === "on";
+      btn.classList.toggle("selected", on === state.settings.sound);
+      btn.onclick = () => { state.settings.sound = on; saveSettings(); renderSettingsPickers(); };
+    });
+  }
 
   /* ---------------------------------------------------------
    * Init
