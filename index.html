@@ -99,26 +99,6 @@ body::before {
   --danger:#e0596b; --success:#57bd85;
   --radius-card:10px; --radius-control:6px;
 }
-[data-theme="crimson"] {
-  --bg-1:#7a1f2c; --bg-2:#320a10; --bg-3:#0d0304;
-  --surface:#38101af0; --surface-strong:#46141ffa; --surface-soft:#280b12d9;
-  --border:#b06a3c; --border-soft:#5f3a20; --border-strong:#eab077;
-  --accent:#e2985c; --accent-strong:#f3bd8c; --accent-ink:#2a0a0d;
-  --ink:#f7e6d6; --ink-soft:#d3a685; --ink-faint:#9c7862;
-  --die-1:#fff1d6; --die-2:#d9a866; --die-3:#8a5626; --pip:#4a0f18;
-  --danger:#e0596b; --success:#57bd85;
-  --radius-card:24px; --radius-control:14px;
-}
-[data-theme="lounge"] {
-  --bg-1:#5c3c1c; --bg-2:#2a1a0c; --bg-3:#0d0703;
-  --surface:#2b1a0df0; --surface-strong:#3a230ffa; --surface-soft:#20140ad9;
-  --border:#a9793f; --border-soft:#5a3f20; --border-strong:#e6bb78;
-  --accent:#d8a256; --accent-strong:#f0c987; --accent-ink:#2b1808;
-  --ink:#f2e5cf; --ink-soft:#cba985; --ink-faint:#977c5f;
-  --die-1:#fff2d8; --die-2:#dcae62; --die-3:#8f5f27; --pip:#2b1a0d;
-  --danger:#e0596b; --success:#57bd85;
-  --radius-card:22px; --radius-control:13px;
-}
 
 /* ---------- base elements ---------- */
 button, input { font: inherit; color: inherit; }
@@ -169,6 +149,17 @@ main.table-layout { display: grid; grid-template-columns: minmax(0, 1fr) 300px; 
 }
 .turn-indicator { font: 600 11px "Inter", sans-serif; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-faint); }
 .turn-indicator b { color: var(--ink-soft); font-weight: 700; }
+
+/* Sits where the phase badge used to: one tap jumps to the other game. */
+.mode-switch {
+  font: 700 11px "Inter", sans-serif; letter-spacing: .16em; text-transform: uppercase; color: var(--accent);
+  min-height: 34px; padding: 0 16px; border-radius: 999px;
+  border: 1px solid color-mix(in srgb, var(--accent) 45%, transparent);
+  background: color-mix(in srgb, var(--accent) 10%, transparent);
+  transition: background .15s, border-color .15s, color .15s;
+}
+.mode-switch::before { content: "⇄"; margin-right: 8px; font-size: 13px; letter-spacing: 0; }
+.mode-switch:hover { border-color: var(--border-strong); background: color-mix(in srgb, var(--accent) 20%, transparent); color: var(--accent-strong); }
 
 .shooter-block { margin: 6px auto 22px; max-width: 460px; }
 .shooter-name { font-size: 14px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-faint); }
@@ -263,26 +254,45 @@ aside.rail { display: grid; gap: 18px; align-content: start; }
 
 /* ---------- overlay / modals ---------- */
 .overlay { position: fixed; inset: 0; z-index: 30; display: flex; align-items: center; justify-content: center; padding: 18px; background: color-mix(in srgb, var(--bg-3) 78%, transparent); backdrop-filter: blur(6px); }
-#settings-overlay, #rules-overlay { z-index: 31; }
-#physical-overlay { z-index: 32; }
-.lobby-settings-link { position: absolute; top: 14px; right: 14px; min-height: 34px; padding: 0 12px; font-size: 11px; }
-.modal-back { position: absolute; top: 14px; left: 14px; min-height: 34px; padding: 0 12px; font-size: 11px; }
+#settings-overlay { z-index: 31; }
+/* Pinned to the modal's top-left corner. The width/margin overrides are required:
+   `.modal .btn` makes every button in a modal full-width with a top margin, which
+   would stretch this one across the header and push it down over the eyebrow. */
+.modal .btn.modal-back {
+  position: absolute; top: 10px; left: 10px;
+  width: auto; margin: 0; min-height: 30px; padding: 0 12px; font-size: 11px;
+}
 .modal {
   width: min(100%, 460px); max-height: calc(100dvh - 30px); overflow: auto; position: relative;
   border-radius: 24px; padding: 30px; text-align: center; border: 1px solid var(--border-strong);
   background: linear-gradient(160deg, var(--surface-strong), var(--surface-soft));
   box-shadow: 0 30px 70px #00000090, inset 0 0 0 1px color-mix(in srgb, var(--accent) 20%, transparent);
 }
-.modal:has(.modal-back), .modal:has(.lobby-settings-link) { padding-top: 60px; }
+.modal:has(.modal-back), .modal:has(.modal-links) { padding-top: 52px; }
+.modal-links { position: absolute; top: 10px; right: 10px; display: flex; gap: 8px; }
 .modal .eyebrow { display: inline-block; margin-bottom: 10px; }
 .modal h2 { font-size: 30px; margin: 4px 0 10px; color: var(--ink); }
 .modal p.lead { margin: 0 auto; max-width: 340px; color: var(--ink-soft); line-height: 1.55; font-size: 14px; }
 .modal .btn { width: 100%; margin-top: 22px; }
+/* Corner links size to their label, like .modal-back — not the full-width modal button. */
+.modal .modal-links .btn { width: auto; margin: 0; min-height: 30px; padding: 0 12px; font-size: 11px; }
 
 .setup-modal { text-align: left; width: min(100%, 560px); }
 .setup-modal h2 { text-align: center; }
 .setup-modal > p.lead { text-align: center; }
 .table-picker, .mode-picker { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-top: 16px; }
+.style-picker { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 16px; }
+.style-card { padding: 12px 8px 10px; border-radius: 14px; border: 1px solid var(--border-soft); background: color-mix(in srgb, var(--surface-soft) 85%, transparent); color: var(--ink-soft); text-align: center; }
+.style-card.selected { border-color: var(--border-strong); background: color-mix(in srgb, var(--accent) 16%, var(--surface-soft)); box-shadow: inset 0 0 0 1px var(--accent); }
+.style-card small { display: block; margin-top: 8px; font-size: 10.5px; color: var(--ink-faint); }
+.style-card.selected small { color: var(--ink); }
+.swatch-die { width: 40px; height: 40px; margin: 0 auto; border-radius: 9px; border: 1px solid #00000055; display: grid; place-items: center; box-shadow: inset 0 1px 3px #ffffff66, 0 2px 5px #00000055; }
+.swatch-die i { width: 8px; height: 8px; border-radius: 50%; display: block; }
+.swatch-coin {
+  width: 40px; height: 40px; margin: 0 auto; border-radius: 50%; border: 1px solid #00000055;
+  display: grid; place-items: center; font: 700 15px "Fraunces", Georgia, serif;
+  box-shadow: inset 0 1px 3px #ffffff77, 0 2px 5px #00000055;
+}
 .pick-card {
   min-height: 62px; text-align: left; padding: 12px 14px; border-radius: 14px; border: 1px solid var(--border-soft);
   background: color-mix(in srgb, var(--surface-soft) 85%, transparent); color: var(--ink-soft);
@@ -308,6 +318,9 @@ aside.rail { display: grid; gap: 18px; align-content: start; }
 .rolloff-seat .btn { width: 100%; margin-top: 8px; min-height: 42px; font-size: 12.5px; }
 
 .outcome-modal.win { border-color: var(--success); }
+/* A coin result has no winner or loser — announce it in the table's own accent. */
+.outcome-modal.reveal { border-color: var(--border-strong); }
+.outcome-modal.reveal .outcome-icon { background: color-mix(in srgb, var(--accent) 22%, var(--surface)); color: var(--accent-strong); }
 .outcome-modal.loss { border-color: var(--border); }
 .outcome-icon { width: 64px; height: 64px; margin: 0 auto 10px; border-radius: 50%; display: grid; place-items: center; font-size: 26px; border: 1px solid var(--border-strong); }
 .outcome-modal.win .outcome-icon { background: color-mix(in srgb, var(--success) 22%, var(--surface)); color: var(--success); }
@@ -334,37 +347,37 @@ aside.rail { display: grid; gap: 18px; align-content: start; }
 /* ---------- rolling method / physical entry ---------- */
 .method-hint { margin: 10px 0 0; padding: 10px 12px; border-radius: 12px; border: 1px dashed var(--border-soft); font-size: 12px; color: var(--ink-soft); text-align: center; }
 
-/* ---------- coin flip stage ---------- */
-.coin-mode .shooter-block, .coin-mode .dice-row, .coin-mode .total-chip, .coin-mode #roll { display: none !important; }
+/* ---------- coin flip stage ----------
+   Coin Flip is a bare flipper: no wagers, ledger, stats, rules or side bets. */
+.coin-mode .shooter-block, .coin-mode .dice-row, .coin-mode .num-pad,
+.coin-mode .total-chip, .coin-mode #roll,
+.coin-mode .wager-plate, .coin-mode .side-bets-panel,
+.coin-mode aside.rail { display: none !important; }
+.coin-mode main.table-layout { grid-template-columns: minmax(0, 1fr); width: min(100%, 620px); margin: 0 auto; }
+.coin-mode .table-panel { padding-bottom: 36px; }
+
 .coin-play { width: min(100%, 420px); margin: 4px auto 0; }
 .coin-calls { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 18px; }
-.coin-call-seat { padding: 12px; border-radius: 14px; border: 1px solid var(--border-soft); background: color-mix(in srgb, var(--surface-soft) 88%, transparent); text-align: center; }
-.coin-call-seat b { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 12px; color: var(--ink-faint); text-transform: uppercase; letter-spacing: .06em; }
-.coin-call-seat span { display: block; margin-top: 6px; font: 700 20px "Fraunces", serif; letter-spacing: .04em; }
-.coin-call-seat span.heads { color: var(--accent-strong); }
-.coin-call-seat span.tails { color: var(--ink-soft); }
+.coin-call-seat { padding: 12px; border-radius: 14px; border: 1px solid var(--border-soft); background: color-mix(in srgb, var(--surface-soft) 88%, transparent); text-align: center; transition: border-color .2s, background .2s; }
+.coin-call-seat { display: grid; place-items: center; min-height: 62px; }
+.coin-call-seat span { display: block; font: 700 20px "Fraunces", serif; letter-spacing: .02em; color: var(--ink); overflow-wrap: anywhere; }
+.coin-call-seat.landed { border-color: var(--border-strong); background: color-mix(in srgb, var(--accent) 18%, var(--surface-soft)); box-shadow: inset 0 0 0 1px var(--accent); }
+.coin-call-seat.landed span { color: var(--accent-strong); }
 
-.coin-stage { perspective: 900px; display: grid; place-items: center; min-height: 190px; margin-bottom: 10px; }
-.coin3d { width: 148px; height: 148px; position: relative; transform-style: preserve-3d; }
-.coin3d.idle { animation: coinIdle 2.6s ease-in-out infinite; }
-@keyframes coinIdle { 0%, 100% { transform: rotateY(-10deg) rotateX(4deg); } 50% { transform: rotateY(10deg) rotateX(-2deg); } }
-.coin-face-flat {
-  position: absolute; inset: 0; border-radius: 50%; backface-visibility: hidden;
-  display: grid; place-items: center; border: 3px solid var(--border-strong);
-  background: radial-gradient(circle at 33% 25%, var(--die-1), var(--die-2) 55%, var(--die-3));
-  color: var(--pip); font: 700 44px "Fraunces", serif; box-shadow: inset 0 3px 8px #ffffff70, inset 0 -10px 16px #00000030, 0 12px 26px #00000060;
-}
-.coin-face-flat.back { transform: rotateY(180deg); }
-.coin-face-flat small { display: block; font: 700 10px "Inter", sans-serif; letter-spacing: .18em; margin-top: 2px; }
-
+.coin-stage { display: grid; place-items: center; min-height: 190px; margin-bottom: 10px; }
 .roller-disc {
-  width: 148px; height: 148px; border-radius: 50%; margin: 0 auto; display: grid; place-items: center;
+  width: 148px; height: 148px; border-radius: 50%; margin: 0 auto; display: grid; place-items: center; text-align: center;
   border: 3px solid var(--border-strong);
-  background: radial-gradient(circle at 33% 25%, var(--die-1), var(--die-2) 55%, var(--die-3));
-  color: var(--pip); font: 700 26px "Fraunces", serif; box-shadow: inset 0 3px 8px #ffffff70, inset 0 -10px 16px #00000030, 0 12px 26px #00000060;
+  background: radial-gradient(circle at 33% 25%, var(--coin-1, var(--die-1)), var(--coin-2, var(--die-2)) 55%, var(--coin-3, var(--die-3)));
+  color: var(--coin-ink, var(--pip)); font: 700 26px "Fraunces", serif; letter-spacing: .04em;
+  box-shadow: inset 0 3px 8px #ffffff70, inset 0 -10px 16px #00000030, 0 12px 26px #00000060;
+  padding: 0 14px; overflow-wrap: anywhere; line-height: 1.15;
 }
-.roller-disc.spin { animation: rollerSpin .12s linear infinite; }
+.roller-disc.long { font-size: 18px; }
+.roller-disc.longer { font-size: 14px; }
+.roller-disc.spin { animation: rollerSpin .1s linear infinite; }
 @keyframes rollerSpin { to { transform: rotate(360deg) scale(.96); } }
+.roller-disc.settled { border-color: var(--accent-strong); box-shadow: inset 0 3px 8px #ffffff70, 0 0 26px color-mix(in srgb, var(--accent) 55%, transparent), 0 12px 26px #00000060; }
 
 .flip-zone { margin-top: 6px; }
 .flip-ring-wrap { position: relative; width: 190px; margin: 0 auto 14px; }
@@ -375,7 +388,23 @@ aside.rail { display: grid; gap: 18px; align-content: start; }
   50% { transform: translateY(-3px) rotate(-4deg) scale(1.04); }
   100% { transform: translateY(0) rotate(4deg) scale(1); }
 }
-.physical-call-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 8px; }
+
+/* ---------- physical entry pads (inline, no extra screens) ---------- */
+.num-pad { width: min(100%, 440px); margin: 0 auto 6px; }
+.num-pad .pad-label { margin: 0 0 10px; font: 700 11px "Inter", sans-serif; letter-spacing: .16em; text-transform: uppercase; color: var(--ink-faint); }
+.num-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 8px; }
+.num-btn {
+  min-height: 58px; border-radius: 14px; border: 1px solid var(--border-soft);
+  background: color-mix(in srgb, var(--surface-soft) 88%, transparent);
+  color: var(--ink-soft); font: 700 21px "Fraunces", serif;
+}
+.num-btn:hover:not(:disabled) { border-color: var(--border-strong); color: var(--ink); }
+.num-btn.selected {
+  border-color: var(--border-strong); color: var(--accent-ink);
+  background: linear-gradient(160deg, var(--accent-strong), var(--accent) 65%);
+  box-shadow: 0 4px 0 color-mix(in srgb, var(--border) 70%, black);
+}
+.num-btn:disabled { opacity: .45; cursor: not-allowed; }
 
 @media (max-width: 900px) {
   main.table-layout { grid-template-columns: 1fr; }
@@ -406,14 +435,13 @@ aside.rail { display: grid; gap: 18px; align-content: start; }
     </div>
     <div class="topbar-actions">
       <button class="btn btn-ghost" id="open-settings" type="button">Settings</button>
-      <button class="btn btn-ghost" id="open-rules" type="button">Table rules</button>
     </div>
   </header>
 
   <main class="table-layout">
     <section class="card table-panel">
       <div class="status-row">
-        <span class="eyebrow" id="phase">Opening roll</span>
+        <button class="btn mode-switch" id="mode-switch" type="button">Coin Flip</button>
         <span class="turn-indicator" id="turn"></span>
       </div>
 
@@ -424,11 +452,12 @@ aside.rail { display: grid; gap: 18px; align-content: start; }
         <p class="rule-copy" id="rule-copy">7 or 11 wins the roll. Snake eyes loses.</p>
       </div>
 
-      <div class="dice-row">
+      <div class="dice-row" id="dice-row">
         <div class="die" id="die1"></div>
         <span class="dice-plus">+</span>
         <div class="die" id="die2"></div>
       </div>
+      <div class="num-pad hidden" id="num-pad"></div>
       <div class="total-chip" id="total-chip">Total<strong id="sum">7</strong></div>
 
       <button class="btn btn-primary" id="roll">Place a wager to roll</button>
@@ -480,33 +509,20 @@ aside.rail { display: grid; gap: 18px; align-content: start; }
   </main>
 </div>
 
-<div class="overlay hidden" id="rules-overlay" role="dialog" aria-modal="true" aria-label="Table rules">
-  <div class="modal">
-    <span class="eyebrow">Dice Duel</span>
-    <h2 id="rules-overlay-title">Table Rules</h2>
-    <ul class="rules-list" style="text-align:left;margin-top:16px" id="rules-overlay-list">
-      <li><b>Opening roll —</b> 7 or 11 wins instantly. Snake eyes (2) loses instantly. Any other total becomes the point.</li>
-      <li><b>Point round —</b> the shooter keeps rolling; hitting the point wins, a 7 first loses.</li>
-      <li><b>Side bets —</b> proposed after the point is set. Whichever player proposes stakes it; the other has 5 seconds to accept, or it's withdrawn.</li>
-      <li><b>Ledger —</b> tracks each player's running total across the whole session, not just one round.</li>
-      <li><b>Shooter rotation —</b> the loser's opponent shoots next round and opens the new wager.</li>
-    </ul>
-    <button class="btn btn-primary" id="close-rules">Close</button>
-  </div>
-</div>
-
 <div class="overlay" id="setup" role="dialog" aria-modal="true" aria-label="Table setup"></div>
 <div class="overlay hidden" id="outcome" role="dialog" aria-modal="true" aria-label="Round result"></div>
-<div class="overlay hidden" id="physical-overlay" role="dialog" aria-modal="true" aria-label="Record physical result"></div>
 
 <div class="overlay hidden" id="settings-overlay" role="dialog" aria-modal="true" aria-label="Settings">
-  <div class="modal setup-modal" style="text-align:center">
-    <span class="eyebrow">Dice Duel</span>
-    <h2>Settings</h2>
-    <div class="field" style="margin-top:18px"><label>Coin flip animation</label></div>
-    <div class="mode-picker" id="coin-anim-picker">
-      <button class="pick-card" data-coin-anim="coin3d" type="button"><strong>3D Coin</strong><small>Cinematic spin &amp; landing</small></button>
-      <button class="pick-card" data-coin-anim="roller" type="button"><strong>Quick Roller</strong><small>Fast mechanical flicker</small></button>
+  <div class="modal setup-modal">
+    <span class="eyebrow" style="display:block;text-align:center">Dice Duel</span>
+    <h2 style="text-align:center">Settings</h2>
+    <div class="field" style="margin-top:18px"><label>Table finish</label></div>
+    <div class="table-picker" id="theme-table-picker"></div>
+    <div class="field"><label id="theme-piece-label">Dice colour</label></div>
+    <div class="style-picker" id="theme-piece-picker"></div>
+    <div id="method-block">
+      <div class="field"><label id="method-label">Rolling method</label></div>
+      <div class="mode-picker" id="method-picker"></div>
     </div>
     <div class="field"><label>Sound</label></div>
     <div class="mode-picker" id="sound-picker">
@@ -530,30 +546,64 @@ aside.rail { display: grid; gap: 18px; align-content: start; }
     { id: "noir",    name: "Noir Table",     desc: "Monochrome · sharp contrast",  swatch: "#6d6d6d" },
     { id: "neon",    name: "Neon Afterdark", desc: "Indigo · cyan accents",        swatch: "#5fe1e8" },
     { id: "artdeco", name: "Art Deco",       desc: "Navy geometry · gold lines",   swatch: "#c9a24f" },
-    { id: "crimson", name: "Crimson Room",   desc: "Velvet red · copper",          swatch: "#b06a3c" },
-    { id: "lounge",  name: "Whiskey Lounge", desc: "Walnut · warm leather",        swatch: "#a9793f" },
   ];
   const DIE_SPOTS = { 1: [4], 2: [0, 8], 3: [0, 4, 8], 4: [0, 2, 6, 8], 5: [0, 2, 4, 6, 8], 6: [0, 2, 3, 5, 6, 8] };
+  // Every total two dice can make. 1 is left out because two dice cannot add up to it.
+  const DICE_TOTALS = [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
   const TABLE_CALLS = {
     2: "Snake eyes.", 3: "Little Joe.", 4: "Little Phoebe.", 5: "Fever five.",
     6: "Easy six.", 7: "Seven, a winner.", 8: "Eighter from Decatur.", 9: "Nine, the point.",
     10: "Big ten.", 11: "Yo-leven.", 12: "Boxcars.",
   };
+  // Dice colours override the table's own --die-*/--pip tokens: [light, mid, dark, pip].
+  const DICE_STYLES = [
+    { id: "ivory",    name: "Ivory",    colors: ["#fffdf5", "#e8e0c8", "#9b9179", "#241f18"] },
+    { id: "obsidian", name: "Obsidian", colors: ["#585862", "#2c2c33", "#101014", "#f2efe6"] },
+    { id: "ruby",     name: "Ruby",     colors: ["#ffd9dd", "#cb3a4e", "#6d0f1e", "#fff0f2"] },
+    { id: "emerald",  name: "Emerald",  colors: ["#d8f5e4", "#2f9c6a", "#14513a", "#eafff4"] },
+    { id: "sapphire", name: "Sapphire", colors: ["#dbe9ff", "#3f74c8", "#17356b", "#eef4ff"] },
+    { id: "gold",     name: "Gold",     colors: ["#fff6d8", "#dfb85e", "#8a5f1e", "#33230a"] },
+  ];
+  const COIN_STYLES = [
+    { id: "sovereign",name: "Gold",     colors: ["#fff4d0", "#dcb055", "#7f5716", "#2e1f06"] },
+    { id: "silver",   name: "Silver",   colors: ["#fdfdfd", "#c9ccd1", "#7d8288", "#23262a"] },
+    { id: "copper",   name: "Copper",   colors: ["#ffdcbd", "#c9773c", "#6f3a12", "#2e1405"] },
+    { id: "obsidian", name: "Obsidian", colors: ["#5a5a64", "#2c2c33", "#0f0f13", "#ede8db"] },
+    { id: "jade",     name: "Jade",     colors: ["#dcf6e7", "#39a877", "#155540", "#f0fff8"] },
+    { id: "rose",     name: "Rose",     colors: ["#ffe0e4", "#d4566a", "#78182a", "#fff2f4"] },
+  ];
   const OPENING_STAKES = [1, 2, 5];
   const SIDEBET_MS = 5000;
+  // Dice spin and coin spin run for the same duration, then both hold the visible
+  // result for RESULT_HOLD_MS before the win/lose screen takes over.
+  const SPIN_MS = 2400;
+  const RESULT_HOLD_MS = 1500;
   const SETTINGS_KEY = "diceduel-settings";
 
   /* ---------------------------------------------------------
    * Settings (persisted)
    * ------------------------------------------------------- */
+  const DEFAULT_SETTINGS = {
+    sound: true,
+    theme: "royal",
+    diceStyle: "ivory",
+    coinStyle: "sovereign",
+    // Only Dice Duel has a rolling method — Coin Flip is always the table's own flip.
+    method: { dice: "auto", coin: "auto" },
+  };
   function loadSettings() {
+    const pick = (list, v, fb) => (list.some((x) => x.id === v) ? v : fb);
+    const method = (v) => (v === "physical" ? "physical" : "auto");
     try {
-      const saved = JSON.parse(localStorage.getItem(SETTINGS_KEY) || "{}");
+      const s = JSON.parse(localStorage.getItem(SETTINGS_KEY) || "{}");
       return {
-        coinAnim: saved.coinAnim === "roller" ? "roller" : "coin3d",
-        sound: saved.sound !== false,
+        sound: s.sound !== false,
+        theme: pick(THEMES, s.theme, "royal"),
+        diceStyle: pick(DICE_STYLES, s.diceStyle, "ivory"),
+        coinStyle: pick(COIN_STYLES, s.coinStyle, "sovereign"),
+        method: { dice: method(s.method && s.method.dice), coin: "auto" },
       };
-    } catch { return { coinAnim: "coin3d", sound: true }; }
+    } catch { return JSON.parse(JSON.stringify(DEFAULT_SETTINGS)); }
   }
   function saveSettings() {
     try { localStorage.setItem(SETTINGS_KEY, JSON.stringify(state.settings)); } catch {}
@@ -563,9 +613,8 @@ aside.rail { display: grid; gap: 18px; align-content: start; }
    * State
    * ------------------------------------------------------- */
   const state = {
-    theme: "royal",
     mode: "dice",            // 'dice' | 'coin'
-    method: "auto",          // 'auto' | 'physical' — how results are produced
+    inMatch: false,
     players: ["Player 1", "Player 2"],
     active: 0,
     wager: 1,
@@ -576,17 +625,23 @@ aside.rail { display: grid; gap: 18px; align-content: start; }
     pendingSideBet: null,
     sideBetDeadline: 0,
     sideBetTimer: null,
-    coinCall: [null, null],       // each player's call for the live round
-    coinReady: false,             // wager + calls locked in, ready to flip
     flipping: false,
+    physicalTotal: null,          // total tapped on the inline pad
+    sides: ["Heads", "Tails"],    // what is written on each side of the coin
+    lastFace: null,               // index of the side that just landed (0 | 1)
     settings: loadSettings(),
-    stats: { rounds: 0, wagered: 0, streakPlayer: null, streakCount: 0, diceTotals: {}, coinCalls: { heads: 0, tails: 0 } },
-    lobby: { theme: "royal", mode: "dice", method: "auto" },
+    stats: { rounds: 0, wagered: 0, streakPlayer: null, streakCount: 0, diceTotals: {} },
+    lobby: { mode: "dice", players: ["", ""], sides: ["", ""] },
   };
+
+  // The mode whose settings/theme options are being edited: the live match, or the lobby pick.
+  const uiMode = () => (state.inMatch ? state.mode : state.lobby.mode);
+  // Only Dice Duel offers a rolling method; Coin Flip always uses the table's own flip.
+  const currentMethod = () => (state.mode === "dice" ? state.settings.method.dice : "auto");
 
   const params = new URLSearchParams(location.search);
   if (params.get("theme") && THEMES.some(t => t.id === params.get("theme"))) {
-    state.lobby.theme = params.get("theme");
+    state.settings.theme = params.get("theme");
   }
 
   /* ---------------------------------------------------------
@@ -594,41 +649,30 @@ aside.rail { display: grid; gap: 18px; align-content: start; }
    * ------------------------------------------------------- */
   const $ = (id) => document.getElementById(id);
   const els = {
-    phase: $("phase"), turn: $("turn"), shooter: $("shooter"),
+    modeSwitch: $("mode-switch"), turn: $("turn"), shooter: $("shooter"),
     pointDisplay: $("point-display"), tableCall: $("table-call"), ruleCopy: $("rule-copy"),
     die1: $("die1"), die2: $("die2"), totalChip: $("total-chip"), sum: $("sum"),
+    diceRow: $("dice-row"), numPad: $("num-pad"),
     roll: $("roll"), wager: $("wager"), wagerPreview: $("wager-preview"),
     chipRow: $("chip-row"), sideHint: $("side-hint"), sidebetOffer: $("sidebet-offer"),
     sidebetAmount: $("sidebet-amount"), sidebetPoolAdd: $("sidebet-pool-add"),
     sidebetSeconds: $("sidebet-seconds"), sidebetTimer: $("sidebet-timer"), sidebetAccept: $("sidebet-accept"),
-    ledger: $("ledger"), setup: $("setup"), outcome: $("outcome"), physicalOverlay: $("physical-overlay"),
-    rulesOverlay: $("rules-overlay"), openRules: $("open-rules"), closeRules: $("close-rules"),
+    ledger: $("ledger"), setup: $("setup"), outcome: $("outcome"),
     settingsOverlay: $("settings-overlay"), openSettings: $("open-settings"), closeSettings: $("close-settings"),
-    coinAnimPicker: $("coin-anim-picker"), soundPicker: $("sound-picker"),
+    soundPicker: $("sound-picker"), methodPicker: $("method-picker"), methodLabel: $("method-label"), methodBlock: $("method-block"),
+    themeTablePicker: $("theme-table-picker"), themePiecePicker: $("theme-piece-picker"), themePieceLabel: $("theme-piece-label"),
     coinPlay: $("coin-play"), statsPanel: $("stats-panel"),
     tablePanel: document.querySelector(".table-panel"),
     ledgerPanel: $("ledger-panel"), rulesPanelTitle: $("rules-panel-title"), rulesPanelList: $("rules-panel-list"),
-    rulesOverlayTitle: $("rules-overlay-title"), rulesOverlayList: $("rules-overlay-list"),
   };
 
   const DICE_RULES_HTML = `
     <li><b>Opening roll —</b> 7 or 11 wins instantly. Snake eyes (2) loses instantly. Any other total sets the point.</li>
     <li><b>Point round —</b> the shooter must roll the point again before a 7 appears.</li>
     <li><b>Side bets —</b> once a point is live, either player may propose a side bet. The other player has 5 seconds to accept.</li>
-    <li><b>Settlement —</b> the winner's ledger rises by the full wager; the loser's falls by the same amount.</li>`;
-  const DICE_RULES_HTML_LONG = `
-    <li><b>Opening roll —</b> 7 or 11 wins instantly. Snake eyes (2) loses instantly. Any other total becomes the point.</li>
-    <li><b>Point round —</b> the shooter keeps rolling; hitting the point wins, a 7 first loses.</li>
-    <li><b>Side bets —</b> proposed after the point is set. Whichever player proposes stakes it; the other has 5 seconds to accept, or it's withdrawn.</li>
-    <li><b>Ledger —</b> tracks each player's running total across the whole session, not just one round.</li>
-    <li><b>Shooter rotation —</b> the loser's opponent shoots next round and opens the new wager.</li>
-    <li><b>Physical dice —</b> switch to Physical in the lobby and the table guides you through entering each real roll by hand.</li>`;
-  const COIN_RULES_HTML = `
-    <li><b>Wager —</b> the active player sets the stake each round; it doubles into the pool, same as Dice Duel.</li>
-    <li><b>Call it —</b> the active player calls heads or tails; the other player automatically takes the opposite side.</li>
-    <li><b>Flip —</b> press Flip? for an automatic flip, or switch to Physical in the lobby and the table walks you through entering a real coin's result.</li>
-    <li><b>Side bets —</b> unlock as soon as both calls are locked in, just like a point round.</li>
-    <li><b>Settlement —</b> whoever called correctly wins the full wager onto the ledger.</li>`;
+    <li><b>Hot hand —</b> win the round and you keep the dice. They only pass when the shooter loses.</li>
+    <li><b>Settlement —</b> the winner's ledger rises by the full wager; the loser's falls by the same amount.</li>
+    <li><b>Real dice —</b> switch the rolling method to Physical in Settings, then just tap the total you rolled.</li>`;
 
   /* ---------------------------------------------------------
    * Sound (restrained, synthesized — no external assets)
@@ -652,9 +696,33 @@ aside.rail { display: grid; gap: 18px; align-content: start; }
       unlock,
       click() { if (!ctx || !state.settings.sound) return; const t = ctx.currentTime; tone(720, t, .07, "triangle", .1); },
       tick() { if (!ctx || !state.settings.sound) return; const t = ctx.currentTime; tone(950, t, .04, "square", .05); },
+      // Wheel-of-fortune flapper: a woody click whose pitch drops as the wheel loses speed.
+      // `progress` runs 0 → 1 across the spin.
+      flapper(progress) {
+        if (!ctx || !state.settings.sound) return;
+        const t = ctx.currentTime;
+        const f = 900 - progress * 460;
+        const osc = ctx.createOscillator(), gain = ctx.createGain(), filt = ctx.createBiquadFilter();
+        osc.type = "sawtooth";
+        osc.frequency.setValueAtTime(f, t);
+        osc.frequency.exponentialRampToValueAtTime(Math.max(60, f * .35), t + .045);
+        filt.type = "bandpass";
+        filt.frequency.setValueAtTime(f * 1.6, t);
+        filt.Q.value = 4.5;
+        gain.gain.setValueAtTime(0, t);
+        gain.gain.linearRampToValueAtTime(.17, t + .004);
+        gain.gain.exponentialRampToValueAtTime(.0001, t + .06);
+        osc.connect(filt).connect(gain).connect(ctx.destination);
+        osc.start(t); osc.stop(t + .08);
+      },
       win() {
         if (!ctx || !state.settings.sound) return; const t = ctx.currentTime;
         [523.25, 659.25, 783.99, 1046.5].forEach((f, i) => tone(f, t + i * .09, .5, "sine", .14));
+      },
+      // Neutral two-note chime for a coin result — nobody won or lost, it just landed.
+      reveal() {
+        if (!ctx || !state.settings.sound) return; const t = ctx.currentTime;
+        tone(659.25, t, .38, "sine", .13); tone(987.77, t + .1, .5, "sine", .11);
       },
       loss() {
         if (!ctx || !state.settings.sound) return; const t = ctx.currentTime;
@@ -667,7 +735,22 @@ aside.rail { display: grid; gap: 18px; align-content: start; }
    * Helpers
    * ------------------------------------------------------- */
   const money = (n) => `$${Math.abs(n)}`;
-  const applyTheme = (id) => { document.documentElement.setAttribute("data-theme", id); state.theme = id; };
+  const PIECE_VARS = ["--die-1", "--die-2", "--die-3", "--pip", "--coin-1", "--coin-2", "--coin-3", "--coin-ink"];
+
+  const styleColors = (list, id) => (list.find((s) => s.id === id) || list[0]).colors;
+
+  // Applies the table finish, then layers the chosen dice / coin palettes on top of it.
+  function applyVisuals() {
+    const root = document.documentElement;
+    root.setAttribute("data-theme", state.settings.theme);
+    PIECE_VARS.forEach((v) => root.style.removeProperty(v));
+
+    const dice = styleColors(DICE_STYLES, state.settings.diceStyle);
+    ["--die-1", "--die-2", "--die-3", "--pip"].forEach((v, i) => root.style.setProperty(v, dice[i]));
+
+    const coin = styleColors(COIN_STYLES, state.settings.coinStyle);
+    ["--coin-1", "--coin-2", "--coin-3", "--coin-ink"].forEach((v, i) => root.style.setProperty(v, coin[i]));
+  }
   const clearSideBetTimer = () => { if (state.sideBetTimer) clearInterval(state.sideBetTimer); state.sideBetTimer = null; };
 
   function paintDie(el, n) {
@@ -688,7 +771,19 @@ aside.rail { display: grid; gap: 18px; align-content: start; }
    * Render
    * ------------------------------------------------------- */
   function render() {
-    const { players, active, point, wager, pendingSideBet, rolling, mode, method } = state;
+    const { players, active, point, wager, pendingSideBet, rolling, mode } = state;
+    const method = currentMethod();
+
+    // Coin Flip is a standalone flipper — no wager, ledger, stats, rules or side bets.
+    // The badge slot holds a one-tap jump to the other game.
+    els.modeSwitch.textContent = mode === "coin" ? "Dice Duel" : "Coin Flip";
+
+    if (mode === "coin") {
+      els.turn.textContent = "";
+      renderCoinPlay();
+      return;
+    }
+
     els.turn.innerHTML = `Wager ${money(wager)} · <b>${players[active]}</b>'s turn`;
     els.wager.textContent = wager;
 
@@ -705,49 +800,61 @@ aside.rail { display: grid; gap: 18px; align-content: start; }
       return `<div class="ledger-row"><b>${escapeHtml(name)}</b><span class="ledger-money ${net >= 0 ? "positive" : "negative"}">${net < 0 ? "−" : "+"}${money(net)}</span></div>`;
     }).join("");
 
-    if (mode === "dice") {
+    {
       els.shooter.textContent = players[active];
       els.pointDisplay.textContent = point ? point : "—";
       els.tableCall.textContent = point ? `“${TABLE_CALLS[point] || ""}”` : "Awaiting the come-out roll.";
       els.ruleCopy.textContent = point
         ? `Roll ${point} again before a 7 shows.`
         : "7 or 11 wins the roll. Snake eyes loses.";
-      els.phase.textContent = point ? "Point round" : "Opening roll";
 
       if (method === "physical") {
-        els.roll.textContent = "Roll the dice";
-        els.roll.disabled = state.roundEnding || pendingSideBet !== null;
+        // Physical dice: one row of totals — tap what the two dice added up to.
+        els.diceRow.classList.add("hidden");
+        els.numPad.classList.remove("hidden");
+        renderNumPad();
+        const total = state.physicalTotal;
+        els.roll.textContent = total !== null ? `Next Roll · ${total}` : "Tap the total you rolled";
+        els.roll.disabled = total === null || state.roundEnding || pendingSideBet !== null;
       } else {
+        els.diceRow.classList.remove("hidden");
+        els.numPad.classList.add("hidden");
         els.roll.textContent = rolling ? "Rolling…" : (point ? `Roll for ${point}` : "Roll the dice");
         els.roll.disabled = rolling || state.roundEnding || pendingSideBet !== null;
       }
-    } else {
-      els.phase.textContent = state.flipping ? "Flipping" : (state.coinReady ? "Ready to flip" : "Wager & call");
     }
 
-    const inMotion = rolling || state.flipping;
-    const sideBetsUnlocked = (mode === "dice" ? point !== null : state.coinReady) && !inMotion;
+    const sideBetsUnlocked = point !== null && !rolling;
     els.chipRow.classList.toggle("dimmed", !sideBetsUnlocked);
     document.querySelectorAll("[data-sidebet]").forEach((btn) => {
       btn.disabled = !sideBetsUnlocked || pendingSideBet !== null;
     });
     els.sideHint.textContent = sideBetsUnlocked
       ? "Propose a side bet — the other player has 5 seconds to accept."
-      : (mode === "dice" ? "Side bets unlock once a point is set." : "Side bets unlock once both calls are locked in.");
+      : "Side bets unlock once a point is set.";
     els.sideHint.classList.toggle("hidden", pendingSideBet !== null);
     els.chipRow.classList.toggle("hidden", pendingSideBet !== null);
 
-    if (mode === "coin") renderCoinPlay();
     renderStats();
   }
 
-  function paintDieStatic(el, n) {
-    el.innerHTML = "";
-    DIE_SPOTS[n].forEach((i) => {
-      const p = document.createElement("i");
-      p.className = "pip";
-      p.style.gridArea = `${Math.floor(i / 3) + 1} / ${(i % 3) + 1}`;
-      el.append(p);
+  // One grid of every total two dice can make (2–12). Tap the total, hit Next Roll.
+  function renderNumPad() {
+    const locked = state.roundEnding || state.pendingSideBet !== null;
+    els.numPad.innerHTML = `
+      <p class="pad-label">Total rolled</p>
+      <div class="num-grid">
+        ${DICE_TOTALS.map((n) => `
+          <button class="num-btn ${state.physicalTotal === n ? "selected" : ""}" type="button"
+            data-pad-total="${n}" ${locked ? "disabled" : ""}>${n}</button>`).join("")}
+      </div>`;
+    els.numPad.querySelectorAll("[data-pad-total]").forEach((btn) => {
+      btn.onclick = () => {
+        if (locked) return;
+        sound.click();
+        state.physicalTotal = Number(btn.dataset.padTotal);
+        render();
+      };
     });
   }
 
@@ -759,40 +866,60 @@ aside.rail { display: grid; gap: 18px; align-content: start; }
    * Rolling logic (dice)
    * ------------------------------------------------------- */
   function rollDice() {
-    if (state.method === "physical") return showPhysicalDiceWizard();
-    if (state.rolling || state.roundEnding || state.pendingSideBet !== null) return;
+    if (state.roundEnding || state.pendingSideBet !== null) return;
+
+    if (currentMethod() === "physical") {
+      // The player already rolled real dice and tapped the total — just settle it.
+      if (state.physicalTotal === null) return;
+      sound.unlock();
+      sound.click();
+      settleDiceRoll(state.physicalTotal);
+      return;
+    }
+
+    if (state.rolling) return;
     sound.unlock();
     state.rolling = true;
     render();
-    let ticks = 0;
-    const spin = setInterval(() => {
-      paintDie(els.die1, 1 + (Math.random() * 6 | 0));
-      paintDie(els.die2, 1 + (Math.random() * 6 | 0));
-      ticks++;
-      if (ticks === 10) {
-        clearInterval(spin);
+    // Decelerating tumble that runs for SPIN_MS, so the dice visibly settle rather than
+    // stopping dead — same curve and duration as the coin wheel.
+    let delay = 45, elapsed = 0;
+    const step = () => {
+      if (elapsed >= SPIN_MS) {
         const a = 1 + (Math.random() * 6 | 0), b = 1 + (Math.random() * 6 | 0);
         paintDie(els.die1, a); paintDie(els.die2, b);
         state.rolling = false;
-        settleDiceRoll(a, b);
+        settleDiceRoll(a + b);
+        return;
       }
-    }, 90);
+      paintDie(els.die1, 1 + (Math.random() * 6 | 0));
+      paintDie(els.die2, 1 + (Math.random() * 6 | 0));
+      sound.tick();
+      elapsed += delay;
+      delay = Math.min(delay * 1.15, 300);
+      setTimeout(step, delay);
+    };
+    step();
   }
 
-  function settleDiceRoll(a, b) {
-    const total = a + b;
+  // Everything is decided by the total: 2 can only ever be 1+1, so it *is* snake eyes.
+  function settleDiceRoll(total) {
     els.sum.textContent = total;
     els.totalChip.classList.add("visible");
     state.stats.diceTotals[total] = (state.stats.diceTotals[total] || 0) + 1;
 
+    // Round-ending outcomes keep the marked total on screen through the result hold;
+    // continuing rolls clear the pad so the next roll starts fresh.
     if (!state.point) {
       if (total === 7 || total === 11) return finishRound(state.active);
-      if (a === 1 && b === 1) return finishRound(state.active ? 0 : 1);
+      if (total === 2) return finishRound(state.active ? 0 : 1);
       state.point = total;
+      state.physicalTotal = null;
       return render();
     }
     if (total === state.point) return finishRound(state.active);
-    if (total === 7 || (a === 1 && b === 1)) return finishRound(state.active ? 0 : 1);
+    if (total === 7 || total === 2) return finishRound(state.active ? 0 : 1);
+    state.physicalTotal = null;
     render();
   }
 
@@ -809,12 +936,13 @@ aside.rail { display: grid; gap: 18px; align-content: start; }
     if (state.stats.streakPlayer === winner) state.stats.streakCount += 1;
     else { state.stats.streakPlayer = winner; state.stats.streakCount = 1; }
     render();
-    setTimeout(() => showOutcome(winner, loser), 550);
+    // Hold the visible result on the table before the win/lose screen takes over.
+    setTimeout(() => showOutcome(winner, loser), RESULT_HOLD_MS);
   }
 
   function showOutcome(winner, loser) {
-    // Dice ties the modal's tone to the shooter's fate; coin has no shooter, so it's always a clean announcement.
-    const isWin = state.mode === "coin" ? true : winner === state.active;
+    // Hot hand: the winner keeps control — the shooter only changes when the shooter loses.
+    const isWin = winner === state.active;
     isWin ? sound.win() : sound.loss();
     const confetti = isWin
       ? `<div class="confetti">${Array.from({ length: 22 }, (_, i) =>
@@ -826,24 +954,17 @@ aside.rail { display: grid; gap: 18px; align-content: start; }
         <div class="outcome-icon">${isWin ? "♦" : "♠"}</div>
         <span class="eyebrow">Round complete</span>
         <h2>${escapeHtml(state.players[winner])} wins the round</h2>
-        <p class="lead">${escapeHtml(state.players[loser])}'s stake moves to ${escapeHtml(state.players[winner])}'s side of the ledger.</p>
-        <div class="outcome-amount"><small>Settled</small><strong>${money(state.wager)}</strong></div>
         <button class="btn btn-primary" id="next-round">Next round</button>
       </div>`;
     els.outcome.classList.remove("hidden");
     $("next-round").onclick = () => {
       els.outcome.classList.add("hidden");
-      state.active = state.active ? 0 : 1;
+      state.active = winner;
       state.roundEnding = false;
+      state.physicalTotal = null;
+      state.point = null;
       els.totalChip.classList.remove("visible");
-      if (state.mode === "dice") {
-        state.point = null;
-        showOpeningWager();
-      } else {
-        state.coinReady = false;
-        state.coinCall = [null, null];
-        startCoinRound();
-      }
+      showOpeningWager();
     };
   }
 
@@ -858,8 +979,9 @@ aside.rail { display: grid; gap: 18px; align-content: start; }
   }
 
   function proposeSideBet(amount) {
-    const unlocked = state.mode === "dice" ? state.point !== null : state.coinReady;
-    if (!unlocked || state.pendingSideBet !== null || state.rolling || state.flipping || state.roundEnding) return;
+    // Side bets are a Dice Duel feature only.
+    if (state.mode !== "dice" || state.point === null) return;
+    if (state.pendingSideBet !== null || state.rolling || state.roundEnding) return;
     sound.click();
     state.pendingSideBet = amount;
     els.sidebetAmount.textContent = amount;
@@ -893,102 +1015,122 @@ aside.rail { display: grid; gap: 18px; align-content: start; }
   function wireBackToLobby() {
     const btn = $("modal-back-btn");
     if (!btn) return;
-    btn.onclick = () => { clearSideBetTimer(); renderLobby(); };
+    btn.onclick = () => { clearSideBetTimer(); state.inMatch = false; renderLobby(); };
   }
 
   function renderLobby() {
+    const coin = state.lobby.mode === "coin";
+    // Dice seats two players; Coin Flip instead names what is written on each side.
+    // Boxes start empty — the placeholder shows what you get if you leave one blank.
+    const fields = coin
+      ? [["Side 1", "Heads", state.lobby.sides[0]], ["Side 2", "Tails", state.lobby.sides[1]]]
+      : [["Player 1", "Player 1", state.lobby.players[0]], ["Player 2", "Player 2", state.lobby.players[1]]];
+
     showOverlay(els.setup);
     els.setup.innerHTML = `
       <div class="modal setup-modal">
-        <button class="btn btn-ghost lobby-settings-link" id="lobby-settings" type="button">Settings</button>
-        <span class="eyebrow">Dice Duel</span>
-        <h2>Choose your table</h2>
-        <p class="lead">Pick the table finish and the game, then seat both players.</p>
-        <div class="table-picker">
-          ${THEMES.map((t) => `
-            <button class="pick-card ${t.id === state.lobby.theme ? "selected" : ""}" data-theme-pick="${t.id}" type="button">
-              <strong><span class="swatch" style="background:${t.swatch}"></span>${t.name}</strong>
-              <small>${t.desc}</small>
-            </button>`).join("")}
+        <div class="modal-links">
+          <button class="btn btn-ghost" id="lobby-settings" type="button">Settings</button>
         </div>
-        <div class="field"><label>Game mode</label></div>
+        <span class="eyebrow">Dice Duel</span>
+        <h2>${coin ? "Name the sides" : "Take a seat"}</h2>
+        <p class="lead">${coin
+          ? "Write whatever you want on each side of the coin, then flip for it."
+          : "Pick the game and seat both players. Table finish and rolling method live under Settings."}</p>
+        <div class="field"><label>Game</label></div>
         <div class="mode-picker">
-          <button class="pick-card ${state.lobby.mode === "dice" ? "selected" : ""}" data-mode-pick="dice" type="button">
+          <button class="pick-card ${!coin ? "selected" : ""}" data-mode-pick="dice" type="button">
             <strong>Dice Duel</strong><small>Craps-style point round</small>
           </button>
-          <button class="pick-card ${state.lobby.mode === "coin" ? "selected" : ""}" data-mode-pick="coin" type="button">
-            <strong>Coin Flip</strong><small>Wager, call it, flip</small>
+          <button class="pick-card ${coin ? "selected" : ""}" data-mode-pick="coin" type="button">
+            <strong>Coin Flip</strong><small>Two sides, one flip</small>
           </button>
         </div>
-        <div class="field"><label>Rolling method</label></div>
-        <div class="mode-picker">
-          <button class="pick-card ${state.lobby.method === "auto" ? "selected" : ""}" data-method-pick="auto" type="button">
-            <strong>Automatic</strong><small>The table rolls / flips for you</small>
-          </button>
-          <button class="pick-card ${state.lobby.method === "physical" ? "selected" : ""}" data-method-pick="physical" type="button">
-            <strong>Physical</strong><small>I have real dice or a coin</small>
-          </button>
-        </div>
-        <div class="field"><label for="p1-input">Player 1</label><input id="p1-input" maxlength="18" value="Player 1" /></div>
-        <div class="field"><label for="p2-input">Player 2</label><input id="p2-input" maxlength="18" value="Player 2" /></div>
-        <button class="btn btn-primary" id="enter-match" type="button">Enter the table</button>
+        ${coin ? "" : `<p class="method-hint" id="lobby-method-hint"></p>`}
+        ${fields.map(([label, placeholder, value], i) => `
+          <div class="field">
+            <label for="p${i + 1}-input">${label}</label>
+            <input id="p${i + 1}-input" maxlength="18" placeholder="${escapeHtml(placeholder)}" value="${escapeHtml(value)}" />
+          </div>`).join("")}
+        <button class="btn btn-primary" id="enter-match" type="button">${coin ? "Start flipping" : "Enter the table"}</button>
       </div>`;
-    applyTheme(state.lobby.theme);
+    applyVisuals();
+    renderLobbyMethodHint();
 
-    document.querySelectorAll("[data-theme-pick]").forEach((btn) => {
-      btn.onclick = () => { state.lobby.theme = btn.dataset.themePick; renderLobby(); };
-    });
     document.querySelectorAll("[data-mode-pick]").forEach((btn) => {
-      btn.onclick = () => { state.lobby.mode = btn.dataset.modePick; renderLobby(); };
-    });
-    document.querySelectorAll("[data-method-pick]").forEach((btn) => {
-      btn.onclick = () => { state.lobby.method = btn.dataset.methodPick; renderLobby(); };
+      btn.onclick = () => { stashLobbyInputs(); state.lobby.mode = btn.dataset.modePick; renderLobby(); };
     });
     $("enter-match").onclick = enterMatch;
-    $("lobby-settings").onclick = () => { renderSettingsPickers(); showOverlay(els.settingsOverlay); };
+    $("lobby-settings").onclick = () => { stashLobbyInputs(); renderSettingsPickers(); showOverlay(els.settingsOverlay); };
     [$("p1-input"), $("p2-input")].forEach((input) => {
+      input.addEventListener("input", stashLobbyInputs);
       input.addEventListener("keydown", (e) => { if (e.key === "Enter") enterMatch(); });
     });
   }
 
+  // Keeps typed names alive across lobby re-renders (switching game, opening a panel).
+  function stashLobbyInputs() {
+    const a = $("p1-input"), b = $("p2-input");
+    if (!a || !b) return;
+    const target = state.lobby.mode === "coin" ? state.lobby.sides : state.lobby.players;
+    target[0] = a.value;
+    target[1] = b.value;
+  }
+
+  // Dice-only: echoes the saved rolling method so the lobby shows it at a glance.
+  function renderLobbyMethodHint() {
+    const hint = $("lobby-method-hint");
+    if (!hint) return;
+    hint.textContent = state.settings.method.dice === "physical"
+      ? "Physical dice — you roll for real and mark the result."
+      : "Automatic — the table rolls the dice.";
+  }
+
   function enterMatch() {
     sound.unlock();
-    state.players = [
-      $("p1-input").value.trim() || "Player 1",
-      $("p2-input").value.trim() || "Player 2",
-    ];
-    state.ledger = [{ won: 0, lost: 0 }, { won: 0, lost: 0 }];
-    state.active = 0;
+    stashLobbyInputs();
     state.mode = state.lobby.mode;
-    state.method = state.lobby.method;
-    state.coinCall = [null, null];
-    state.coinReady = false;
-    state.stats = { rounds: 0, wagered: 0, streakPlayer: null, streakCount: 0, diceTotals: {}, coinCalls: { heads: 0, tails: 0 } };
-    applyTheme(state.lobby.theme);
+    state.inMatch = true;
+    applyVisuals();
     hideOverlay(els.setup);
 
     if (state.mode === "coin") {
+      // Blank boxes fall back to whatever the placeholder promised.
+      state.sides = [
+        state.lobby.sides[0].trim() || "Heads",
+        state.lobby.sides[1].trim() || "Tails",
+      ];
+      state.lastFace = null;
+      state.roundEnding = false;
+      state.flipping = false;
+      state.physicalTotal = null;
       document.body.classList.add("coin-mode");
       els.coinPlay.classList.remove("hidden");
-      els.rulesPanelTitle.textContent = "Coin flip rules";
-      els.rulesPanelList.innerHTML = COIN_RULES_HTML;
-      els.rulesOverlayTitle.textContent = "Coin Flip Rules";
-      els.rulesOverlayList.innerHTML = COIN_RULES_HTML;
-      startCoinRound();
+      render();
+      return;
+    }
+
+    state.players = [
+      state.lobby.players[0].trim() || "Player 1",
+      state.lobby.players[1].trim() || "Player 2",
+    ];
+    state.ledger = [{ won: 0, lost: 0 }, { won: 0, lost: 0 }];
+    state.active = 0;
+    state.point = null;
+    state.roundEnding = false;
+    state.physicalTotal = null;
+    state.stats = { rounds: 0, wagered: 0, streakPlayer: null, streakCount: 0, diceTotals: {} };
+    els.totalChip.classList.remove("visible");
+    document.body.classList.remove("coin-mode");
+    els.coinPlay.classList.add("hidden");
+    els.rulesPanelTitle.textContent = "House rules";
+    els.rulesPanelList.innerHTML = DICE_RULES_HTML;
+    if (currentMethod() === "physical") {
+      // Physical dice: no need to simulate a roll-off — just pick a fair first shooter and go.
+      state.active = Math.random() < .5 ? 0 : 1;
+      showOpeningWager();
     } else {
-      document.body.classList.remove("coin-mode");
-      els.coinPlay.classList.add("hidden");
-      els.rulesPanelTitle.textContent = "House rules";
-      els.rulesPanelList.innerHTML = DICE_RULES_HTML;
-      els.rulesOverlayTitle.textContent = "Table Rules";
-      els.rulesOverlayList.innerHTML = DICE_RULES_HTML_LONG;
-      if (state.method === "physical") {
-        // Physical dice: no need to simulate a roll-off — just pick a fair first shooter and go.
-        state.active = Math.random() < .5 ? 0 : 1;
-        showOpeningWager();
-      } else {
-        beginRollOff();
-      }
+      beginRollOff();
     }
   }
 
@@ -1038,25 +1180,24 @@ aside.rail { display: grid; gap: 18px; align-content: start; }
     });
   }
 
-  function showOpeningWager(onDone, onBack) {
+  // Dice Duel only — Coin Flip has no stake screen.
+  function showOpeningWager() {
     showOverlay(els.setup);
     els.setup.innerHTML = `
       <div class="modal setup-modal" style="text-align:center">
         <button class="btn btn-ghost modal-back" id="modal-back-btn" type="button">← Back</button>
-        <span class="eyebrow">Place next wager</span>
-        <h2>${escapeHtml(state.players[state.active])}'s wager</h2>
-        <p class="lead">Choose the stake. The other player matches it, so the pool doubles.</p>
+        <span class="eyebrow">Table stake</span>
+        <h2>Set the stake</h2>
+        <p class="lead">Both players ante the same amount, so the bank starts even. The pool is double the stake.</p>
         <div class="opening-options">
           ${OPENING_STAKES.map((amount) => `<button class="chip-btn" data-opening-wager="${amount}" type="button">$${amount}</button>`).join("")}
         </div>
       </div>`;
-    if (onBack) $("modal-back-btn").onclick = () => { clearSideBetTimer(); onBack(); };
-    else wireBackToLobby();
+    wireBackToLobby();
     document.querySelectorAll("[data-opening-wager]").forEach((btn) => {
       btn.onclick = () => {
         sound.click();
         state.wager = Number(btn.dataset.openingWager) * 2;
-        if (onDone) { onDone(); return; }
         state.point = null;
         hideOverlay(els.setup);
         render();
@@ -1065,88 +1206,40 @@ aside.rail { display: grid; gap: 18px; align-content: start; }
   }
 
   /* ---------------------------------------------------------
-   * Coin mode — wager (shared above) → call → flip
+   * Coin mode — name the sides, then flip
    * ------------------------------------------------------- */
-  // startCoinRound() re-runs the wager → call pair for the current round, so the
-  // call screen's Back button can return here instead of dumping the player to the lobby.
-  function startCoinRound() {
-    showOpeningWager(() => showCoinCall(startCoinRound));
-  }
-
-  function showCoinCall(onBack) {
-    showOverlay(els.setup);
-    const active = state.active, other = active ? 0 : 1;
-    els.setup.innerHTML = `
-      <div class="modal setup-modal" style="text-align:center">
-        <button class="btn btn-ghost modal-back" id="modal-back-btn" type="button">← Back</button>
-        <span class="eyebrow">Call it</span>
-        <h2>${escapeHtml(state.players[active])} calls the coin</h2>
-        <p class="lead">${escapeHtml(state.players[other])} automatically takes whichever side is left.</p>
-        <div class="opening-options" style="grid-template-columns:1fr 1fr">
-          <button class="chip-btn" data-call="heads" type="button">Heads</button>
-          <button class="chip-btn" data-call="tails" type="button">Tails</button>
-        </div>
-      </div>`;
-    if (onBack) $("modal-back-btn").onclick = () => { clearSideBetTimer(); onBack(); };
-    else wireBackToLobby();
-    document.querySelectorAll("[data-call]").forEach((btn) => {
-      btn.onclick = () => {
-        sound.click();
-        const call = btn.dataset.call;
-        state.coinCall[active] = call;
-        state.coinCall[other] = call === "heads" ? "tails" : "heads";
-        state.coinReady = true;
-        hideOverlay(els.setup);
-        render();
-      };
-    });
-  }
+  // Short token used while the wheel is spinning — full side names would be a blur.
+  const sideToken = (i) => (state.sides[i].trim().charAt(0) || String(i + 1)).toUpperCase();
+  const discSizeClass = (text) => (text.length > 14 ? "longer" : text.length > 7 ? "long" : "");
 
   function renderCoinPlay() {
-    const [c0, c1] = state.coinCall;
-    const callsHtml = `
+    const settled = state.roundEnding && state.lastFace !== null;
+    const sidesHtml = `
       <div class="coin-calls">
-        <div class="coin-call-seat"><b>${escapeHtml(state.players[0])}</b><span class="${c0 || ""}">${c0 ? c0.toUpperCase() : "—"}</span></div>
-        <div class="coin-call-seat"><b>${escapeHtml(state.players[1])}</b><span class="${c1 || ""}">${c1 ? c1.toUpperCase() : "—"}</span></div>
+        ${state.sides.map((name, i) => `
+          <div class="coin-call-seat ${settled && state.lastFace === i ? "landed" : ""}">
+            <span>${escapeHtml(name)}</span>
+          </div>`).join("")}
       </div>`;
 
-    if (!state.coinReady) {
-      els.coinPlay.innerHTML = callsHtml + `<p class="method-hint">Waiting on the wager and call for this round…</p>`;
-      return;
-    }
+    const discText = settled ? state.sides[state.lastFace] : (state.flipping ? "" : "READY");
+    const stageHtml = `<div class="coin-stage"><div class="roller-disc ${discSizeClass(discText)} ${settled ? "settled" : ""}" id="coin-roller">${escapeHtml(discText)}</div></div>`;
 
-    const stageHtml = state.settings.coinAnim === "roller"
-      ? `<div class="coin-stage"><div class="roller-disc" id="coin-roller">${state.flipping ? "" : "READY"}</div></div>`
-      : `<div class="coin-stage"><div class="coin3d ${state.flipping ? "" : "idle"}" id="coin3d"><div class="coin3d-inner" id="coin3d-inner">
-           <div class="coin-face-flat front">H<small>HEADS</small></div>
-           <div class="coin-face-flat back">T<small>TAILS</small></div>
-         </div></div></div>`;
-
-    const sideBetPending = state.pendingSideBet !== null;
     let controlsHtml;
-    if (state.flipping) {
+    if (settled) {
+      controlsHtml = `<p class="method-hint">It landed on ${escapeHtml(state.sides[state.lastFace])}.</p>`;
+    } else if (state.flipping) {
       controlsHtml = `<p class="method-hint">Flipping…</p>`;
-    } else if (sideBetPending) {
-      controlsHtml = `<p class="method-hint">Settle the side bet above before flipping.</p>`;
-    } else if (state.method === "physical") {
-      controlsHtml = `
-        <p class="method-hint">Flip your physical coin, then record what landed.</p>
-        <button class="btn btn-primary" id="physical-flip-btn" type="button">Enter flip result</button>`;
     } else {
       controlsHtml = `
         <div class="flip-ring-wrap">
           <button class="btn btn-primary" id="flip-btn" type="button">Flip?</button>
         </div>
-        <p class="method-hint">Both calls are locked in — tap Flip? whenever you're ready.</p>`;
+        <p class="method-hint">Tap Flip? whenever you're ready.</p>`;
     }
 
-    els.coinPlay.innerHTML = callsHtml + stageHtml + `<div class="flip-zone">${controlsHtml}</div>`;
-
-    if (!state.flipping && !sideBetPending && state.method !== "physical") {
-      $("flip-btn").onclick = () => windUpThenFlip($("flip-btn"));
-    } else if (!state.flipping && !sideBetPending && state.method === "physical") {
-      $("physical-flip-btn").onclick = () => showPhysicalCoinWizard();
-    }
+    els.coinPlay.innerHTML = sidesHtml + stageHtml + `<div class="flip-zone">${controlsHtml}</div>`;
+    if (!settled && !state.flipping) $("flip-btn").onclick = () => windUpThenFlip($("flip-btn"));
   }
 
   // A quick casino-style "wind up" flourish on the button before the real flip animation runs.
@@ -1168,48 +1261,31 @@ aside.rail { display: grid; gap: 18px; align-content: start; }
   }
 
   function doFlip() {
-    if (state.flipping || state.pendingSideBet !== null) return;
+    if (state.flipping) return;
     sound.unlock();
     state.flipping = true;
-    const face = Math.random() < .5 ? "heads" : "tails";
+    const face = Math.random() < .5 ? 0 : 1;
     render();
-    const anim = state.settings.coinAnim === "roller" ? playRoller : playCoin3D;
-    anim(face, () => { state.flipping = false; resolveCoinFlip(face); });
+    playRoller(face, () => resolveCoinFlip(face));
   }
 
-  function playCoin3D(face, done) {
-    const inner = $("coin3d-inner");
-    if (!inner || !inner.animate) { setTimeout(done, 1200); return; }
-    const spins = 5;
-    const endDeg = spins * 360 + (face === "heads" ? 0 : 180);
-    const anim = inner.animate([
-      { transform: "translateY(0) rotateY(0deg) scale(1)" },
-      { transform: `translateY(-64px) rotateY(${endDeg * 0.55}deg) scale(1.1)`, offset: .5 },
-      { transform: `translateY(0) rotateY(${endDeg}deg) scale(1)` },
-    ], { duration: 1300, easing: "cubic-bezier(.22,.61,.25,1)" });
-    let lastTick = 0;
-    const tickTimer = setInterval(() => {
-      const t = performance.now();
-      if (t - lastTick > 110) { sound.tick(); lastTick = t; }
-    }, 60);
-    anim.onfinish = () => { clearInterval(tickTimer); done(); };
-  }
-
+  // Wheel-of-fortune style: the disc flickers between the two side tokens on a
+  // decelerating schedule that runs for SPIN_MS — exactly as long as the dice spin.
   function playRoller(face, done) {
     const disc = $("coin-roller");
-    if (!disc) { setTimeout(done, 900); return; }
+    if (!disc) { setTimeout(done, SPIN_MS); return; }
     disc.classList.add("spin");
-    let delay = 55, elapsed = 0;
+    let delay = 40, elapsed = 0;
     const step = () => {
-      disc.textContent = Math.random() < .5 ? "H" : "T";
-      sound.tick();
+      disc.textContent = sideToken(Math.random() < .5 ? 0 : 1);
+      sound.flapper(Math.min(1, elapsed / SPIN_MS));
       elapsed += delay;
-      delay = Math.min(delay * 1.22, 220);
-      if (elapsed < 950) setTimeout(step, delay);
-      else {
+      delay = Math.min(delay * 1.17, 200);
+      if (elapsed < SPIN_MS) {
+        setTimeout(step, delay);
+      } else {
         disc.classList.remove("spin");
-        disc.textContent = face === "heads" ? "HEADS" : "TAILS";
-        setTimeout(done, 250);
+        done();
       }
     };
     step();
@@ -1217,131 +1293,28 @@ aside.rail { display: grid; gap: 18px; align-content: start; }
 
   function resolveCoinFlip(face) {
     state.flipping = false;
-    state.stats.coinCalls[face] += 1;
-    const winner = state.coinCall[0] === face ? 0 : 1;
-    finishRound(winner);
+    state.lastFace = face;
+    state.roundEnding = true;
+    render();
+    setTimeout(() => showCoinResult(face), RESULT_HOLD_MS);
   }
 
-  /* ---------------------------------------------------------
-   * Physical mode — guided result entry
-   * Walks the table through "have you played?" → "what fell?" →
-   * a review step, then records the result exactly like an
-   * automatic roll/flip would.
-   * ------------------------------------------------------- */
-  function showPhysicalDiceWizard() {
-    if (state.rolling || state.roundEnding || state.pendingSideBet !== null) return;
-    let step = "confirm";
-    let a = null, b = null;
-
-    function draw() {
-      showOverlay(els.physicalOverlay);
-      let inner, back;
-      if (step === "confirm") {
-        inner = `
-          <span class="eyebrow">Physical roll</span>
-          <h2>${escapeHtml(state.players[state.active])}'s turn</h2>
-          <p class="lead">Roll both physical dice together. Once you've both seen the result, tell the table you're ready.</p>
-          <button class="btn btn-primary" id="pw-next" type="button">We've rolled — enter the result</button>`;
-        back = () => hideOverlay(els.physicalOverlay);
-      } else if (step === "die1") {
-        inner = `
-          <span class="eyebrow">Physical roll</span>
-          <h2>First die — what fell?</h2>
-          <p class="lead">Tap the number showing on the first die.</p>
-          <div class="opening-options">
-            ${[1, 2, 3, 4, 5, 6].map((n) => `<button class="chip-btn" data-val="${n}" type="button">${n}</button>`).join("")}
-          </div>`;
-        back = () => { step = "confirm"; draw(); };
-      } else if (step === "die2") {
-        inner = `
-          <span class="eyebrow">Physical roll</span>
-          <h2>Second die — what fell?</h2>
-          <p class="lead">Tap the number showing on the second die.</p>
-          <div class="opening-options">
-            ${[1, 2, 3, 4, 5, 6].map((n) => `<button class="chip-btn" data-val="${n}" type="button">${n}</button>`).join("")}
-          </div>`;
-        back = () => { step = "die1"; draw(); };
-      } else {
-        inner = `
-          <span class="eyebrow">Physical roll</span>
-          <h2>${a} + ${b} = ${a + b}</h2>
-          <p class="lead">Confirm this matches what the dice showed, then record the result.</p>
-          <button class="btn btn-primary" id="pw-done" type="button">Done — record result</button>`;
-        back = () => { step = "die2"; draw(); };
-      }
-      els.physicalOverlay.innerHTML = `
-        <div class="modal setup-modal" style="text-align:center">
-          <button class="btn btn-ghost modal-back" id="pw-back" type="button">← Back</button>
-          ${inner}
-        </div>`;
-      $("pw-back").onclick = back;
-      if (step === "confirm") {
-        $("pw-next").onclick = () => { sound.click(); step = "die1"; draw(); };
-      } else if (step === "die1" || step === "die2") {
-        els.physicalOverlay.querySelectorAll("[data-val]").forEach((btn) => {
-          btn.onclick = () => {
-            sound.click();
-            if (step === "die1") { a = Number(btn.dataset.val); step = "die2"; }
-            else { b = Number(btn.dataset.val); step = "review"; }
-            draw();
-          };
-        });
-      } else {
-        $("pw-done").onclick = () => {
-          sound.click();
-          paintDieStatic(els.die1, a);
-          paintDieStatic(els.die2, b);
-          hideOverlay(els.physicalOverlay);
-          settleDiceRoll(a, b);
-        };
-      }
-    }
-    draw();
-  }
-
-  function showPhysicalCoinWizard() {
-    if (state.flipping || state.pendingSideBet !== null) return;
-    let step = "confirm";
-
-    function draw() {
-      showOverlay(els.physicalOverlay);
-      let inner, back;
-      if (step === "confirm") {
-        inner = `
-          <span class="eyebrow">Physical flip</span>
-          <h2>Flip your coin</h2>
-          <p class="lead">Flip the physical coin. Once you've both seen the result, tell the table you're ready.</p>
-          <button class="btn btn-primary" id="pw-next" type="button">We've flipped — enter the result</button>`;
-        back = () => hideOverlay(els.physicalOverlay);
-      } else {
-        inner = `
-          <span class="eyebrow">Physical flip</span>
-          <h2>What did it land on?</h2>
-          <div class="opening-options" style="grid-template-columns:1fr 1fr">
-            <button class="chip-btn" data-face="heads" type="button">Heads</button>
-            <button class="chip-btn" data-face="tails" type="button">Tails</button>
-          </div>`;
-        back = () => { step = "confirm"; draw(); };
-      }
-      els.physicalOverlay.innerHTML = `
-        <div class="modal setup-modal" style="text-align:center">
-          <button class="btn btn-ghost modal-back" id="pw-back" type="button">← Back</button>
-          ${inner}
-        </div>`;
-      $("pw-back").onclick = back;
-      if (step === "confirm") {
-        $("pw-next").onclick = () => { sound.click(); step = "face"; draw(); };
-      } else {
-        els.physicalOverlay.querySelectorAll("[data-face]").forEach((btn) => {
-          btn.onclick = () => {
-            sound.click();
-            hideOverlay(els.physicalOverlay);
-            resolveCoinFlip(btn.dataset.face);
-          };
-        });
-      }
-    }
-    draw();
+  function showCoinResult(face) {
+    sound.reveal();
+    els.outcome.innerHTML = `
+      <div class="modal outcome-modal reveal">
+        <div class="outcome-icon">◆</div>
+        <span class="eyebrow">The coin landed on</span>
+        <h2>${escapeHtml(state.sides[face])}</h2>
+        <button class="btn btn-primary" id="flip-again">Flip again</button>
+      </div>`;
+    els.outcome.classList.remove("hidden");
+    $("flip-again").onclick = () => {
+      els.outcome.classList.add("hidden");
+      state.roundEnding = false;
+      state.lastFace = null;
+      render();
+    };
   }
 
   /* ---------------------------------------------------------
@@ -1354,29 +1327,13 @@ aside.rail { display: grid; gap: 18px; align-content: start; }
       ? `${escapeHtml(state.players[s.streakPlayer])} · ${s.streakCount} in a row`
       : "No streak yet";
 
-    let distHtml = "";
-    if (state.mode === "dice") {
-      const totals = Array.from({ length: 11 }, (_, i) => i + 2);
-      const max = Math.max(1, ...totals.map((t) => s.diceTotals[t] || 0));
-      if (s.rounds === 0 && Object.keys(s.diceTotals).length === 0) {
-        distHtml = `<p class="stat-empty">Roll history will appear here.</p>`;
-      } else {
-        distHtml = `
-          <div class="stat-bars">${totals.map((t) => `<i style="height:${((s.diceTotals[t] || 0) / max) * 100 || 3}%" title="${t}: ${s.diceTotals[t] || 0}"></i>`).join("")}</div>
-          <div class="stat-bars-labels">${totals.map((t) => `<span>${t}</span>`).join("")}</div>`;
-      }
-    } else {
-      const { heads, tails } = s.coinCalls;
-      const max = Math.max(1, heads, tails);
-      distHtml = (heads + tails === 0)
-        ? `<p class="stat-empty">Flip history will appear here.</p>`
-        : `
-          <div class="stat-bars">
-            <i style="height:${(heads / max) * 100 || 3}%" title="Heads: ${heads}"></i>
-            <i style="height:${(tails / max) * 100 || 3}%" title="Tails: ${tails}"></i>
-          </div>
-          <div class="stat-bars-labels"><span>Heads (${heads})</span><span>Tails (${tails})</span></div>`;
-    }
+    const totals = Array.from({ length: 11 }, (_, i) => i + 2);
+    const max = Math.max(1, ...totals.map((t) => s.diceTotals[t] || 0));
+    const distHtml = Object.keys(s.diceTotals).length === 0
+      ? `<p class="stat-empty">Roll history will appear here.</p>`
+      : `
+        <div class="stat-bars">${totals.map((t) => `<i style="height:${((s.diceTotals[t] || 0) / max) * 100 || 3}%" title="${t}: ${s.diceTotals[t] || 0}"></i>`).join("")}</div>
+        <div class="stat-bars-labels">${totals.map((t) => `<span>${t}</span>`).join("")}</div>`;
 
     els.statsPanel.innerHTML = `
       <div class="stat-grid">
@@ -1395,18 +1352,91 @@ aside.rail { display: grid; gap: 18px; align-content: start; }
     b.addEventListener("click", () => proposeSideBet(Number(b.dataset.sidebet)));
   });
   els.sidebetAccept.addEventListener("click", acceptSideBet);
-  els.openRules.addEventListener("click", () => showOverlay(els.rulesOverlay));
-  els.closeRules.addEventListener("click", () => hideOverlay(els.rulesOverlay));
-  els.rulesOverlay.addEventListener("click", (e) => { if (e.target === els.rulesOverlay) hideOverlay(els.rulesOverlay); });
 
+  /* ---- Jump straight to the other game ---- */
+  els.modeSwitch.addEventListener("click", () => {
+    sound.click();
+    clearSideBetTimer();
+    state.pendingSideBet = null;
+    els.sidebetOffer.classList.add("hidden");
+    els.outcome.classList.add("hidden");
+    state.inMatch = false;
+    state.lobby.mode = state.mode === "coin" ? "dice" : "coin";
+    renderLobby();
+  });
+
+  /* ---- Theme section, rendered inside the Settings panel ---- */
+  function renderThemePickers() {
+    els.themeTablePicker.innerHTML = THEMES.map((t) => `
+      <button class="pick-card ${t.id === state.settings.theme ? "selected" : ""}" data-theme-pick="${t.id}" type="button">
+        <strong><span class="swatch" style="background:${t.swatch}"></span>${t.name}</strong>
+        <small>${t.desc}</small>
+      </button>`).join("");
+    els.themeTablePicker.querySelectorAll("[data-theme-pick]").forEach((btn) => {
+      btn.onclick = () => {
+        sound.click();
+        state.settings.theme = btn.dataset.themePick;
+        saveSettings(); applyVisuals(); renderThemePickers();
+      };
+    });
+
+    // Dice colours in Dice Duel, coin finishes in Coin Flip — never both.
+    const dice = uiMode() === "dice";
+    const list = dice ? DICE_STYLES : COIN_STYLES;
+    const chosen = dice ? state.settings.diceStyle : state.settings.coinStyle;
+    els.themePieceLabel.textContent = dice ? "Dice colour" : "Coin finish";
+
+    // Each swatch is the real piece in that palette — a pipped die, or a coin with its ink on it.
+    els.themePiecePicker.innerHTML = list.map((s) => {
+      const c = s.colors;
+      const art = dice
+        ? `<span class="swatch-die" style="background:linear-gradient(155deg,${c[0]},${c[1]} 55%,${c[2]})"><i style="background:${c[3]}"></i></span>`
+        : `<span class="swatch-coin" style="background:radial-gradient(circle at 33% 25%,${c[0]},${c[1]} 55%,${c[2]});color:${c[3]}">${s.name.charAt(0)}</span>`;
+      return `<button class="style-card ${s.id === chosen ? "selected" : ""}" data-piece-pick="${s.id}" type="button">${art}<small>${s.name}</small></button>`;
+    }).join("");
+    els.themePiecePicker.querySelectorAll("[data-piece-pick]").forEach((btn) => {
+      btn.onclick = () => {
+        sound.click();
+        if (dice) state.settings.diceStyle = btn.dataset.piecePick;
+        else state.settings.coinStyle = btn.dataset.piecePick;
+        saveSettings(); applyVisuals(); renderThemePickers();
+        if (state.inMatch) render();
+      };
+    });
+  }
+
+  /* ---- Settings panel: table finish, pieces, dice rolling method, sound ---- */
   els.openSettings.addEventListener("click", () => { renderSettingsPickers(); showOverlay(els.settingsOverlay); });
   els.closeSettings.addEventListener("click", () => hideOverlay(els.settingsOverlay));
   els.settingsOverlay.addEventListener("click", (e) => { if (e.target === els.settingsOverlay) hideOverlay(els.settingsOverlay); });
+
   function renderSettingsPickers() {
-    els.coinAnimPicker.querySelectorAll("[data-coin-anim]").forEach((btn) => {
-      btn.classList.toggle("selected", btn.dataset.coinAnim === state.settings.coinAnim);
-      btn.onclick = () => { state.settings.coinAnim = btn.dataset.coinAnim; saveSettings(); renderSettingsPickers(); };
-    });
+    renderThemePickers();
+    // Coin Flip has no rolling method at all, so the whole block is hidden there.
+    const dice = uiMode() === "dice";
+    els.methodBlock.classList.toggle("hidden", !dice);
+    if (dice) {
+      const chosen = state.settings.method.dice;
+      els.methodLabel.textContent = "Dice rolling method";
+      els.methodPicker.innerHTML = `
+        <button class="pick-card ${chosen === "auto" ? "selected" : ""}" data-method-pick="auto" type="button">
+          <strong>Automatic</strong><small>The table rolls the dice</small>
+        </button>
+        <button class="pick-card ${chosen === "physical" ? "selected" : ""}" data-method-pick="physical" type="button">
+          <strong>Physical dice</strong><small>I roll real dice and mark them</small>
+        </button>`;
+      els.methodPicker.querySelectorAll("[data-method-pick]").forEach((btn) => {
+        btn.onclick = () => {
+          sound.click();
+          state.settings.method.dice = btn.dataset.methodPick;
+          // Half-marked entries from the other method would be stale — clear them.
+          state.physicalTotal = null;
+          saveSettings(); renderSettingsPickers(); renderLobbyMethodHint();
+          if (state.inMatch) render();
+        };
+      });
+    }
+
     els.soundPicker.querySelectorAll("[data-sound]").forEach((btn) => {
       const on = btn.dataset.sound === "on";
       btn.classList.toggle("selected", on === state.settings.sound);
@@ -1417,7 +1447,7 @@ aside.rail { display: grid; gap: 18px; align-content: start; }
   /* ---------------------------------------------------------
    * Init
    * ------------------------------------------------------- */
-  applyTheme(state.lobby.theme);
+  applyVisuals();
   paintDie(els.die1, 5);
   paintDie(els.die2, 2);
   render();
