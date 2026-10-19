@@ -177,6 +177,8 @@ main.table-layout { display: grid; grid-template-columns: minmax(0, 1fr) 300px; 
   box-shadow: inset 0 2px 4px #ffffff55, inset 0 -8px 14px #00000030, 0 10px 20px #00000055;
 }
 .die.rolling { animation: dieRoll .5s ease-out; }
+.point-display.beat { animation: beat .34s ease-out; }
+@keyframes beat { 0% { transform: scale(1); } 22% { transform: scale(1.13); text-shadow: 0 0 22px color-mix(in srgb, var(--danger) 70%, transparent); } 100% { transform: scale(1); } }
 @keyframes dieRoll { 0% { transform: rotate(0) scale(1); } 45% { transform: rotate(150deg) scale(.94); } 100% { transform: rotate(360deg) scale(1); } }
 .pip { width: 13px; height: 13px; border-radius: 50%; place-self: center; background: var(--pip); box-shadow: inset 0 1px 1px #00000055; }
 .dice-plus { font: 600 22px "Fraunces", serif; color: var(--ink-faint); }
@@ -247,6 +249,13 @@ aside.rail { display: grid; gap: 18px; align-content: start; }
 .ledger-money { font: 700 16px "Fraunces", serif; font-variant-numeric: tabular-nums; }
 .positive { color: var(--success); }
 .negative { color: var(--danger); }
+.panel-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 10px; }
+.side-panel .panel-head h3 { margin: 0; }
+.btn.reveal-btn { min-height: 30px; padding: 0 14px; font-size: 11px; letter-spacing: .1em; text-transform: uppercase; border-radius: 999px; }
+.stats-wrap { position: relative; }
+.stats-wrap.locked #stats-panel { filter: blur(10px); opacity: .25; pointer-events: none; user-select: none; -webkit-user-select: none; }
+.stats-lock { position: absolute; inset: 0; display: grid; place-items: center; text-align: center; font: 700 11px "Inter", sans-serif; letter-spacing: .14em; text-transform: uppercase; color: var(--ink-soft); }
+.stats-wrap:not(.locked) .stats-lock { display: none; }
 .rules-list { margin: 0; padding: 0; list-style: none; display: grid; gap: 10px; }
 .rules-list li { font-size: 12.5px; line-height: 1.55; color: var(--ink-soft); padding-left: 16px; position: relative; }
 .rules-list li::before { content: "◆"; position: absolute; left: 0; top: 1px; font-size: 8px; color: var(--accent); }
@@ -473,14 +482,14 @@ aside.rail { display: grid; gap: 18px; align-content: start; }
       <div class="side-bets-panel" id="side-bets-panel">
         <h3>Side bets</h3>
         <div class="chip-row dimmed" id="chip-row">
+          <button class="chip-btn" data-sidebet="0.25" disabled>+25¢</button>
+          <button class="chip-btn" data-sidebet="0.5" disabled>+50¢</button>
           <button class="chip-btn" data-sidebet="1" disabled>+$1</button>
-          <button class="chip-btn" data-sidebet="2" disabled>+$2</button>
-          <button class="chip-btn" data-sidebet="5" disabled>+$5</button>
         </div>
         <p class="side-hint" id="side-hint">Side bets unlock once a point is set.</p>
         <div class="sidebet-offer hidden" id="sidebet-offer">
-          <p>Side bet: each player adds $<span id="sidebet-amount">1</span> — the pool grows by $<span id="sidebet-pool-add">2</span>.</p>
-          <small><span id="sidebet-seconds">5.0</span>s to accept</small>
+          <p>Side bet: each player adds $<span id="sidebet-amount">0.25</span> — the pool grows by $<span id="sidebet-pool-add">0.50</span>.</p>
+          <small><span id="sidebet-seconds">7.0</span>s to accept</small>
           <div class="timer-track"><i class="timer-fill" id="sidebet-timer"></i></div>
           <button class="btn btn-primary" id="sidebet-accept">Accept side bet</button>
         </div>
@@ -488,22 +497,28 @@ aside.rail { display: grid; gap: 18px; align-content: start; }
     </section>
 
     <aside class="rail">
-      <section class="card side-panel" id="ledger-panel">
-        <h3>Ledger</h3>
-        <div class="ledger" id="ledger"></div>
-      </section>
-      <section class="card side-panel">
-        <h3>Session</h3>
-        <div id="stats-panel"></div>
-      </section>
       <section class="card side-panel">
         <h3 id="rules-panel-title">House rules</h3>
         <ul class="rules-list" id="rules-panel-list">
           <li><b>Opening roll —</b> 7 or 11 wins instantly. Snake eyes (2) loses instantly. Any other total sets the point.</li>
           <li><b>Point round —</b> the shooter must roll the point again before a 7 appears.</li>
-          <li><b>Side bets —</b> once a point is live, either player may propose a side bet. The other player has 5 seconds to accept.</li>
+          <li><b>Side bets —</b> once a point is live, either player may propose a side bet. The other player has 7 seconds to accept.</li>
           <li><b>Settlement —</b> the winner's ledger rises by the full wager; the loser's falls by the same amount.</li>
         </ul>
+      </section>
+      <section class="card side-panel" id="ledger-panel">
+        <h3>Ledger</h3>
+        <div class="ledger" id="ledger"></div>
+      </section>
+      <section class="card side-panel">
+        <div class="panel-head">
+          <h3>Session</h3>
+          <button class="btn btn-ghost reveal-btn" id="stats-toggle" type="button" aria-expanded="false">Show</button>
+        </div>
+        <div class="stats-wrap locked" id="stats-wrap">
+          <div id="stats-panel" aria-hidden="true"></div>
+          <div class="stats-lock">Hidden · tap Show</div>
+        </div>
       </section>
     </aside>
   </main>
@@ -573,10 +588,10 @@ aside.rail { display: grid; gap: 18px; align-content: start; }
     { id: "rose",     name: "Rose",     colors: ["#ffe0e4", "#d4566a", "#78182a", "#fff2f4"] },
   ];
   const OPENING_STAKES = [1, 2, 5];
-  const SIDEBET_MS = 5000;
+  const SIDEBET_MS = 7000;
   // Dice spin and coin spin run for the same duration, then both hold the visible
   // result for RESULT_HOLD_MS before the win/lose screen takes over.
-  const SPIN_MS = 2400;
+  const SPIN_MS = 5000;
   const RESULT_HOLD_MS = 1500;
   const SETTINGS_KEY = "diceduel-settings";
 
@@ -669,7 +684,7 @@ aside.rail { display: grid; gap: 18px; align-content: start; }
   const DICE_RULES_HTML = `
     <li><b>Opening roll —</b> 7 or 11 wins instantly. Snake eyes (2) loses instantly. Any other total sets the point.</li>
     <li><b>Point round —</b> the shooter must roll the point again before a 7 appears.</li>
-    <li><b>Side bets —</b> once a point is live, either player may propose a side bet. The other player has 5 seconds to accept.</li>
+    <li><b>Side bets —</b> once a point is live, either player may propose a side bet. The other player has 7 seconds to accept.</li>
     <li><b>Hot hand —</b> win the round and you keep the dice. They only pass when the shooter loses.</li>
     <li><b>Settlement —</b> the winner's ledger rises by the full wager; the loser's falls by the same amount.</li>
     <li><b>Real dice —</b> switch the rolling method to Physical in Settings, then just tap the total you rolled.</li>`;
@@ -715,6 +730,14 @@ aside.rail { display: grid; gap: 18px; align-content: start; }
         osc.connect(filt).connect(gain).connect(ctx.destination);
         osc.start(t); osc.stop(t + .08);
       },
+      // Lub-dub: low body plus a short click so it still reads on phone speakers.
+      heartbeat() {
+        if (!ctx || !state.settings.sound) return; const t = ctx.currentTime;
+        tone(82, t, .16, "sine", .5); tone(165, t, .05, "triangle", .08);
+        tone(66, t + .15, .2, "sine", .4); tone(132, t + .15, .05, "triangle", .06);
+      },
+      land() { if (!ctx || !state.settings.sound) return; const t = ctx.currentTime; tone(300, t, .09, "triangle", .16); tone(140, t, .14, "sine", .2); },
+      tease() { if (!ctx || !state.settings.sound) return; const t = ctx.currentTime; tone(1318.5, t, .14, "sine", .07); tone(1760, t + .05, .16, "sine", .05); },
       win() {
         if (!ctx || !state.settings.sound) return; const t = ctx.currentTime;
         [523.25, 659.25, 783.99, 1046.5].forEach((f, i) => tone(f, t + i * .09, .5, "sine", .14));
@@ -734,7 +757,9 @@ aside.rail { display: grid; gap: 18px; align-content: start; }
   /* ---------------------------------------------------------
    * Helpers
    * ------------------------------------------------------- */
-  const money = (n) => `$${Math.abs(n)}`;
+  // Whole dollars show as $5; anything with cents shows as $5.25.
+  const money = (n) => { const a = Math.abs(n); return Number.isInteger(a) ? `$${a}` : `$${a.toFixed(2)}`; };
+  const amountText = (n) => money(n).slice(1);
   const PIECE_VARS = ["--die-1", "--die-2", "--die-3", "--pip", "--coin-1", "--coin-2", "--coin-3", "--coin-ink"];
 
   const styleColors = (list, id) => (list.find((s) => s.id === id) || list[0]).colors;
@@ -785,7 +810,7 @@ aside.rail { display: grid; gap: 18px; align-content: start; }
     }
 
     els.turn.innerHTML = `Wager ${money(wager)} · <b>${players[active]}</b>'s turn`;
-    els.wager.textContent = wager;
+    els.wager.textContent = amountText(wager);
 
     const draftAmount = pendingSideBet;
     if (draftAmount) {
@@ -830,7 +855,7 @@ aside.rail { display: grid; gap: 18px; align-content: start; }
       btn.disabled = !sideBetsUnlocked || pendingSideBet !== null;
     });
     els.sideHint.textContent = sideBetsUnlocked
-      ? "Propose a side bet — the other player has 5 seconds to accept."
+      ? "Propose a side bet — the other player has 7 seconds to accept."
       : "Side bets unlock once a point is set.";
     els.sideHint.classList.toggle("hidden", pendingSideBet !== null);
     els.chipRow.classList.toggle("hidden", pendingSideBet !== null);
@@ -862,6 +887,68 @@ aside.rail { display: grid; gap: 18px; align-content: start; }
     return str.replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
   }
 
+
+  /* ---------------------------------------------------------
+   * The roll (5s): both dice tumble, die 1 lands first, die 2 keeps
+   * spinning, flashes the number the shooter needs, then lands.
+   * In the point round a heartbeat thumps faster as the dice slow down.
+   * ------------------------------------------------------- */
+  const DIE1_LAND_MS = 3400;
+  const TEASE_AT_MS = 4100;
+  const TEASE_HOLD_MS = 420;
+  function playDiceRoll({ d1, d2, need, heartbeat, onDone }) {
+    const timers = new Set();
+    let stopped = false;
+    const t0 = performance.now();
+    const elapsed = () => performance.now() - t0;
+    const later = (ms, fn) => {
+      const id = setTimeout(() => { timers.delete(id); if (!stopped) fn(); }, Math.max(0, ms));
+      timers.add(id);
+    };
+    const face = (...not) => { let f; do { f = 1 + Math.floor(Math.random() * 6); } while (not.includes(f)); return f; };
+    const teaseOk = Number.isInteger(need) && need >= 1 && need <= 6;
+    let delay = 45;
+
+    const land = () => {
+      paintDie(els.die2, d2); sound.land();
+      stopped = true; timers.forEach(clearTimeout); timers.clear();
+      onDone();
+    };
+    const tease = () => {
+      paintDie(els.die2, need); sound.tease();
+      later(TEASE_HOLD_MS, () => {
+        paintDie(els.die2, face(need, d2)); sound.tick();
+        later(SPIN_MS - elapsed(), land);
+      });
+    };
+    const die2Tumble = () => {
+      const t = elapsed();
+      if (teaseOk && t >= TEASE_AT_MS) return tease();
+      if (!teaseOk && t >= SPIN_MS) return land();
+      paintDie(els.die2, face(need)); sound.tick();
+      delay = Math.min(delay * 1.1, 340);
+      later(Math.min(delay, (teaseOk ? TEASE_AT_MS : SPIN_MS) - t), die2Tumble);
+    };
+    const bothTumble = () => {
+      if (elapsed() >= DIE1_LAND_MS) { paintDie(els.die1, d1); sound.land(); return die2Tumble(); }
+      paintDie(els.die1, face()); paintDie(els.die2, face()); sound.tick();
+      delay = Math.min(delay * 1.13, 260);
+      later(Math.min(delay, DIE1_LAND_MS - elapsed()), bothTumble);
+    };
+    if (heartbeat) {
+      const beat = () => {
+        const t = elapsed();
+        if (t > SPIN_MS - 200) return;
+        sound.heartbeat();
+        els.pointDisplay.classList.remove("beat"); void els.pointDisplay.offsetWidth; els.pointDisplay.classList.add("beat");
+        later(900 - 540 * Math.min(1, t / SPIN_MS), beat);
+      };
+      beat();
+    }
+    bothTumble();
+    return () => { stopped = true; timers.forEach(clearTimeout); timers.clear(); };
+  }
+
   /* ---------------------------------------------------------
    * Rolling logic (dice)
    * ------------------------------------------------------- */
@@ -881,25 +968,13 @@ aside.rail { display: grid; gap: 18px; align-content: start; }
     sound.unlock();
     state.rolling = true;
     render();
-    // Decelerating tumble that runs for SPIN_MS, so the dice visibly settle rather than
-    // stopping dead — same curve and duration as the coin wheel.
-    let delay = 45, elapsed = 0;
-    const step = () => {
-      if (elapsed >= SPIN_MS) {
-        const a = 1 + (Math.random() * 6 | 0), b = 1 + (Math.random() * 6 | 0);
-        paintDie(els.die1, a); paintDie(els.die2, b);
-        state.rolling = false;
-        settleDiceRoll(a + b);
-        return;
-      }
-      paintDie(els.die1, 1 + (Math.random() * 6 | 0));
-      paintDie(els.die2, 1 + (Math.random() * 6 | 0));
-      sound.tick();
-      elapsed += delay;
-      delay = Math.min(delay * 1.15, 300);
-      setTimeout(step, delay);
-    };
-    step();
+    const a = 1 + (Math.random() * 6 | 0), b = 1 + (Math.random() * 6 | 0);
+    playDiceRoll({
+      d1: a, d2: b,
+      need: (state.point || 7) - a,      // the face die 2 needs to win (point, or 7 on the come-out)
+      heartbeat: state.point !== null,
+      onDone: () => { state.rolling = false; settleDiceRoll(a + b); },
+    });
   }
 
   // Everything is decided by the total: 2 can only ever be 1+1, so it *is* snake eyes.
@@ -984,8 +1059,8 @@ aside.rail { display: grid; gap: 18px; align-content: start; }
     if (state.pendingSideBet !== null || state.rolling || state.roundEnding) return;
     sound.click();
     state.pendingSideBet = amount;
-    els.sidebetAmount.textContent = amount;
-    els.sidebetPoolAdd.textContent = amount * 2;
+    els.sidebetAmount.textContent = amountText(amount);
+    els.sidebetPoolAdd.textContent = amountText(amount * 2);
     els.sidebetOffer.classList.remove("hidden");
     state.sideBetDeadline = Date.now() + SIDEBET_MS;
     const tick = () => {
@@ -1030,6 +1105,7 @@ aside.rail { display: grid; gap: 18px; align-content: start; }
     els.setup.innerHTML = `
       <div class="modal setup-modal">
         <div class="modal-links">
+          <a class="btn btn-ghost" href="online.html" style="display:inline-flex;align-items:center;text-decoration:none">Play online</a>
           <button class="btn btn-ghost" id="lobby-settings" type="button">Settings</button>
         </div>
         <span class="eyebrow">Dice Duel</span>
@@ -1443,6 +1519,18 @@ aside.rail { display: grid; gap: 18px; align-content: start; }
       btn.onclick = () => { state.settings.sound = on; saveSettings(); renderSettingsPickers(); };
     });
   }
+
+
+  /* ---- Session stats stay hidden until someone taps Show ---- */
+  (() => {
+    const btn = document.getElementById("stats-toggle"), wrap = document.getElementById("stats-wrap");
+    btn.addEventListener("click", () => {
+      const locked = wrap.classList.toggle("locked");
+      btn.textContent = locked ? "Show" : "Hide";
+      btn.setAttribute("aria-expanded", String(!locked));
+      document.getElementById("stats-panel").setAttribute("aria-hidden", String(locked));
+    });
+  })();
 
   /* ---------------------------------------------------------
    * Init
