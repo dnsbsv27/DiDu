@@ -21,13 +21,12 @@
    ============================================================ */
 
 * { box-sizing: border-box; }
-/* The whole game is sized to the viewport — nothing on the table ever scrolls. */
-html { color-scheme: dark; -webkit-text-size-adjust: 100%; height: 100%; }
+html { color-scheme: dark; -webkit-text-size-adjust: 100%; }
 body {
   margin: 0;
-  height: 100dvh;
+  min-height: 100dvh;
   min-width: 320px;
-  overflow: hidden;
+  overflow-x: hidden;
   font-family: "Inter", -apple-system, "Segoe UI", sans-serif;
   color: var(--ink);
   background:
@@ -109,31 +108,21 @@ h1, h2, h3 { font-family: "Fraunces", Georgia, serif; margin: 0; }
 .hidden { display: none !important; }
 .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 
-.shell {
-  width: min(100%, 1180px); margin: 0 auto;
-  height: 100dvh; display: flex; flex-direction: column;
-  padding: clamp(8px, 1.6vh, 18px) 18px calc(clamp(8px, 1.6vh, 18px) + env(safe-area-inset-bottom));
-  gap: clamp(6px, 1.2vh, 14px);
-}
+.shell { width: min(100%, 1180px); margin: 0 auto; padding: 28px 20px 56px; }
 
 /* ---------- header ---------- */
-/* Lobby sits left, Skins + Settings & Rules right, wordmark centred between them. */
-.topbar {
-  flex: none; display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 10px;
-}
-.topbar-left { justify-self: start; }
-.crest { width: clamp(30px, 5vh, 50px); height: clamp(30px, 5vh, 50px); border-radius: 50%; object-fit: cover; object-position: 50% 18%; border: 1px solid var(--border-strong); box-shadow: 0 4px 16px #00000066; }
-.wordmark { display: flex; align-items: center; gap: 12px; justify-self: center; }
+.topbar { display: flex; flex-direction: column; align-items: center; gap: 4px; margin-bottom: 30px; text-align: center; }
+.crest { width: 56px; height: 56px; border-radius: 50%; object-fit: cover; object-position: 50% 18%; border: 1px solid var(--border-strong); box-shadow: 0 4px 16px #00000066; }
+.wordmark { display: flex; align-items: center; gap: 14px; }
 .wordmark h1 {
-  font-size: clamp(15px, 2.4vh, 24px); font-weight: 600; letter-spacing: .16em; text-transform: uppercase;
+  font-size: 26px; font-weight: 600; letter-spacing: .16em; text-transform: uppercase;
   color: var(--accent-strong); text-shadow: 0 2px 10px color-mix(in srgb, var(--accent) 45%, transparent);
 }
-.tagline { margin: 2px 0 0; font-size: clamp(8px, 1.1vh, 11px); letter-spacing: .3em; text-transform: uppercase; color: var(--ink-faint); font-weight: 600; }
-.topbar-actions { justify-self: end; display: flex; gap: 8px; }
-.topbar .btn { min-height: clamp(32px, 4.4vh, 42px); padding: 0 clamp(10px, 1.4vw, 16px); font-size: clamp(10px, 1.3vh, 12.5px); }
+.tagline { margin: 2px 0 0; font-size: 11px; letter-spacing: .32em; text-transform: uppercase; color: var(--ink-faint); font-weight: 600; }
+.topbar-actions { position: absolute; right: 20px; top: 22px; display: flex; gap: 8px; }
 
 /* ---------- layout ---------- */
-main.table-layout { flex: 1; min-height: 0; display: block; }
+main.table-layout { display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: 20px; align-items: start; }
 
 .card {
   position: relative;
@@ -150,55 +139,57 @@ main.table-layout { flex: 1; min-height: 0; display: block; }
 }
 
 /* ---------- table (game) panel ---------- */
-.table-panel {
-  height: 100%; padding: clamp(12px, 2.2vh, 26px) clamp(14px, 2vw, 28px);
-  text-align: center; overflow: hidden;
-}
-/* Side-bet rail down the left, everything else in the main column. */
-.table-grid { height: 100%; display: grid; grid-template-columns: clamp(104px, 13vw, 150px) minmax(0, 1fr); gap: clamp(10px, 1.6vw, 22px); }
-.table-main { min-height: 0; display: flex; flex-direction: column; align-items: center; }
+.table-panel { padding: 34px 36px 30px; text-align: center; overflow: hidden; }
 
-/* Top info boxes: name+roll and point/wager on the left, flippable ledger on the right. */
-.info-grid {
-  width: 100%; display: grid; grid-template-columns: 1fr 1fr minmax(150px, 1.05fr);
-  gap: clamp(6px, 1vh, 10px); margin-bottom: clamp(6px, 1.2vh, 14px);
+.status-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 22px; }
+.eyebrow {
+  font: 700 11px "Inter", sans-serif; letter-spacing: .18em; text-transform: uppercase; color: var(--accent);
+  padding: 6px 14px; border: 1px solid color-mix(in srgb, var(--accent) 45%, transparent); border-radius: 999px;
+  background: color-mix(in srgb, var(--accent) 10%, transparent);
 }
-.info-box {
-  padding: clamp(6px, 1.1vh, 12px) 10px; border-radius: 14px;
-  border: 1px solid var(--border-soft); background: color-mix(in srgb, var(--surface-soft) 88%, transparent);
-  display: flex; flex-direction: column; justify-content: center; gap: 2px; min-width: 0;
+.turn-indicator { font: 600 11px "Inter", sans-serif; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-faint); }
+.turn-indicator b { color: var(--ink-soft); font-weight: 700; }
+
+/* Sits where the phase badge used to: one tap jumps to the other game. */
+.mode-switch {
+  font: 700 11px "Inter", sans-serif; letter-spacing: .16em; text-transform: uppercase; color: var(--accent);
+  min-height: 34px; padding: 0 16px; border-radius: 999px;
+  border: 1px solid color-mix(in srgb, var(--accent) 45%, transparent);
+  background: color-mix(in srgb, var(--accent) 10%, transparent);
+  transition: background .15s, border-color .15s, color .15s;
 }
-.info-box small { display: block; font: 700 clamp(8px, 1.05vh, 10px) "Inter", sans-serif; letter-spacing: .14em; text-transform: uppercase; color: var(--ink-faint); }
-.info-box strong { font: 600 clamp(17px, 3vh, 30px)/1.1 "Fraunces", Georgia, serif; color: var(--ink); }
-.info-shooter { grid-column: span 2; flex-direction: row; align-items: center; justify-content: space-between; gap: 10px; }
-.info-shooter .who { min-width: 0; text-align: left; }
-.info-shooter .who b { display: block; font: 700 clamp(11px, 1.6vh, 15px) "Inter", sans-serif; color: var(--ink); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.info-rolled { text-align: right; flex: none; }
-.info-rolled strong { color: var(--accent-strong); }
-.wager-preview { display: block; font: 500 clamp(8px, 1.05vh, 11px) "Inter", sans-serif; color: var(--ink-faint); }
-.point-display { margin: 0; color: var(--ink); }
-.point-display.beat { animation: beat .34s ease-out; }
+.mode-switch::before { content: "⇄"; margin-right: 8px; font-size: 13px; letter-spacing: 0; }
+.mode-switch:hover { border-color: var(--border-strong); background: color-mix(in srgb, var(--accent) 20%, transparent); color: var(--accent-strong); }
 
-.table-call { margin: 0; font: italic 500 clamp(11px, 1.6vh, 14px) "Fraunces", Georgia, serif; color: var(--ink-soft); }
-.rule-copy { margin: 2px 0 0; font-size: clamp(10px, 1.4vh, 13px); color: var(--ink-faint); }
+.shooter-block { margin: 6px auto 22px; max-width: 460px; }
+.shooter-name { font-size: 14px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-faint); }
+.point-display { margin: 6px 0 0; font: 600 56px/1 "Fraunces", Georgia, serif; color: var(--ink); }
+.point-display .slash { color: var(--ink-faint); font-weight: 500; margin: 0 6px; }
+.table-call { margin: 10px 0 0; font: italic 500 14px "Fraunces", Georgia, serif; color: var(--ink-soft); min-height: 20px; }
+.rule-copy { margin: 4px 0 0; font-size: 13px; color: var(--ink-faint); min-height: 18px; }
 
-/* Dice, pad and the roll button travel together in the middle of the column. */
-.play-stage { flex: 1; min-height: 0; width: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: clamp(4px, 1vh, 12px); }
-.dice-row { display: flex; align-items: center; justify-content: center; gap: clamp(10px, 2vw, 20px); }
+.dice-row { min-height: 148px; display: flex; align-items: center; justify-content: center; gap: 20px; }
 .die {
-  width: var(--die-size); height: var(--die-size); border-radius: 20px; padding: calc(var(--die-size) * .145);
+  width: 96px; height: 96px; border-radius: 20px; padding: 14px;
   display: grid; grid-template: repeat(3, 1fr) / repeat(3, 1fr);
   border: 2px solid var(--border-strong);
   background: linear-gradient(155deg, var(--die-1), var(--die-2) 55%, var(--die-3));
   box-shadow: inset 0 2px 4px #ffffff55, inset 0 -8px 14px #00000030, 0 10px 20px #00000055;
 }
-:root { --die-size: clamp(54px, 13vh, 96px); }
 .die.rolling { animation: dieRoll .5s ease-out; }
 .point-display.beat { animation: beat .34s ease-out; }
 @keyframes beat { 0% { transform: scale(1); } 22% { transform: scale(1.13); text-shadow: 0 0 22px color-mix(in srgb, var(--danger) 70%, transparent); } 100% { transform: scale(1); } }
 @keyframes dieRoll { 0% { transform: rotate(0) scale(1); } 45% { transform: rotate(150deg) scale(.94); } 100% { transform: rotate(360deg) scale(1); } }
-.pip { width: calc(var(--die-size) * .135); height: calc(var(--die-size) * .135); border-radius: 50%; place-self: center; background: var(--pip); box-shadow: inset 0 1px 1px #00000055; }
-.dice-plus { font: 600 clamp(15px, 2.4vh, 22px) "Fraunces", serif; color: var(--ink-faint); }
+.pip { width: 13px; height: 13px; border-radius: 50%; place-self: center; background: var(--pip); box-shadow: inset 0 1px 1px #00000055; }
+.dice-plus { font: 600 22px "Fraunces", serif; color: var(--ink-faint); }
+
+.total-chip {
+  display: none; width: 132px; margin: 18px auto 6px; padding: 10px 8px; border-radius: 16px;
+  border: 1px solid var(--border-strong); background: color-mix(in srgb, var(--accent) 16%, var(--surface));
+  font: 700 11px "Inter", sans-serif; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-soft);
+}
+.total-chip.visible { display: block; }
+.total-chip strong { display: block; margin-top: 2px; font: 600 30px "Fraunces", serif; color: var(--ink); letter-spacing: -.02em; }
 
 .btn {
   border: 0; border-radius: var(--radius-control); font-weight: 700; letter-spacing: .02em;
@@ -217,67 +208,54 @@ main.table-layout { flex: 1; min-height: 0; display: block; }
 }
 .btn-ghost:hover { border-color: var(--border-strong); color: var(--ink); }
 
-#roll {
-  width: min(100%, 340px); font: 700 clamp(11px, 1.6vh, 15px) "Inter", sans-serif;
-  text-transform: uppercase; letter-spacing: .1em; margin: 0 auto; display: block; flex: none;
-  min-height: clamp(38px, 5.6vh, 52px);
-}
+#roll { width: min(100%, 320px); font: 700 15px "Inter", sans-serif; text-transform: uppercase; letter-spacing: .1em; margin: 4px auto 26px; display: block; }
 
-/* ---------- side-bet rail (left column) ---------- */
-.bet-rail {
-  min-height: 0; display: flex; flex-direction: column; text-align: left;
-  padding: clamp(8px, 1.4vh, 16px) clamp(8px, 0.9vw, 14px); border-radius: 18px;
-  border: 1px solid var(--border-soft); background: color-mix(in srgb, var(--surface-soft) 92%, transparent);
+.wager-plate { width: min(100%, 420px); margin: 0 auto 18px; }
+.wager-plate h3, .side-panel h3 {
+  margin: 0 0 10px; font: 700 11px "Inter", sans-serif; letter-spacing: .18em; text-transform: uppercase; color: var(--ink-faint);
 }
-.bet-rail h3 { margin: 0 0 clamp(6px, 1vh, 12px); font: 700 clamp(8px, 1.1vh, 11px) "Inter", sans-serif; letter-spacing: .16em; text-transform: uppercase; color: var(--ink-faint); text-align: center; }
-.chip-row { display: flex; flex-direction: column; gap: clamp(6px, 1.1vh, 12px); }
-/* Chips sit under the heading; the hint is pinned to the bottom of the rail. */
-.bet-rail .side-hint { margin-top: auto; padding-top: 10px; }
+.pool-amount {
+  padding: 14px; border-radius: 16px; border: 1px solid var(--border);
+  background: linear-gradient(160deg, var(--surface-strong), var(--surface-soft));
+  box-shadow: inset 0 0 16px #00000040;
+  font: 600 32px "Fraunces", serif; color: var(--accent-strong); letter-spacing: -.02em;
+}
+.wager-preview { display: block; margin-top: 6px; font: 500 12px "Inter", sans-serif; color: var(--ink-faint); min-height: 16px; }
+
+.side-bets-panel { width: min(100%, 420px); margin: 0 auto; padding: 18px 20px; text-align: left; border-radius: 18px; border: 1px solid var(--border-soft); background: color-mix(in srgb, var(--surface-soft) 92%, transparent); }
+.chip-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
 .chip-btn {
-  min-height: clamp(36px, 5.4vh, 54px); border-radius: 999px; border: 1px solid var(--border-strong);
+  min-height: 54px; border-radius: 999px; border: 1px solid var(--border-strong);
   background: radial-gradient(circle at 35% 30%, var(--die-1), var(--accent) 55%, var(--border) 100%);
-  color: var(--accent-ink); font: 800 clamp(12px, 1.7vh, 16px) "Inter", sans-serif;
-  box-shadow: 0 4px 0 color-mix(in srgb, var(--border) 70%, black), inset 0 0 0 3px color-mix(in srgb, var(--accent-ink) 12%, transparent);
+  color: var(--accent-ink); font: 800 15px "Inter", sans-serif; box-shadow: 0 4px 0 color-mix(in srgb, var(--border) 70%, black), inset 0 0 0 3px color-mix(in srgb, var(--accent-ink) 12%, transparent);
 }
 .chip-btn:disabled { opacity: .4; filter: grayscale(.5); box-shadow: none; }
 .chip-row.dimmed { opacity: .4; filter: grayscale(.6); }
-.side-hint { margin: clamp(6px, 1vh, 12px) 0 0; font-size: clamp(9px, 1.2vh, 11.5px); color: var(--ink-faint); text-align: center; line-height: 1.45; }
+.side-hint { margin: 10px 0 0; font-size: 12px; color: var(--ink-faint); text-align: center; line-height: 1.5; }
 
-.sidebet-offer { margin-top: 10px; padding: 12px; border-radius: 14px; border: 1px solid var(--border-strong); background: color-mix(in srgb, var(--accent) 10%, var(--surface)); text-align: center; }
-.sidebet-offer p { margin: 0; font-size: clamp(10px, 1.3vh, 12.5px); font-weight: 600; color: var(--ink); }
-.sidebet-offer small { display: block; margin: 6px 0 8px; font-size: 10px; letter-spacing: .06em; text-transform: uppercase; color: var(--ink-faint); }
+.sidebet-offer { margin-top: 14px; padding: 16px; border-radius: 16px; border: 1px solid var(--border-strong); background: color-mix(in srgb, var(--accent) 10%, var(--surface)); text-align: center; }
+.sidebet-offer p { margin: 0; font-size: 13px; font-weight: 600; color: var(--ink); }
+.sidebet-offer small { display: block; margin: 8px 0 10px; font-size: 11px; letter-spacing: .06em; text-transform: uppercase; color: var(--ink-faint); }
 .timer-track { height: 5px; border-radius: 999px; overflow: hidden; background: #00000040; }
 .timer-fill { display: block; height: 100%; background: linear-gradient(90deg, var(--accent), var(--accent-strong)); transition: width .1s linear; }
-.sidebet-offer .btn { width: 100%; margin-top: 10px; min-height: 38px; font-size: 11.5px; padding: 0 8px; }
+.sidebet-offer .btn { width: 100%; margin-top: 12px; }
 
-/* ---------- ledger: one face, flips to session stats ---------- */
-.ledger-flip { grid-column: 3; grid-row: 1 / span 2; perspective: 1200px; min-height: clamp(104px, 17vh, 170px); position: relative; z-index: 2; }
-/* Absolute so growing the flipped card never stretches the info-grid rows behind it. */
-.flip-inner { position: absolute; top: 0; left: 0; width: 100%; height: 100%; transition: transform .55s cubic-bezier(.3,.8,.3,1), height .35s ease; transform-style: preserve-3d; }
-/* Flipped, the card grows down over the empty felt so every stat fits without scrolling. */
-.ledger-flip.flipped { z-index: 5; }
-.ledger-flip.flipped .flip-inner { transform: rotateY(180deg); height: clamp(186px, 31vh, 310px); }
-.ledger-flip.flipped .flip-back { box-shadow: 0 18px 40px #00000070; }
-.flip-face {
-  position: absolute; inset: 0; backface-visibility: hidden; -webkit-backface-visibility: hidden;
-  border-radius: 14px; border: 1px solid var(--border-soft);
-  /* Opaque base: the flipped face lifts over the table and must not let it show through. */
-  background-color: var(--bg-2);
-  background-image: linear-gradient(160deg, var(--surface-strong), var(--surface-soft));
-  padding: clamp(7px, 1.1vh, 12px) clamp(8px, 0.8vw, 13px); text-align: left;
-  display: flex; flex-direction: column; overflow: hidden;
-}
-.flip-back { transform: rotateY(180deg); }
-.panel-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: clamp(4px, .8vh, 9px); flex: none; }
-.panel-head h3 { margin: 0; font: 700 clamp(8px, 1.05vh, 10px) "Inter", sans-serif; letter-spacing: .14em; text-transform: uppercase; color: var(--ink-faint); }
-.btn.reveal-btn { min-height: clamp(22px, 3vh, 28px); padding: 0 clamp(8px, .8vw, 13px); font-size: clamp(8.5px, 1.05vh, 10.5px); letter-spacing: .1em; text-transform: uppercase; border-radius: 999px; }
-.ledger { display: grid; gap: clamp(4px, .8vh, 8px); align-content: center; flex: 1; min-height: 0; }
-.ledger-row { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 8px; padding: clamp(5px, .9vh, 10px) clamp(8px, .8vw, 13px); border-radius: 11px; background: color-mix(in srgb, var(--surface) 70%, transparent); border: 1px solid var(--border-soft); }
-.ledger-row b { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: clamp(10px, 1.35vh, 13px); color: var(--ink); }
-.ledger-money { font: 700 clamp(12px, 1.8vh, 16px) "Fraunces", serif; font-variant-numeric: tabular-nums; }
+/* ---------- aside / ledger ---------- */
+aside.rail { display: grid; gap: 18px; align-content: start; }
+.side-panel { padding: 22px; }
+.ledger { display: grid; gap: 10px; }
+.ledger-row { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 8px; padding: 13px 15px; border-radius: 13px; background: color-mix(in srgb, var(--surface-soft) 90%, transparent); border: 1px solid var(--border-soft); }
+.ledger-row b { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 13px; color: var(--ink); }
+.ledger-money { font: 700 16px "Fraunces", serif; font-variant-numeric: tabular-nums; }
 .positive { color: var(--success); }
 .negative { color: var(--danger); }
-.flip-back #stats-panel { flex: 1; min-height: 0; overflow: auto; }
+.panel-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 10px; }
+.side-panel .panel-head h3 { margin: 0; }
+.btn.reveal-btn { min-height: 30px; padding: 0 14px; font-size: 11px; letter-spacing: .1em; text-transform: uppercase; border-radius: 999px; }
+.stats-wrap { position: relative; }
+.stats-wrap.locked #stats-panel { filter: blur(10px); opacity: .25; pointer-events: none; user-select: none; -webkit-user-select: none; }
+.stats-lock { position: absolute; inset: 0; display: grid; place-items: center; text-align: center; font: 700 11px "Inter", sans-serif; letter-spacing: .14em; text-transform: uppercase; color: var(--ink-soft); }
+.stats-wrap:not(.locked) .stats-lock { display: none; }
 .rules-list { margin: 0; padding: 0; list-style: none; display: grid; gap: 10px; }
 .rules-list li { font-size: 12.5px; line-height: 1.55; color: var(--ink-soft); padding-left: 16px; position: relative; }
 .rules-list li::before { content: "◆"; position: absolute; left: 0; top: 1px; font-size: 8px; color: var(--accent); }
@@ -364,32 +342,28 @@ main.table-layout { flex: 1; min-height: 0; display: block; }
 .confetti i { position: absolute; top: -14px; width: 7px; height: 7px; background: var(--accent-strong); transform: rotate(45deg); animation: fall 2.6s linear infinite; opacity: .85; }
 @keyframes fall { to { transform: translateY(120%) rotate(220deg); opacity: 0; } }
 
-/* ---------- session stats (back of the ledger card) ---------- */
-.stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; margin-bottom: 5px; }
-.stat-box { padding: clamp(4px, .7vh, 8px) 8px; border-radius: 10px; border: 1px solid var(--border-soft); background: color-mix(in srgb, var(--surface) 70%, transparent); }
-.stat-box small { display: block; font: 700 clamp(7px, .95vh, 9px) "Inter", sans-serif; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-faint); }
-.stat-box strong { display: block; margin-top: 2px; font: 600 clamp(11px, 1.6vh, 15px) "Fraunces", serif; color: var(--ink); }
-.stat-split { display: grid; gap: 4px; margin-bottom: 5px; }
-.stat-split-row { display: grid; grid-template-columns: minmax(0, 1fr) auto auto; gap: 6px; align-items: baseline; padding: clamp(3px, .6vh, 6px) 8px; border-radius: 9px; background: color-mix(in srgb, var(--surface) 70%, transparent); border: 1px solid var(--border-soft); }
-.stat-split-row b { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font: 600 clamp(9px, 1.2vh, 11px) "Inter", sans-serif; color: var(--ink); }
-.stat-split-row span { font: 700 clamp(9px, 1.2vh, 11.5px) "Fraunces", serif; font-variant-numeric: tabular-nums; }
-.stat-bars { display: flex; align-items: flex-end; gap: 2px; height: clamp(22px, 4vh, 40px); margin-top: 4px; }
+/* ---------- session stats ---------- */
+.stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 9px; margin-bottom: 4px; }
+.stat-box { padding: 12px; border-radius: 12px; border: 1px solid var(--border-soft); background: color-mix(in srgb, var(--surface-soft) 88%, transparent); }
+.stat-box small { display: block; font: 700 10px "Inter", sans-serif; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-faint); }
+.stat-box strong { display: block; margin-top: 4px; font: 600 19px "Fraunces", serif; color: var(--ink); }
+.stat-bars { display: flex; align-items: flex-end; gap: 3px; height: 46px; margin-top: 10px; }
 .stat-bars i { flex: 1; min-height: 3px; background: linear-gradient(180deg, var(--accent-strong), var(--accent)); border-radius: 3px 3px 1px 1px; position: relative; }
-.stat-bars-labels { display: flex; gap: 2px; margin-top: 3px; }
-.stat-bars-labels span { flex: 1; text-align: center; font-size: clamp(6px, .9vh, 8.5px); color: var(--ink-faint); }
-.stat-empty { font-size: clamp(9px, 1.2vh, 11px); color: var(--ink-faint); text-align: center; padding: 6px 0; }
+.stat-bars-labels { display: flex; gap: 3px; margin-top: 4px; }
+.stat-bars-labels span { flex: 1; text-align: center; font-size: 9px; color: var(--ink-faint); }
+.stat-empty { font-size: 12px; color: var(--ink-faint); text-align: center; padding: 6px 0; }
 
 /* ---------- rolling method / physical entry ---------- */
 .method-hint { margin: 10px 0 0; padding: 10px 12px; border-radius: 12px; border: 1px dashed var(--border-soft); font-size: 12px; color: var(--ink-soft); text-align: center; }
 
 /* ---------- coin flip stage ----------
    Coin Flip is a bare flipper: no wagers, ledger, stats, rules or side bets. */
-.coin-mode .info-grid, .coin-mode .dice-row, .coin-mode .num-pad,
-.coin-mode .table-call, .coin-mode .rule-copy, .coin-mode #roll,
-.coin-mode .bet-rail { display: none !important; }
-.coin-mode main.table-layout { width: min(100%, 620px); margin: 0 auto; }
-.coin-mode .table-grid { grid-template-columns: minmax(0, 1fr); }
-.coin-mode .table-main { justify-content: center; }
+.coin-mode .shooter-block, .coin-mode .dice-row, .coin-mode .num-pad,
+.coin-mode .total-chip, .coin-mode #roll,
+.coin-mode .wager-plate, .coin-mode .side-bets-panel,
+.coin-mode aside.rail { display: none !important; }
+.coin-mode main.table-layout { grid-template-columns: minmax(0, 1fr); width: min(100%, 620px); margin: 0 auto; }
+.coin-mode .table-panel { padding-bottom: 36px; }
 
 .coin-play { width: min(100%, 420px); margin: 4px auto 0; }
 .coin-calls { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 18px; }
@@ -425,13 +399,13 @@ main.table-layout { flex: 1; min-height: 0; display: block; }
 }
 
 /* ---------- physical entry pads (inline, no extra screens) ---------- */
-.num-pad { width: min(100%, 440px); margin: 0 auto; flex: none; }
-.num-pad .pad-label { margin: 0 0 clamp(5px, .9vh, 10px); font: 700 clamp(8px, 1.1vh, 11px) "Inter", sans-serif; letter-spacing: .16em; text-transform: uppercase; color: var(--ink-faint); }
-.num-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: clamp(5px, .8vh, 8px); }
+.num-pad { width: min(100%, 440px); margin: 0 auto 6px; }
+.num-pad .pad-label { margin: 0 0 10px; font: 700 11px "Inter", sans-serif; letter-spacing: .16em; text-transform: uppercase; color: var(--ink-faint); }
+.num-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 8px; }
 .num-btn {
-  min-height: clamp(36px, 6vh, 58px); border-radius: 14px; border: 1px solid var(--border-soft);
+  min-height: 58px; border-radius: 14px; border: 1px solid var(--border-soft);
   background: color-mix(in srgb, var(--surface-soft) 88%, transparent);
-  color: var(--ink-soft); font: 700 clamp(14px, 2.2vh, 21px) "Fraunces", serif;
+  color: var(--ink-soft); font: 700 21px "Fraunces", serif;
 }
 .num-btn:hover:not(:disabled) { border-color: var(--border-strong); color: var(--ink); }
 .num-btn.selected {
@@ -441,19 +415,16 @@ main.table-layout { flex: 1; min-height: 0; display: block; }
 }
 .num-btn:disabled { opacity: .45; cursor: not-allowed; }
 
-@media (max-width: 760px) {
-  .shell { padding: 8px 10px calc(8px + env(safe-area-inset-bottom)); }
-  .table-panel { padding: 12px 10px; }
-  .table-grid { grid-template-columns: clamp(86px, 24vw, 120px) minmax(0, 1fr); gap: 9px; }
-  :root { --die-size: clamp(48px, 11vh, 80px); }
-  .tagline { display: none; }
-  /* Narrow screens: ledger drops under the name/point/wager boxes. */
-  .info-grid { grid-template-columns: 1fr 1fr; }
-  .ledger-flip { grid-column: 1 / -1; grid-row: auto; min-height: clamp(88px, 15vh, 130px); }
+@media (max-width: 900px) {
+  main.table-layout { grid-template-columns: 1fr; }
 }
-@media (max-width: 420px) {
-  .topbar .btn { padding: 0 8px; font-size: 9.5px; letter-spacing: 0; }
-  .wordmark { gap: 8px; }
+@media (max-width: 760px) {
+  .shell { padding: 20px 14px 44px; }
+  .table-panel { padding: 26px 18px; }
+  .point-display { font-size: 44px; }
+  .die { width: clamp(72px, 24vw, 92px); height: clamp(72px, 24vw, 92px); }
+  .topbar-actions { position: static; justify-content: center; margin-top: 10px; }
+  .topbar { position: relative; }
 }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; }
@@ -464,7 +435,6 @@ main.table-layout { flex: 1; min-height: 0; display: block; }
 
 <div class="shell">
   <header class="topbar">
-    <button class="btn btn-ghost topbar-left" id="open-lobby" type="button">Lobby</button>
     <div class="wordmark">
       <img class="crest" src="47794DE1-D40E-48A4-8423-D802E1821F85.PNG" alt="Dice Duel crest" />
       <div>
@@ -473,118 +443,106 @@ main.table-layout { flex: 1; min-height: 0; display: block; }
       </div>
     </div>
     <div class="topbar-actions">
-      <button class="btn btn-ghost" id="open-skins" type="button">Skins</button>
-      <button class="btn btn-ghost" id="open-settings" type="button">Settings &amp; Rules</button>
+      <button class="btn btn-ghost" id="open-settings" type="button">Settings</button>
     </div>
   </header>
 
   <main class="table-layout">
     <section class="card table-panel">
-      <div class="table-grid">
+      <div class="status-row">
+        <button class="btn mode-switch" id="mode-switch" type="button">Coin Flip</button>
+        <span class="turn-indicator" id="turn"></span>
+      </div>
 
-        <aside class="bet-rail" id="side-bets-panel">
-          <h3>Side bets</h3>
-          <div class="chip-row dimmed" id="chip-row">
-            <button class="chip-btn" data-sidebet="0.25" disabled>+25¢</button>
-            <button class="chip-btn" data-sidebet="0.5" disabled>+50¢</button>
-            <button class="chip-btn" data-sidebet="1" disabled>+$1</button>
-          </div>
-          <p class="side-hint" id="side-hint">Side bets unlock once a point is set.</p>
-          <div class="sidebet-offer hidden" id="sidebet-offer">
-            <p>Side bet: each player adds $<span id="sidebet-amount">0.25</span> — the pool grows by $<span id="sidebet-pool-add">0.50</span>.</p>
-            <small><span id="sidebet-seconds">7.0</span>s to accept</small>
-            <div class="timer-track"><i class="timer-fill" id="sidebet-timer"></i></div>
-            <button class="btn btn-primary" id="sidebet-accept">Accept side bet</button>
-          </div>
-        </aside>
+      <div class="shooter-block">
+        <p class="shooter-name" id="shooter">Player 1</p>
+        <p class="point-display" id="point-display">—</p>
+        <p class="table-call" id="table-call"></p>
+        <p class="rule-copy" id="rule-copy">7 or 11 wins the roll. Snake eyes loses.</p>
+      </div>
 
-        <div class="table-main">
-          <div class="info-grid">
-            <div class="info-box info-shooter">
-              <span class="who"><small>Shooter</small><b id="shooter">Player 1</b></span>
-              <span class="info-rolled"><small>Rolled</small><strong id="sum">—</strong></span>
-            </div>
+      <div class="dice-row" id="dice-row">
+        <div class="die" id="die1"></div>
+        <span class="dice-plus">+</span>
+        <div class="die" id="die2"></div>
+      </div>
+      <div class="num-pad hidden" id="num-pad"></div>
+      <div class="total-chip" id="total-chip">Total<strong id="sum">7</strong></div>
 
-            <div class="ledger-flip" id="ledger-flip">
-              <div class="flip-inner">
-                <div class="flip-face flip-front">
-                  <div class="panel-head">
-                    <h3>Ledger</h3>
-                    <button class="btn btn-ghost reveal-btn" id="stats-toggle" type="button" aria-expanded="false">Stats</button>
-                  </div>
-                  <div class="ledger" id="ledger"></div>
-                </div>
-                <div class="flip-face flip-back">
-                  <div class="panel-head">
-                    <h3>Session</h3>
-                    <button class="btn btn-ghost reveal-btn" id="stats-back" type="button">Back</button>
-                  </div>
-                  <div id="stats-panel"></div>
-                </div>
-              </div>
-            </div>
+      <button class="btn btn-primary" id="roll">Place a wager to roll</button>
 
-            <div class="info-box"><small>Point to roll</small><strong class="point-display" id="point-display">—</strong></div>
-            <div class="info-box">
-              <small>Current wager</small>
-              <strong>$<span id="wager">1</span></strong>
-              <span class="wager-preview" id="wager-preview"></span>
-            </div>
-          </div>
+      <div class="coin-play hidden" id="coin-play"></div>
 
-          <p class="table-call" id="table-call"></p>
-          <p class="rule-copy" id="rule-copy">7 or 11 wins the roll. Snake eyes loses.</p>
+      <div class="wager-plate">
+        <h3>Current wager</h3>
+        <p class="pool-amount">$<span id="wager">1</span></p>
+        <span class="wager-preview" id="wager-preview"></span>
+      </div>
 
-          <div class="play-stage">
-            <div class="dice-row" id="dice-row">
-              <div class="die" id="die1"></div>
-              <span class="dice-plus">+</span>
-              <div class="die" id="die2"></div>
-            </div>
-            <div class="num-pad hidden" id="num-pad"></div>
-
-            <button class="btn btn-primary" id="roll">Place a wager to roll</button>
-
-            <div class="coin-play hidden" id="coin-play"></div>
-          </div>
+      <div class="side-bets-panel" id="side-bets-panel">
+        <h3>Side bets</h3>
+        <div class="chip-row dimmed" id="chip-row">
+          <button class="chip-btn" data-sidebet="0.25" disabled>+25¢</button>
+          <button class="chip-btn" data-sidebet="0.5" disabled>+50¢</button>
+          <button class="chip-btn" data-sidebet="1" disabled>+$1</button>
+        </div>
+        <p class="side-hint" id="side-hint">Side bets unlock once a point is set.</p>
+        <div class="sidebet-offer hidden" id="sidebet-offer">
+          <p>Side bet: each player adds $<span id="sidebet-amount">0.25</span> — the pool grows by $<span id="sidebet-pool-add">0.50</span>.</p>
+          <small><span id="sidebet-seconds">7.0</span>s to accept</small>
+          <div class="timer-track"><i class="timer-fill" id="sidebet-timer"></i></div>
+          <button class="btn btn-primary" id="sidebet-accept">Accept side bet</button>
         </div>
       </div>
     </section>
+
+    <aside class="rail">
+      <section class="card side-panel">
+        <h3 id="rules-panel-title">House rules</h3>
+        <ul class="rules-list" id="rules-panel-list">
+          <li><b>Opening roll —</b> 7 or 11 wins instantly. Snake eyes (2) loses instantly. Any other total sets the point.</li>
+          <li><b>Point round —</b> the shooter must roll the point again before a 7 appears.</li>
+          <li><b>Side bets —</b> once a point is live, either player may propose a side bet. The other player has 7 seconds to accept.</li>
+          <li><b>Settlement —</b> the winner's ledger rises by the full wager; the loser's falls by the same amount.</li>
+        </ul>
+      </section>
+      <section class="card side-panel" id="ledger-panel">
+        <h3>Ledger</h3>
+        <div class="ledger" id="ledger"></div>
+      </section>
+      <section class="card side-panel">
+        <div class="panel-head">
+          <h3>Session</h3>
+          <button class="btn btn-ghost reveal-btn" id="stats-toggle" type="button" aria-expanded="false">Show</button>
+        </div>
+        <div class="stats-wrap locked" id="stats-wrap">
+          <div id="stats-panel" aria-hidden="true"></div>
+          <div class="stats-lock">Hidden · tap Show</div>
+        </div>
+      </section>
+    </aside>
   </main>
 </div>
 
 <div class="overlay" id="setup" role="dialog" aria-modal="true" aria-label="Table setup"></div>
 <div class="overlay hidden" id="outcome" role="dialog" aria-modal="true" aria-label="Round result"></div>
 
-<div class="overlay hidden" id="skins-overlay" role="dialog" aria-modal="true" aria-label="Skins">
+<div class="overlay hidden" id="settings-overlay" role="dialog" aria-modal="true" aria-label="Settings">
   <div class="modal setup-modal">
     <span class="eyebrow" style="display:block;text-align:center">Dice Duel</span>
-    <h2 style="text-align:center">Skins</h2>
-    <p class="lead" style="text-align:center">Pick the table finish and the pieces you play with.</p>
+    <h2 style="text-align:center">Settings</h2>
     <div class="field" style="margin-top:18px"><label>Table finish</label></div>
     <div class="table-picker" id="theme-table-picker"></div>
     <div class="field"><label id="theme-piece-label">Dice colour</label></div>
     <div class="style-picker" id="theme-piece-picker"></div>
-    <button class="btn btn-primary" id="close-skins" type="button">Done</button>
-  </div>
-</div>
-
-<div class="overlay hidden" id="settings-overlay" role="dialog" aria-modal="true" aria-label="Settings and rules">
-  <div class="modal setup-modal">
-    <span class="eyebrow" style="display:block;text-align:center">Dice Duel</span>
-    <h2 style="text-align:center">Settings &amp; Rules</h2>
     <div id="method-block">
-      <div class="field" style="margin-top:18px"><label id="method-label">Rolling method</label></div>
+      <div class="field"><label id="method-label">Rolling method</label></div>
       <div class="mode-picker" id="method-picker"></div>
     </div>
     <div class="field"><label>Sound</label></div>
     <div class="mode-picker" id="sound-picker">
       <button class="pick-card" data-sound="on" type="button"><strong>On</strong><small>Table chimes &amp; clicks</small></button>
       <button class="pick-card" data-sound="off" type="button"><strong>Off</strong><small>Silent table</small></button>
-    </div>
-    <div id="rules-block">
-      <div class="field"><label id="rules-panel-title">House rules</label></div>
-      <ul class="rules-list" id="rules-panel-list"></ul>
     </div>
     <button class="btn btn-primary" id="close-settings" type="button">Done</button>
   </div>
@@ -684,7 +642,6 @@ main.table-layout { flex: 1; min-height: 0; display: block; }
     sideBetTimer: null,
     flipping: false,
     physicalTotal: null,          // total tapped on the inline pad
-    lastTotal: null,              // last total the dice actually showed
     sides: ["Heads", "Tails"],    // what is written on each side of the coin
     lastFace: null,               // index of the side that just landed (0 | 1)
     settings: loadSettings(),
@@ -707,9 +664,9 @@ main.table-layout { flex: 1; min-height: 0; display: block; }
    * ------------------------------------------------------- */
   const $ = (id) => document.getElementById(id);
   const els = {
-    openLobby: $("open-lobby"), shooter: $("shooter"),
+    modeSwitch: $("mode-switch"), turn: $("turn"), shooter: $("shooter"),
     pointDisplay: $("point-display"), tableCall: $("table-call"), ruleCopy: $("rule-copy"),
-    die1: $("die1"), die2: $("die2"), sum: $("sum"),
+    die1: $("die1"), die2: $("die2"), totalChip: $("total-chip"), sum: $("sum"),
     diceRow: $("dice-row"), numPad: $("num-pad"),
     roll: $("roll"), wager: $("wager"), wagerPreview: $("wager-preview"),
     chipRow: $("chip-row"), sideHint: $("side-hint"), sidebetOffer: $("sidebet-offer"),
@@ -717,13 +674,11 @@ main.table-layout { flex: 1; min-height: 0; display: block; }
     sidebetSeconds: $("sidebet-seconds"), sidebetTimer: $("sidebet-timer"), sidebetAccept: $("sidebet-accept"),
     ledger: $("ledger"), setup: $("setup"), outcome: $("outcome"),
     settingsOverlay: $("settings-overlay"), openSettings: $("open-settings"), closeSettings: $("close-settings"),
-    skinsOverlay: $("skins-overlay"), openSkins: $("open-skins"), closeSkins: $("close-skins"),
     soundPicker: $("sound-picker"), methodPicker: $("method-picker"), methodLabel: $("method-label"), methodBlock: $("method-block"),
     themeTablePicker: $("theme-table-picker"), themePiecePicker: $("theme-piece-picker"), themePieceLabel: $("theme-piece-label"),
     coinPlay: $("coin-play"), statsPanel: $("stats-panel"),
     tablePanel: document.querySelector(".table-panel"),
-    ledgerFlip: $("ledger-flip"), statsToggle: $("stats-toggle"), statsBack: $("stats-back"),
-    rulesPanelTitle: $("rules-panel-title"), rulesPanelList: $("rules-panel-list"), rulesBlock: $("rules-block"),
+    ledgerPanel: $("ledger-panel"), rulesPanelTitle: $("rules-panel-title"), rulesPanelList: $("rules-panel-list"),
   };
 
   const DICE_RULES_HTML = `
@@ -845,11 +800,16 @@ main.table-layout { flex: 1; min-height: 0; display: block; }
     const method = currentMethod();
 
     // Coin Flip is a standalone flipper — no wager, ledger, stats, rules or side bets.
+    // The badge slot holds a one-tap jump to the other game.
+    els.modeSwitch.textContent = mode === "coin" ? "Dice Duel" : "Coin Flip";
+
     if (mode === "coin") {
+      els.turn.textContent = "";
       renderCoinPlay();
       return;
     }
 
+    els.turn.innerHTML = `Wager ${money(wager)} · <b>${players[active]}</b>'s turn`;
     els.wager.textContent = amountText(wager);
 
     const draftAmount = pendingSideBet;
@@ -867,7 +827,6 @@ main.table-layout { flex: 1; min-height: 0; display: block; }
 
     {
       els.shooter.textContent = players[active];
-      els.sum.textContent = state.lastTotal === null ? "—" : state.lastTotal;
       els.pointDisplay.textContent = point ? point : "—";
       els.tableCall.textContent = point ? `“${TABLE_CALLS[point] || ""}”` : "Awaiting the come-out roll.";
       els.ruleCopy.textContent = point
@@ -1020,8 +979,8 @@ main.table-layout { flex: 1; min-height: 0; display: block; }
 
   // Everything is decided by the total: 2 can only ever be 1+1, so it *is* snake eyes.
   function settleDiceRoll(total) {
-    state.lastTotal = total;
     els.sum.textContent = total;
+    els.totalChip.classList.add("visible");
     state.stats.diceTotals[total] = (state.stats.diceTotals[total] || 0) + 1;
 
     // Round-ending outcomes keep the marked total on screen through the result hold;
@@ -1079,7 +1038,7 @@ main.table-layout { flex: 1; min-height: 0; display: block; }
       state.roundEnding = false;
       state.physicalTotal = null;
       state.point = null;
-      state.lastTotal = null;
+      els.totalChip.classList.remove("visible");
       showOpeningWager();
     };
   }
@@ -1147,7 +1106,6 @@ main.table-layout { flex: 1; min-height: 0; display: block; }
       <div class="modal setup-modal">
         <div class="modal-links">
           <a class="btn btn-ghost" href="online.html" style="display:inline-flex;align-items:center;text-decoration:none">Play online</a>
-          <button class="btn btn-ghost" id="lobby-skins" type="button">Skins</button>
           <button class="btn btn-ghost" id="lobby-settings" type="button">Settings</button>
         </div>
         <span class="eyebrow">Dice Duel</span>
@@ -1179,7 +1137,6 @@ main.table-layout { flex: 1; min-height: 0; display: block; }
       btn.onclick = () => { stashLobbyInputs(); state.lobby.mode = btn.dataset.modePick; renderLobby(); };
     });
     $("enter-match").onclick = enterMatch;
-    $("lobby-skins").onclick = () => { stashLobbyInputs(); renderThemePickers(); showOverlay(els.skinsOverlay); };
     $("lobby-settings").onclick = () => { stashLobbyInputs(); renderSettingsPickers(); showOverlay(els.settingsOverlay); };
     [$("p1-input"), $("p2-input")].forEach((input) => {
       input.addEventListener("input", stashLobbyInputs);
@@ -1239,7 +1196,7 @@ main.table-layout { flex: 1; min-height: 0; display: block; }
     state.roundEnding = false;
     state.physicalTotal = null;
     state.stats = { rounds: 0, wagered: 0, streakPlayer: null, streakCount: 0, diceTotals: {} };
-    state.lastTotal = null;
+    els.totalChip.classList.remove("visible");
     document.body.classList.remove("coin-mode");
     els.coinPlay.classList.add("hidden");
     els.rulesPanelTitle.textContent = "House rules";
@@ -1454,23 +1411,12 @@ main.table-layout { flex: 1; min-height: 0; display: block; }
         <div class="stat-bars">${totals.map((t) => `<i style="height:${((s.diceTotals[t] || 0) / max) * 100 || 3}%" title="${t}: ${s.diceTotals[t] || 0}"></i>`).join("")}</div>
         <div class="stat-bars-labels">${totals.map((t) => `<span>${t}</span>`).join("")}</div>`;
 
-    // Won / lost per player, so the back of the card answers "who's up, and by how much".
-    const splitHtml = state.players.map((name, i) => {
-      const l = state.ledger[i];
-      return `<div class="stat-split-row">
-        <b>${escapeHtml(name)}</b>
-        <span class="positive">+${money(l.won)}</span>
-        <span class="negative">−${money(l.lost)}</span>
-      </div>`;
-    }).join("");
-
     els.statsPanel.innerHTML = `
       <div class="stat-grid">
         <div class="stat-box"><small>Rounds</small><strong>${s.rounds}</strong></div>
         <div class="stat-box"><small>Wagered</small><strong>${money(s.wagered)}</strong></div>
       </div>
-      <div class="stat-split">${splitHtml}</div>
-      <div class="stat-box" style="margin-bottom:5px"><small>Streak</small><strong style="font-size:clamp(9px,1.2vh,12px)">${streakText}</strong></div>
+      <div class="stat-box" style="margin-bottom:10px"><small>Streak</small><strong style="font-size:14px">${streakText}</strong></div>
       ${distHtml}`;
   }
 
@@ -1483,25 +1429,17 @@ main.table-layout { flex: 1; min-height: 0; display: block; }
   });
   els.sidebetAccept.addEventListener("click", acceptSideBet);
 
-  /* ---- Back to the lobby, where the game is chosen ---- */
-  els.openLobby.addEventListener("click", () => {
+  /* ---- Jump straight to the other game ---- */
+  els.modeSwitch.addEventListener("click", () => {
     sound.click();
     clearSideBetTimer();
     state.pendingSideBet = null;
     els.sidebetOffer.classList.add("hidden");
     els.outcome.classList.add("hidden");
     state.inMatch = false;
-    els.ledgerFlip.classList.remove("flipped");
+    state.lobby.mode = state.mode === "coin" ? "dice" : "coin";
     renderLobby();
   });
-
-  /* ---- Ledger card flips to reveal the session stats ---- */
-  const setLedgerFace = (showStats) => {
-    els.ledgerFlip.classList.toggle("flipped", showStats);
-    els.statsToggle.setAttribute("aria-expanded", String(showStats));
-  };
-  els.statsToggle.addEventListener("click", () => { sound.click(); setLedgerFace(true); });
-  els.statsBack.addEventListener("click", () => { sound.click(); setLedgerFace(false); });
 
   /* ---- Theme section, rendered inside the Settings panel ---- */
   function renderThemePickers() {
@@ -1543,19 +1481,13 @@ main.table-layout { flex: 1; min-height: 0; display: block; }
     });
   }
 
-  /* ---- Skins panel: table finish + the pieces for the current game ---- */
-  els.openSkins.addEventListener("click", () => { renderThemePickers(); showOverlay(els.skinsOverlay); });
-  els.closeSkins.addEventListener("click", () => hideOverlay(els.skinsOverlay));
-  els.skinsOverlay.addEventListener("click", (e) => { if (e.target === els.skinsOverlay) hideOverlay(els.skinsOverlay); });
-
-  /* ---- Settings & Rules panel: rolling method, sound, house rules ---- */
+  /* ---- Settings panel: table finish, pieces, dice rolling method, sound ---- */
   els.openSettings.addEventListener("click", () => { renderSettingsPickers(); showOverlay(els.settingsOverlay); });
   els.closeSettings.addEventListener("click", () => hideOverlay(els.settingsOverlay));
   els.settingsOverlay.addEventListener("click", (e) => { if (e.target === els.settingsOverlay) hideOverlay(els.settingsOverlay); });
 
   function renderSettingsPickers() {
-    els.rulesPanelTitle.textContent = "House rules";
-    els.rulesPanelList.innerHTML = DICE_RULES_HTML;
+    renderThemePickers();
     // Coin Flip has no rolling method at all, so the whole block is hidden there.
     const dice = uiMode() === "dice";
     els.methodBlock.classList.toggle("hidden", !dice);
@@ -1580,8 +1512,6 @@ main.table-layout { flex: 1; min-height: 0; display: block; }
         };
       });
     }
-    // Coin Flip has no house rules of its own, so that block goes too.
-    els.rulesBlock.classList.toggle("hidden", !dice);
 
     els.soundPicker.querySelectorAll("[data-sound]").forEach((btn) => {
       const on = btn.dataset.sound === "on";
@@ -1590,6 +1520,17 @@ main.table-layout { flex: 1; min-height: 0; display: block; }
     });
   }
 
+
+  /* ---- Session stats stay hidden until someone taps Show ---- */
+  (() => {
+    const btn = document.getElementById("stats-toggle"), wrap = document.getElementById("stats-wrap");
+    btn.addEventListener("click", () => {
+      const locked = wrap.classList.toggle("locked");
+      btn.textContent = locked ? "Show" : "Hide";
+      btn.setAttribute("aria-expanded", String(!locked));
+      document.getElementById("stats-panel").setAttribute("aria-hidden", String(locked));
+    });
+  })();
 
   /* ---------------------------------------------------------
    * Init
